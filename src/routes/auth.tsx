@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Logo } from "@/components/logo";
-import authHero from "@/assets/auth-hero.png.asset.json";
+import authHero from "@/assets/auth-hero-new.png.asset.json";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
