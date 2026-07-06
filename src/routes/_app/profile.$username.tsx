@@ -1,7 +1,16 @@
 import { createFileRoute, useParams, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState, useEffect } from "react";
-import { MapPin, Calendar, Edit3, Loader2, UserPlus, UserCheck } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import {
+  MapPin,
+  Calendar,
+  Edit3,
+  Loader2,
+  UserPlus,
+  UserCheck,
+  Camera,
+  MessageCircle,
+} from "lucide-react";
 import { formatDistanceToNow, format } from "date-fns";
 import { toast } from "sonner";
 
@@ -21,6 +30,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { openConversationWith } from "@/lib/messaging";
+import { useNavigate } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_app/profile/$username")({
   component: ProfilePage,
@@ -66,8 +77,9 @@ async function fetchFollowStats(userId: string) {
 
 function ProfilePage() {
   const { username } = useParams({ from: "/_app/profile/$username" });
-  const { user, profile: myProfile, refreshProfile } = useAuth();
+  const { user, refreshProfile } = useAuth();
   const qc = useQueryClient();
+  const navigate = useNavigate();
 
   const { data: profile, isLoading } = useQuery({
     queryKey: ["profile", username],
@@ -129,9 +141,9 @@ function ProfilePage() {
 
   if (!profile) {
     return (
-      <div className="rounded-2xl border bg-card p-12 text-center">
+      <div className="rounded-2xl border bg-white p-12 text-center">
         <h2 className="text-lg font-bold">Profile not found</h2>
-        <p className="text-sm text-muted-foreground mt-1">@{username} doesn't exist.</p>
+        <p className="text-sm text-gray-500 mt-1">@{username} doesn't exist.</p>
         <Link to="/" className="text-primary text-sm font-semibold mt-4 inline-block">
           Back to feed
         </Link>
@@ -142,19 +154,18 @@ function ProfilePage() {
   const initial = (profile.display_name || profile.username).slice(0, 1).toUpperCase();
 
   return (
-    <div className="space-y-6">
-      {/* Cover + header */}
-      <div className="rounded-2xl border bg-card shadow-soft overflow-hidden">
+    <div className="max-w-4xl mx-auto space-y-6">
+      <div className="rounded-2xl border bg-white shadow-sm overflow-hidden">
         <div className="h-40 bg-gradient-to-r from-primary via-primary-glow to-primary" />
         <div className="p-5 pt-0">
           <div className="flex items-end justify-between -mt-12">
-            <Avatar className="h-24 w-24 ring-4 ring-card">
+            <Avatar className="h-24 w-24 ring-4 ring-white">
               <AvatarImage src={profile.avatar_url ?? undefined} />
               <AvatarFallback className="bg-primary text-primary-foreground text-2xl font-bold">
                 {initial}
               </AvatarFallback>
             </Avatar>
-            <div className="mb-2">
+            <div className="mb-2 flex gap-2">
               {isSelf ? (
                 <EditProfileDialog
                   profile={profile}
@@ -164,23 +175,40 @@ function ProfilePage() {
                   }}
                 />
               ) : (
-                <Button
-                  variant={isFollowing ? "outline" : "default"}
-                  onClick={() => toggleFollow.mutate()}
-                  disabled={toggleFollow.isPending}
-                  className="gap-2"
-                >
-                  {isFollowing ? <UserCheck className="h-4 w-4" /> : <UserPlus className="h-4 w-4" />}
-                  {isFollowing ? "Following" : "Follow"}
-                </Button>
+                <>
+                  <Button
+                    variant="outline"
+                    className="gap-2"
+                    onClick={async () => {
+                      if (!user) return;
+                      try {
+                        const cid = await openConversationWith(user.id, profile.id);
+                        navigate({ to: "/messages", search: { c: cid } });
+                      } catch (e) {
+                        toast.error((e as Error).message);
+                      }
+                    }}
+                  >
+                    <MessageCircle className="h-4 w-4" /> Message
+                  </Button>
+                  <Button
+                    variant={isFollowing ? "outline" : "default"}
+                    onClick={() => toggleFollow.mutate()}
+                    disabled={toggleFollow.isPending}
+                    className="gap-2"
+                  >
+                    {isFollowing ? <UserCheck className="h-4 w-4" /> : <UserPlus className="h-4 w-4" />}
+                    {isFollowing ? "Following" : "Follow"}
+                  </Button>
+                </>
               )}
             </div>
           </div>
           <div className="mt-4">
             <h1 className="text-2xl font-bold">{profile.display_name || profile.username}</h1>
-            <div className="text-sm text-muted-foreground">@{profile.username}</div>
+            <div className="text-sm text-gray-500">@{profile.username}</div>
             {profile.bio && <p className="mt-3 text-[15px]">{profile.bio}</p>}
-            <div className="flex flex-wrap items-center gap-4 mt-3 text-xs text-muted-foreground">
+            <div className="flex flex-wrap items-center gap-4 mt-3 text-xs text-gray-500">
               {profile.location && (
                 <span className="inline-flex items-center gap-1">
                   <MapPin className="h-3.5 w-3.5" /> {profile.location}
@@ -193,29 +221,28 @@ function ProfilePage() {
             <div className="flex gap-6 mt-4 text-sm">
               <div>
                 <span className="font-bold">{stats?.followers ?? 0}</span>{" "}
-                <span className="text-muted-foreground">Followers</span>
+                <span className="text-gray-500">Followers</span>
               </div>
               <div>
                 <span className="font-bold">{stats?.following ?? 0}</span>{" "}
-                <span className="text-muted-foreground">Following</span>
+                <span className="text-gray-500">Following</span>
               </div>
               <div>
                 <span className="font-bold">{posts?.length ?? 0}</span>{" "}
-                <span className="text-muted-foreground">Posts</span>
+                <span className="text-gray-500">Posts</span>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Posts */}
       <div>
         <h2 className="text-lg font-bold mb-3 px-1">Posts</h2>
         {posts && posts.length > 0 ? (
           <div className="space-y-4">
             {posts.map((p) => (
-              <article key={p.id} className="rounded-2xl border bg-card p-5 shadow-soft">
-                <div className="text-xs text-muted-foreground mb-2">
+              <article key={p.id} className="rounded-2xl border bg-white p-5 shadow-sm">
+                <div className="text-xs text-gray-500 mb-2">
                   {formatDistanceToNow(new Date(p.created_at), { addSuffix: true })}
                 </div>
                 <p className="text-[15px] leading-relaxed whitespace-pre-wrap">{p.content}</p>
@@ -224,20 +251,45 @@ function ProfilePage() {
                     <img src={p.image_url} alt="" className="w-full max-h-[520px] object-cover" />
                   </div>
                 )}
-                <div className="mt-3 text-xs text-muted-foreground">
+                <div className="mt-3 text-xs text-gray-500">
                   {p.likes.length} likes · {p.comments.length} comments
                 </div>
               </article>
             ))}
           </div>
         ) : (
-          <div className="rounded-2xl border bg-card p-10 text-center text-sm text-muted-foreground">
+          <div className="rounded-2xl border bg-white p-10 text-center text-sm text-gray-500">
             No posts yet.
           </div>
         )}
       </div>
     </div>
   );
+}
+
+async function fileToDataUrl(file: File, maxDim = 512): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      img.onload = () => {
+        const scale = Math.min(1, maxDim / Math.max(img.width, img.height));
+        const w = Math.round(img.width * scale);
+        const h = Math.round(img.height * scale);
+        const canvas = document.createElement("canvas");
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return reject(new Error("Canvas unsupported"));
+        ctx.drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL("image/jpeg", 0.85));
+      };
+      img.onerror = reject;
+      img.src = e.target?.result as string;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
 }
 
 function EditProfileDialog({
@@ -253,6 +305,7 @@ function EditProfileDialog({
   const [location, setLocation] = useState(profile.location ?? "");
   const [avatarUrl, setAvatarUrl] = useState(profile.avatar_url ?? "");
   const [saving, setSaving] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (open) {
@@ -262,6 +315,21 @@ function EditProfileDialog({
       setAvatarUrl(profile.avatar_url ?? "");
     }
   }, [open, profile]);
+
+  async function pickFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    if (f.size > 5 * 1024 * 1024) {
+      toast.error("Image must be under 5MB");
+      return;
+    }
+    try {
+      const dataUrl = await fileToDataUrl(f);
+      setAvatarUrl(dataUrl);
+    } catch {
+      toast.error("Could not read image");
+    }
+  }
 
   async function save() {
     setSaving(true);
@@ -284,6 +352,8 @@ function EditProfileDialog({
     onSaved();
   }
 
+  const initial = (displayName || profile.username).slice(0, 1).toUpperCase();
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -297,7 +367,42 @@ function EditProfileDialog({
           <DialogTitle>Edit profile</DialogTitle>
           <DialogDescription>Update how you appear in the community.</DialogDescription>
         </DialogHeader>
-        <div className="space-y-3">
+        <div className="space-y-4">
+          <div className="flex items-center gap-4">
+            <Avatar className="h-20 w-20">
+              <AvatarImage src={avatarUrl || undefined} />
+              <AvatarFallback className="bg-primary text-primary-foreground text-xl font-bold">
+                {initial}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex flex-col gap-2">
+              <input
+                ref={fileRef}
+                type="file"
+                accept="image/*"
+                hidden
+                onChange={pickFile}
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="gap-2"
+                onClick={() => fileRef.current?.click()}
+              >
+                <Camera className="h-4 w-4" /> Upload photo
+              </Button>
+              {avatarUrl && (
+                <button
+                  type="button"
+                  className="text-xs text-red-600 hover:underline text-left"
+                  onClick={() => setAvatarUrl("")}
+                >
+                  Remove
+                </button>
+              )}
+            </div>
+          </div>
           <div className="space-y-1.5">
             <Label>Display name</Label>
             <Input value={displayName} onChange={(e) => setDisplayName(e.target.value)} />
@@ -309,10 +414,6 @@ function EditProfileDialog({
           <div className="space-y-1.5">
             <Label>Location</Label>
             <Input value={location} onChange={(e) => setLocation(e.target.value)} />
-          </div>
-          <div className="space-y-1.5">
-            <Label>Avatar URL</Label>
-            <Input value={avatarUrl} onChange={(e) => setAvatarUrl(e.target.value)} placeholder="https://..." />
           </div>
         </div>
         <DialogFooter>

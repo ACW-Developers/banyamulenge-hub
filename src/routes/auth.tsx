@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Logo } from "@/components/logo";
-import authHero from "@/assets/auth-hero.png.asset.json";
+import authHero from "@/assets/auth-hero-new.png.asset.json";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -83,20 +83,21 @@ function AuthPage() {
   return (
     <div className="min-h-screen grid lg:grid-cols-2 bg-background">
       {/* Left visual */}
-      <div className="relative hidden lg:block overflow-hidden">
+      <div className="relative hidden lg:flex flex-col justify-between overflow-hidden bg-gradient-to-br from-orange-50 via-white to-orange-50 p-12">
+        <div className="flex items-center gap-2">
+          <Logo className="h-10" />
+        </div>
         <img
           src={authHero.url}
           alt="Banyamulenge community"
-          className="absolute inset-0 h-full w-full object-cover"
+          className="max-h-[70vh] w-auto mx-auto object-contain drop-shadow-2xl"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/20" />
-        <div className="relative z-10 flex h-full flex-col justify-end p-12 text-white">
-          <h1 className="text-4xl font-bold leading-tight max-w-md">
+        <div className="max-w-md">
+          <h1 className="text-3xl font-bold leading-tight text-gray-900">
             One community. One heritage. Everywhere in the world.
           </h1>
-          <p className="mt-4 text-white/85 max-w-md">
-            Preserve our stories, connect across continents, celebrate Banyamulenge culture and
-            empower one another.
+          <p className="mt-3 text-gray-600">
+            Preserve our stories, connect across continents, and celebrate Banyamulenge culture.
           </p>
         </div>
       </div>
