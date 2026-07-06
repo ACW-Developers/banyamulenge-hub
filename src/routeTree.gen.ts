@@ -15,6 +15,7 @@ import { Route as AppIndexRouteImport } from './routes/_app/index'
 import { Route as AppMessagesRouteImport } from './routes/_app/messages'
 import { Route as AppExploreRouteImport } from './routes/_app/explore'
 import { Route as AppCommunityRouteImport } from './routes/_app/community'
+import { Route as AppAdminRouteImport } from './routes/_app/admin'
 import { Route as AppProfileUsernameRouteImport } from './routes/_app/profile.$username'
 
 const AuthRoute = AuthRouteImport.update({
@@ -46,6 +47,11 @@ const AppCommunityRoute = AppCommunityRouteImport.update({
   path: '/community',
   getParentRoute: () => AppRoute,
 } as any)
+const AppAdminRoute = AppAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppProfileUsernameRoute = AppProfileUsernameRouteImport.update({
   id: '/profile/$username',
   path: '/profile/$username',
@@ -55,6 +61,7 @@ const AppProfileUsernameRoute = AppProfileUsernameRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
   '/auth': typeof AuthRoute
+  '/admin': typeof AppAdminRoute
   '/community': typeof AppCommunityRoute
   '/explore': typeof AppExploreRoute
   '/messages': typeof AppMessagesRoute
@@ -62,6 +69,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
+  '/admin': typeof AppAdminRoute
   '/community': typeof AppCommunityRoute
   '/explore': typeof AppExploreRoute
   '/messages': typeof AppMessagesRoute
@@ -72,6 +80,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
+  '/_app/admin': typeof AppAdminRoute
   '/_app/community': typeof AppCommunityRoute
   '/_app/explore': typeof AppExploreRoute
   '/_app/messages': typeof AppMessagesRoute
@@ -83,6 +92,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/admin'
     | '/community'
     | '/explore'
     | '/messages'
@@ -90,6 +100,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/auth'
+    | '/admin'
     | '/community'
     | '/explore'
     | '/messages'
@@ -99,6 +110,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/_app'
     | '/auth'
+    | '/_app/admin'
     | '/_app/community'
     | '/_app/explore'
     | '/_app/messages'
@@ -155,6 +167,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppCommunityRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/admin': {
+      id: '/_app/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AppAdminRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/profile/$username': {
       id: '/_app/profile/$username'
       path: '/profile/$username'
@@ -166,6 +185,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AppRouteChildren {
+  AppAdminRoute: typeof AppAdminRoute
   AppCommunityRoute: typeof AppCommunityRoute
   AppExploreRoute: typeof AppExploreRoute
   AppMessagesRoute: typeof AppMessagesRoute
@@ -174,6 +194,7 @@ interface AppRouteChildren {
 }
 
 const AppRouteChildren: AppRouteChildren = {
+  AppAdminRoute: AppAdminRoute,
   AppCommunityRoute: AppCommunityRoute,
   AppExploreRoute: AppExploreRoute,
   AppMessagesRoute: AppMessagesRoute,
