@@ -18,6 +18,7 @@ import { Route as AppCommunityRouteImport } from './routes/_app/community'
 import { Route as AppAdminRouteImport } from './routes/_app/admin'
 import { Route as AppAdminIndexRouteImport } from './routes/_app/admin/index'
 import { Route as AppProfileUsernameRouteImport } from './routes/_app/profile.$username'
+import { Route as AppCommunitySlugRouteImport } from './routes/_app/community.$slug'
 import { Route as AppAdminUsersRouteImport } from './routes/_app/admin/users'
 import { Route as AppAdminSettingsRouteImport } from './routes/_app/admin/settings'
 import { Route as AppAdminLogsRouteImport } from './routes/_app/admin/logs'
@@ -66,6 +67,11 @@ const AppProfileUsernameRoute = AppProfileUsernameRouteImport.update({
   path: '/profile/$username',
   getParentRoute: () => AppRoute,
 } as any)
+const AppCommunitySlugRoute = AppCommunitySlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => AppCommunityRoute,
+} as any)
 const AppAdminUsersRoute = AppAdminUsersRouteImport.update({
   id: '/users',
   path: '/users',
@@ -86,24 +92,26 @@ export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
   '/auth': typeof AuthRoute
   '/admin': typeof AppAdminRouteWithChildren
-  '/community': typeof AppCommunityRoute
+  '/community': typeof AppCommunityRouteWithChildren
   '/explore': typeof AppExploreRoute
   '/messages': typeof AppMessagesRoute
   '/admin/logs': typeof AppAdminLogsRoute
   '/admin/settings': typeof AppAdminSettingsRoute
   '/admin/users': typeof AppAdminUsersRoute
+  '/community/$slug': typeof AppCommunitySlugRoute
   '/profile/$username': typeof AppProfileUsernameRoute
   '/admin/': typeof AppAdminIndexRoute
 }
 export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
-  '/community': typeof AppCommunityRoute
+  '/community': typeof AppCommunityRouteWithChildren
   '/explore': typeof AppExploreRoute
   '/messages': typeof AppMessagesRoute
   '/': typeof AppIndexRoute
   '/admin/logs': typeof AppAdminLogsRoute
   '/admin/settings': typeof AppAdminSettingsRoute
   '/admin/users': typeof AppAdminUsersRoute
+  '/community/$slug': typeof AppCommunitySlugRoute
   '/profile/$username': typeof AppProfileUsernameRoute
   '/admin': typeof AppAdminIndexRoute
 }
@@ -112,13 +120,14 @@ export interface FileRoutesById {
   '/_app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
   '/_app/admin': typeof AppAdminRouteWithChildren
-  '/_app/community': typeof AppCommunityRoute
+  '/_app/community': typeof AppCommunityRouteWithChildren
   '/_app/explore': typeof AppExploreRoute
   '/_app/messages': typeof AppMessagesRoute
   '/_app/': typeof AppIndexRoute
   '/_app/admin/logs': typeof AppAdminLogsRoute
   '/_app/admin/settings': typeof AppAdminSettingsRoute
   '/_app/admin/users': typeof AppAdminUsersRoute
+  '/_app/community/$slug': typeof AppCommunitySlugRoute
   '/_app/profile/$username': typeof AppProfileUsernameRoute
   '/_app/admin/': typeof AppAdminIndexRoute
 }
@@ -134,6 +143,7 @@ export interface FileRouteTypes {
     | '/admin/logs'
     | '/admin/settings'
     | '/admin/users'
+    | '/community/$slug'
     | '/profile/$username'
     | '/admin/'
   fileRoutesByTo: FileRoutesByTo
@@ -146,6 +156,7 @@ export interface FileRouteTypes {
     | '/admin/logs'
     | '/admin/settings'
     | '/admin/users'
+    | '/community/$slug'
     | '/profile/$username'
     | '/admin'
   id:
@@ -160,6 +171,7 @@ export interface FileRouteTypes {
     | '/_app/admin/logs'
     | '/_app/admin/settings'
     | '/_app/admin/users'
+    | '/_app/community/$slug'
     | '/_app/profile/$username'
     | '/_app/admin/'
   fileRoutesById: FileRoutesById
@@ -234,6 +246,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppProfileUsernameRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/community/$slug': {
+      id: '/_app/community/$slug'
+      path: '/$slug'
+      fullPath: '/community/$slug'
+      preLoaderRoute: typeof AppCommunitySlugRouteImport
+      parentRoute: typeof AppCommunityRoute
+    }
     '/_app/admin/users': {
       id: '/_app/admin/users'
       path: '/users'
@@ -276,9 +295,21 @@ const AppAdminRouteWithChildren = AppAdminRoute._addFileChildren(
   AppAdminRouteChildren,
 )
 
+interface AppCommunityRouteChildren {
+  AppCommunitySlugRoute: typeof AppCommunitySlugRoute
+}
+
+const AppCommunityRouteChildren: AppCommunityRouteChildren = {
+  AppCommunitySlugRoute: AppCommunitySlugRoute,
+}
+
+const AppCommunityRouteWithChildren = AppCommunityRoute._addFileChildren(
+  AppCommunityRouteChildren,
+)
+
 interface AppRouteChildren {
   AppAdminRoute: typeof AppAdminRouteWithChildren
-  AppCommunityRoute: typeof AppCommunityRoute
+  AppCommunityRoute: typeof AppCommunityRouteWithChildren
   AppExploreRoute: typeof AppExploreRoute
   AppMessagesRoute: typeof AppMessagesRoute
   AppIndexRoute: typeof AppIndexRoute
@@ -287,7 +318,7 @@ interface AppRouteChildren {
 
 const AppRouteChildren: AppRouteChildren = {
   AppAdminRoute: AppAdminRouteWithChildren,
-  AppCommunityRoute: AppCommunityRoute,
+  AppCommunityRoute: AppCommunityRouteWithChildren,
   AppExploreRoute: AppExploreRoute,
   AppMessagesRoute: AppMessagesRoute,
   AppIndexRoute: AppIndexRoute,

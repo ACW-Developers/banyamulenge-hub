@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { Search, Shield, ShieldOff, Loader2 } from "lucide-react";
+import { Search, Shield, ShieldOff, Loader2, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -9,22 +9,46 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/lib/auth-context";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { logActivity } from "@/lib/tracking";
 
 export const Route = createFileRoute("/_app/admin/users")({
   component: UsersAdmin,
 });
 
+type Row = {
+  id: string;
+  username: string;
+  display_name: string | null;
+  avatar_url: string | null;
+  location: string | null;
+  bio: string | null;
+  created_at: string;
+  roles: string[];
+};
+
 function UsersAdmin() {
   const { user } = useAuth();
   const qc = useQueryClient();
   const [q, setQ] = useState("");
+  const [editing, setEditing] = useState<Row | null>(null);
+  const [confirmDel, setConfirmDel] = useState<Row | null>(null);
 
   const { data, isLoading } = useQuery({
     queryKey: ["admin-users", q],
-    queryFn: async () => {
+    queryFn: async (): Promise<Row[]> => {
       let query = supabase
         .from("profiles")
-        .select("id, username, display_name, avatar_url, location, created_at")
+        .select("id, username, display_name, avatar_url, location, bio, created_at")
         .order("created_at", { ascending: false })
         .limit(200);
       if (q) query = query.or(`username.ilike.%${q}%,display_name.ilike.%${q}%`);
@@ -32,7 +56,7 @@ function UsersAdmin() {
       const ids = (profiles ?? []).map((p) => p.id);
       const { data: roles } = ids.length
         ? await supabase.from("user_roles").select("user_id, role").in("user_id", ids)
-        : { data: [] };
+        : { data: [] as { user_id: string; role: string }[] };
       return (profiles ?? []).map((p) => ({
         ...p,
         roles: (roles ?? []).filter((r) => r.user_id === p.id).map((r) => r.role),
@@ -55,15 +79,47 @@ function UsersAdmin() {
           .insert({ user_id: userId, role: "admin" });
         if (error) throw error;
       }
-      await supabase.from("activity_logs").insert({
-        user_id: user?.id,
-        action: isAdmin ? "role.revoke.admin" : "role.grant.admin",
-        target_type: "user",
-        target_id: userId,
-      });
+      logActivity(user?.id ?? null, isAdmin ? "role.revoke.admin" : "role.grant.admin", "user", userId);
     },
     onSuccess: () => {
       toast.success("Updated");
+      qc.invalidateQueries({ queryKey: ["admin-users"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const saveEdit = useMutation({
+    mutationFn: async (row: Row) => {
+      const { error } = await supabase
+        .from("profiles")
+        .update({
+          display_name: row.display_name,
+          username: row.username,
+          location: row.location,
+          bio: row.bio,
+        })
+        .eq("id", row.id);
+      if (error) throw error;
+      logActivity(user?.id ?? null, "user.update", "user", row.id);
+    },
+    onSuccess: () => {
+      toast.success("Profile updated");
+      setEditing(null);
+      qc.invalidateQueries({ queryKey: ["admin-users"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const deleteUser = useMutation({
+    mutationFn: async (row: Row) => {
+      // Delete profile row (auth account remains but profile & content cascades where linked)
+      const { error } = await supabase.from("profiles").delete().eq("id", row.id);
+      if (error) throw error;
+      logActivity(user?.id ?? null, "user.delete", "user", row.id);
+    },
+    onSuccess: () => {
+      toast.success("User profile removed");
+      setConfirmDel(null);
       qc.invalidateQueries({ queryKey: ["admin-users"] });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -74,7 +130,7 @@ function UsersAdmin() {
       <div>
         <h1 className="text-2xl font-bold text-gray-900">User Management</h1>
         <p className="text-sm text-gray-500 mt-1">
-          View all members. Grant or revoke administrator access.
+          View all members. Edit profiles, remove accounts, grant or revoke admin.
         </p>
       </div>
 
@@ -109,6 +165,7 @@ function UsersAdmin() {
             {data?.map((u) => {
               const isAdminUser = u.roles.includes("admin");
               const initial = (u.display_name || u.username).slice(0, 1).toUpperCase();
+              const self = u.id === user?.id;
               return (
                 <tr key={u.id} className="border-t hover:bg-gray-50/50">
                   <td className="px-4 py-3">
@@ -139,25 +196,45 @@ function UsersAdmin() {
                     )}
                   </td>
                   <td className="px-4 py-3 text-right">
-                    <Button
-                      variant={isAdminUser ? "outline" : "default"}
-                      size="sm"
-                      disabled={toggleAdmin.isPending || u.id === user?.id}
-                      onClick={() =>
-                        toggleAdmin.mutate({ userId: u.id, isAdmin: isAdminUser })
-                      }
-                      className="gap-1"
-                    >
-                      {isAdminUser ? (
-                        <>
-                          <ShieldOff className="h-3 w-3" /> Revoke
-                        </>
-                      ) : (
-                        <>
-                          <Shield className="h-3 w-3" /> Make Admin
-                        </>
-                      )}
-                    </Button>
+                    <div className="inline-flex gap-1">
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        onClick={() => setEditing(u)}
+                        aria-label="Edit"
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant={isAdminUser ? "outline" : "default"}
+                        size="sm"
+                        disabled={toggleAdmin.isPending || self}
+                        onClick={() =>
+                          toggleAdmin.mutate({ userId: u.id, isAdmin: isAdminUser })
+                        }
+                        className="gap-1"
+                      >
+                        {isAdminUser ? (
+                          <>
+                            <ShieldOff className="h-3 w-3" /> Revoke
+                          </>
+                        ) : (
+                          <>
+                            <Shield className="h-3 w-3" /> Admin
+                          </>
+                        )}
+                      </Button>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="text-red-600 hover:text-red-700"
+                        disabled={self}
+                        onClick={() => setConfirmDel(u)}
+                        aria-label="Delete"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </td>
                 </tr>
               );
@@ -165,6 +242,84 @@ function UsersAdmin() {
           </tbody>
         </table>
       </div>
+
+      {/* Edit dialog */}
+      <Dialog open={!!editing} onOpenChange={(o) => !o && setEditing(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit user</DialogTitle>
+            <DialogDescription>Update profile details.</DialogDescription>
+          </DialogHeader>
+          {editing && (
+            <div className="space-y-3">
+              <div className="space-y-1.5">
+                <Label>Display name</Label>
+                <Input
+                  value={editing.display_name ?? ""}
+                  onChange={(e) => setEditing({ ...editing, display_name: e.target.value })}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Username</Label>
+                <Input
+                  value={editing.username}
+                  onChange={(e) => setEditing({ ...editing, username: e.target.value })}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Location</Label>
+                <Input
+                  value={editing.location ?? ""}
+                  onChange={(e) => setEditing({ ...editing, location: e.target.value })}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Bio</Label>
+                <Textarea
+                  value={editing.bio ?? ""}
+                  onChange={(e) => setEditing({ ...editing, bio: e.target.value })}
+                  rows={3}
+                />
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditing(null)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={() => editing && saveEdit.mutate(editing)}
+              disabled={saveEdit.isPending}
+            >
+              {saveEdit.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete confirm */}
+      <Dialog open={!!confirmDel} onOpenChange={(o) => !o && setConfirmDel(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete user profile</DialogTitle>
+            <DialogDescription>
+              This removes the profile, posts, and related content. This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setConfirmDel(null)}>
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => confirmDel && deleteUser.mutate(confirmDel)}
+              disabled={deleteUser.isPending}
+            >
+              {deleteUser.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Delete"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
