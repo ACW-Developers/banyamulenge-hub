@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Mail, Lock, User, Loader2, ArrowLeft } from "lucide-react";
+import { Mail, Lock, User, Loader2, ArrowLeft, Eye, EyeOff } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
@@ -9,7 +9,6 @@ import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Logo } from "@/components/logo";
 import authHero from "@/assets/auth-hero-new.png.asset.json";
 
 export const Route = createFileRoute("/auth")({
@@ -31,6 +30,7 @@ function AuthPage() {
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPw, setShowPw] = useState(false);
   const [displayName, setDisplayName] = useState("");
   const [busy, setBusy] = useState(false);
 
@@ -82,21 +82,21 @@ function AuthPage() {
 
   return (
     <div className="min-h-screen grid lg:grid-cols-2 bg-background">
-      {/* Left visual */}
-      <div className="relative hidden lg:flex flex-col justify-between overflow-hidden bg-gradient-to-br from-orange-50 via-white to-orange-50 p-12">
-        <div className="flex items-center gap-2">
-          <Logo className="h-10" />
-        </div>
-        <img
-          src={authHero.url}
-          alt="Banyamulenge community"
-          className="max-h-[70vh] w-auto mx-auto object-contain drop-shadow-2xl"
-        />
-        <div className="max-w-md">
-          <h1 className="text-3xl font-bold leading-tight text-gray-900">
+      {/* Left visual — full-bleed hero with darkened bottom */}
+      <div
+        className="relative hidden lg:flex flex-col justify-end overflow-hidden bg-gray-900"
+        style={{
+          backgroundImage: `url(${authHero.url})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      >
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+        <div className="relative z-10 p-10 text-white max-w-md">
+          <h1 className="text-3xl font-bold leading-tight drop-shadow-lg">
             One community. One heritage. Everywhere in the world.
           </h1>
-          <p className="mt-3 text-gray-600">
+          <p className="mt-3 text-white/90 drop-shadow">
             Preserve our stories, connect across continents, and celebrate Banyamulenge culture.
           </p>
         </div>
@@ -105,12 +105,12 @@ function AuthPage() {
       {/* Right form */}
       <div className="flex items-center justify-center p-6 sm:p-10">
         <div className="w-full max-w-md">
-          <div className="flex flex-col items-center text-center mb-8">
-            <Logo className="h-16 mb-4" />
-            <p className="text-sm text-muted-foreground">Community Heritage Platform</p>
-          </div>
+          <div className="rounded-2xl border bg-card shadow-soft p-6 sm:p-8 pt-6">
+            <div className="text-center mb-5">
+              <h2 className="text-2xl font-bold text-gray-900">Banyamulenge Community</h2>
+              <p className="text-xs text-muted-foreground mt-1">Community Heritage Platform</p>
+            </div>
 
-          <div className="rounded-2xl border bg-card shadow-soft p-6 sm:p-8">
             <div className="grid grid-cols-2 gap-1 rounded-lg bg-muted p-1 mb-6">
               <button
                 type="button"
@@ -174,14 +174,22 @@ function AuthPage() {
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="password"
-                    type="password"
+                    type={showPw ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="pl-9"
+                    className="pl-9 pr-10"
                     minLength={6}
                     required
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPw((v) => !v)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    tabIndex={-1}
+                  >
+                    {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
                 </div>
               </div>
 
