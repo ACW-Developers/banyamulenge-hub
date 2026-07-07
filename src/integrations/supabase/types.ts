@@ -255,32 +255,79 @@ export type Database = {
           },
         ]
       }
+      page_visits: {
+        Row: {
+          browser: string | null
+          country: string | null
+          created_at: string
+          device: string | null
+          id: string
+          os: string | null
+          path: string
+          user_id: string | null
+        }
+        Insert: {
+          browser?: string | null
+          country?: string | null
+          created_at?: string
+          device?: string | null
+          id?: string
+          os?: string | null
+          path: string
+          user_id?: string | null
+        }
+        Update: {
+          browser?: string | null
+          country?: string | null
+          created_at?: string
+          device?: string | null
+          id?: string
+          os?: string | null
+          path?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       posts: {
         Row: {
           content: string
           created_at: string
+          group_id: string | null
           id: string
           image_url: string | null
+          is_announcement: boolean
           updated_at: string
           user_id: string
         }
         Insert: {
           content: string
           created_at?: string
+          group_id?: string | null
           id?: string
           image_url?: string | null
+          is_announcement?: boolean
           updated_at?: string
           user_id: string
         }
         Update: {
           content?: string
           created_at?: string
+          group_id?: string | null
           id?: string
           image_url?: string | null
+          is_announcement?: boolean
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "posts_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -341,6 +388,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      create_direct_conversation: {
+        Args: { other_user: string }
+        Returns: string
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
