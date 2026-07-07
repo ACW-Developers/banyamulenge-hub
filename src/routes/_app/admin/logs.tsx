@@ -1,23 +1,33 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Activity, Loader2 } from "lucide-react";
+import { useState } from "react";
+import { Activity, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 import { formatDistanceToNow, format } from "date-fns";
 
 import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_app/admin/logs")({
   component: LogsAdmin,
 });
 
+const PAGE_SIZE = 25;
+
 function LogsAdmin() {
+  const [page, setPage] = useState(0);
+
   const { data, isLoading } = useQuery({
-    queryKey: ["admin-logs"],
+    queryKey: ["admin-logs", page],
     queryFn: async () => {
-      const { data: logs } = await supabase
+      const from = page * PAGE_SIZE;
+      const to = from + PAGE_SIZE - 1;
+      const { data: logs, count } = await supabase
         .from("activity_logs")
-        .select("id, user_id, action, target_type, target_id, metadata, created_at")
+        .select("id, user_id, action, target_type, target_id, metadata, created_at", {
+          count: "exact",
+        })
         .order("created_at", { ascending: false })
-        .limit(200);
+        .range(from, to);
       const ids = Array.from(new Set((logs ?? []).map((l) => l.user_id).filter(Boolean))) as string[];
       const { data: profiles } = ids.length
         ? await supabase
@@ -26,16 +36,22 @@ function LogsAdmin() {
             .in("id", ids)
         : { data: [] };
       const byId = new Map((profiles ?? []).map((p) => [p.id, p]));
-      return (logs ?? []).map((l) => ({ ...l, actor: l.user_id ? byId.get(l.user_id) : null }));
+      return {
+        rows: (logs ?? []).map((l) => ({ ...l, actor: l.user_id ? byId.get(l.user_id) : null })),
+        total: count ?? 0,
+      };
     },
   });
+
+  const total = data?.total ?? 0;
+  const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Activity Logs</h1>
         <p className="text-sm text-gray-500 mt-1">
-          Chronological record of administrative actions.
+          Every action, page view, and admin change with timestamps.
         </p>
       </div>
 
@@ -44,9 +60,9 @@ function LogsAdmin() {
           <div className="p-8 flex justify-center">
             <Loader2 className="h-5 w-5 animate-spin text-primary" />
           </div>
-        ) : data && data.length > 0 ? (
+        ) : data && data.rows.length > 0 ? (
           <ul className="divide-y">
-            {data.map((l) => {
+            {data.rows.map((l) => {
               const initial = (l.actor?.display_name || l.actor?.username || "?")
                 .slice(0, 1)
                 .toUpperCase();
@@ -69,13 +85,15 @@ function LogsAdmin() {
                         <span className="text-gray-500">
                           {" on "}
                           {l.target_type}{" "}
-                          <span className="font-mono text-xs">{l.target_id?.slice(0, 8)}</span>
+                          <span className="font-mono text-xs">
+                            {typeof l.target_id === "string" ? l.target_id.slice(0, 40) : ""}
+                          </span>
                         </span>
                       )}
                     </div>
                     <div className="text-xs text-gray-400 mt-0.5">
                       {formatDistanceToNow(new Date(l.created_at), { addSuffix: true })} ·{" "}
-                      {format(new Date(l.created_at), "MMM d, HH:mm")}
+                      {format(new Date(l.created_at), "MMM d, yyyy HH:mm:ss")}
                     </div>
                   </div>
                 </li>
@@ -88,6 +106,29 @@ function LogsAdmin() {
             <p className="text-sm text-gray-500">No activity logged yet.</p>
           </div>
         )}
+        <div className="flex items-center justify-between p-3 border-t bg-gray-50/50">
+          <div className="text-xs text-gray-500">
+            Page {page + 1} of {pages} · {total} entries
+          </div>
+          <div className="flex gap-1">
+            <Button
+              size="sm"
+              variant="outline"
+              disabled={page === 0}
+              onClick={() => setPage((p) => Math.max(0, p - 1))}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              disabled={page + 1 >= pages}
+              onClick={() => setPage((p) => p + 1)}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
       </div>
     </div>
   );

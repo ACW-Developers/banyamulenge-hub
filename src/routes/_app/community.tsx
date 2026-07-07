@@ -1,7 +1,7 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { Users, Plus, Loader2, LogOut, UserPlus } from "lucide-react";
+import { Users, Plus, Loader2, LogOut, UserPlus, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -34,7 +34,7 @@ function slugify(s: string) {
 function CommunityPage() {
   const { user } = useAuth();
   const qc = useQueryClient();
-  const navigate = useNavigate();
+  
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [desc, setDesc] = useState("");
@@ -164,23 +164,32 @@ function CommunityPage() {
                 {g.description && (
                   <p className="text-sm text-gray-600 line-clamp-2 mb-3">{g.description}</p>
                 )}
-                <Button
-                  variant={isMember ? "outline" : "default"}
-                  size="sm"
-                  className="w-full gap-2"
-                  onClick={() => join.mutate({ groupId: g.id, member: isMember })}
-                  disabled={join.isPending}
-                >
-                  {isMember ? (
-                    <>
-                      <LogOut className="h-4 w-4" /> Leave
-                    </>
-                  ) : (
-                    <>
-                      <UserPlus className="h-4 w-4" /> Join
-                    </>
+                <div className="flex gap-2">
+                  <Button
+                    variant={isMember ? "outline" : "default"}
+                    size="sm"
+                    className="flex-1 gap-2"
+                    onClick={() => join.mutate({ groupId: g.id, member: isMember })}
+                    disabled={join.isPending}
+                  >
+                    {isMember ? (
+                      <>
+                        <LogOut className="h-4 w-4" /> Leave
+                      </>
+                    ) : (
+                      <>
+                        <UserPlus className="h-4 w-4" /> Join
+                      </>
+                    )}
+                  </Button>
+                  {isMember && (
+                    <Button size="sm" variant="secondary" asChild className="gap-1">
+                      <Link to="/community/$slug" params={{ slug: g.slug }}>
+                        View <ArrowRight className="h-3.5 w-3.5" />
+                      </Link>
+                    </Button>
                   )}
-                </Button>
+                </div>
               </div>
             );
           })}

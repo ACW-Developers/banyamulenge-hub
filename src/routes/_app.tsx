@@ -14,6 +14,8 @@ import {
   Settings,
   Activity,
   ChevronDown,
+  Menu,
+  X,
 } from "lucide-react";
 
 import { useAuth } from "@/lib/auth-context";
@@ -29,20 +31,29 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { trackVisit, logActivity } from "@/lib/tracking";
 
 export const Route = createFileRoute("/_app")({
   component: AppLayout,
 });
 
 function AppLayout() {
-  const { session, loading, profile, signOut, isAdmin } = useAuth();
+  const { session, loading, profile, signOut, isAdmin, user } = useAuth();
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [openMenu, setOpenMenu] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   useEffect(() => {
     if (!loading && !session) navigate({ to: "/auth" });
   }, [session, loading, navigate]);
+
+  // Track page visits + activity for admin analytics
+  useEffect(() => {
+    if (!user) return;
+    trackVisit(pathname, user.id);
+    logActivity(user.id, "page.view", "route", pathname);
+  }, [pathname, user]);
 
   if (loading || !session) {
     return (
@@ -79,7 +90,11 @@ function AppLayout() {
   return (
     <div className="min-h-screen bg-gray-50/70">
       {/* Sidebar (desktop) */}
-      <aside className="hidden lg:flex fixed top-0 left-0 bottom-0 w-64 flex-col bg-white border-r z-30">
+      <aside
+        className={`hidden lg:flex fixed top-0 left-0 bottom-0 flex-col bg-white border-r z-30 transition-all duration-300 ${
+          sidebarOpen ? "w-64" : "w-0 -translate-x-full"
+        }`}
+      >
         <div className="h-16 flex items-center px-5 border-b">
           <Link to="/" className="flex items-center gap-2">
             <Logo className="h-9" />
@@ -144,10 +159,62 @@ function AppLayout() {
         </div>
       </aside>
 
+      {/* Mobile sidebar overlay */}
+      {sidebarOpen && (
+        <div
+          className="lg:hidden fixed inset-0 z-40 bg-black/40"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+      <aside
+        className={`lg:hidden fixed top-0 left-0 bottom-0 w-64 flex flex-col bg-white border-r z-50 transition-transform duration-300 ${
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        <div className="h-16 flex items-center justify-between px-5 border-b">
+          <Link to="/" className="flex items-center gap-2" onClick={() => setSidebarOpen(false)}>
+            <Logo className="h-9" />
+          </Link>
+          <button onClick={() => setSidebarOpen(false)} className="text-gray-500">
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+        <nav className="flex-1 overflow-y-auto p-3 space-y-1">
+          {[...nav, ...(isAdmin ? adminNav : [])].map((item) => {
+            const Icon = item.icon;
+            const active = isActive(item.to);
+            return (
+              <Link
+                key={item.label}
+                to={item.to}
+                onClick={() => setSidebarOpen(false)}
+                className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium ${
+                  active
+                    ? "bg-primary/10 text-primary"
+                    : "text-gray-600 hover:bg-gray-100"
+                }`}
+              >
+                <Icon className="h-4 w-4" />
+                {item.label}
+              </Link>
+            );
+          })}
+        </nav>
+      </aside>
+
       {/* Content wrapper */}
-      <div className="lg:pl-64">
+      <div className={`transition-all duration-300 ${sidebarOpen ? "lg:pl-64" : "lg:pl-0"}`}>
         {/* Top navbar */}
-        <header className="sticky top-0 z-20 bg-white border-b h-16 flex items-center px-4 sm:px-6 gap-4">
+        <header className="sticky top-0 z-20 bg-white border-b h-16 flex items-center px-4 sm:px-6 gap-3">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setSidebarOpen((v) => !v)}
+            className="text-gray-600 shrink-0"
+            aria-label="Toggle sidebar"
+          >
+            <Menu className="h-5 w-5" />
+          </Button>
           <div className="hidden md:flex flex-1 max-w-md relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
             <Input
@@ -161,7 +228,7 @@ function AppLayout() {
             </Button>
             <DropdownMenu open={openMenu} onOpenChange={setOpenMenu}>
               <DropdownMenuTrigger asChild>
-                <button className="flex items-center gap-2 rounded-full pr-2 hover:bg-gray-100 transition p-1">
+                <button className="flex items-center gap-2 rounded-full pl-1 pr-2 py-1 border border-gray-200 hover:border-primary/40 hover:bg-primary/5 transition">
                   <Avatar className="h-9 w-9 ring-2 ring-primary/20">
                     <AvatarImage src={profile?.avatar_url ?? undefined} />
                     <AvatarFallback className="bg-primary text-primary-foreground text-sm font-semibold">
