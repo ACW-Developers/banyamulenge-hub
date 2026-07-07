@@ -34,7 +34,7 @@ function slugify(s: string) {
 function CommunityPage() {
   const { user } = useAuth();
   const qc = useQueryClient();
-  const navigate = useNavigate();
+  
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [desc, setDesc] = useState("");
