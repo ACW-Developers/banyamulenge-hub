@@ -65,7 +65,7 @@ export async function logActivity(
       action,
       target_type: target_type ?? null,
       target_id: target_id ?? null,
-      metadata: metadata ?? {},
+      metadata: (metadata ?? {}) as never,
     });
   } catch {
     // ignore
