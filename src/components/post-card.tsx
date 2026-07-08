@@ -354,11 +354,14 @@ export function PostComposer({
             placeholder={`Share something with the community, ${profile?.display_name || "friend"}...`}
             className="min-h-[80px] resize-none border-0 bg-gray-50 focus-visible:ring-1"
           />
-          {imageData && (
+          {preview && (
             <div className="relative rounded-xl overflow-hidden border">
-              <img src={imageData} alt="preview" className="w-full max-h-72 object-cover" />
+              <img src={preview} alt="preview" className="w-full max-h-72 object-cover" />
               <button
-                onClick={() => setImageData(null)}
+                onClick={() => {
+                  setFile(null);
+                  setPreview(null);
+                }}
                 className="absolute top-2 right-2 rounded-full bg-black/60 text-white p-1 hover:bg-black"
                 aria-label="Remove image"
                 type="button"
