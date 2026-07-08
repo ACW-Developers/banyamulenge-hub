@@ -49,6 +49,23 @@ function GroupPage() {
     },
   });
 
+  const qc = useQueryClient();
+  useEffect(() => {
+    if (!group?.id) return;
+    const gid = group.id;
+    const ch = supabase
+      .channel(`group-feed-${gid}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "posts", filter: `group_id=eq.${gid}` },
+        () => qc.invalidateQueries({ queryKey: ["group-feed", gid] }))
+      .on("postgres_changes", { event: "*", schema: "public", table: "likes" },
+        () => qc.invalidateQueries({ queryKey: ["group-feed", gid] }))
+      .on("postgres_changes", { event: "*", schema: "public", table: "comments" },
+        () => qc.invalidateQueries({ queryKey: ["group-feed", gid] }))
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, [group?.id, qc]);
+
+
   if (loadingGroup) {
     return (
       <div className="flex justify-center py-16">
