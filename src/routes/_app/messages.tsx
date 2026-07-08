@@ -71,15 +71,42 @@ function MessagesPage() {
     queryKey: ["messages", activeId],
     enabled: !!activeId,
     queryFn: async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("messages")
         .select("id, sender_id, content, created_at")
         .eq("conversation_id", activeId!)
         .order("created_at", { ascending: true });
+      if (error) throw error;
       return data ?? [];
     },
-    refetchInterval: 3000,
   });
+
+  // Realtime updates for messages and conversations
+  useEffect(() => {
+    if (!user) return;
+    const ch = supabase
+      .channel(`msg-rt-${user.id}`)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "messages" },
+        (payload) => {
+          const row = (payload.new ?? payload.old) as { conversation_id?: string } | null;
+          qc.invalidateQueries({ queryKey: ["conversations", user.id] });
+          if (row?.conversation_id) {
+            qc.invalidateQueries({ queryKey: ["messages", row.conversation_id] });
+          }
+        },
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "conversations" },
+        () => qc.invalidateQueries({ queryKey: ["conversations", user.id] }),
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(ch);
+    };
+  }, [user, qc]);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight });
@@ -87,18 +114,20 @@ function MessagesPage() {
 
   async function send() {
     if (!user || !activeId || !text.trim()) return;
+    const body = text.trim();
+    setText("");
     setSending(true);
     const { error } = await supabase.from("messages").insert({
       conversation_id: activeId,
       sender_id: user.id,
-      content: text.trim(),
+      content: body,
     });
     setSending(false);
     if (error) {
       toast.error(error.message);
+      setText(body);
       return;
     }
-    setText("");
     qc.invalidateQueries({ queryKey: ["messages", activeId] });
     qc.invalidateQueries({ queryKey: ["conversations", user.id] });
   }
