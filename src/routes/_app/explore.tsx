@@ -114,78 +114,85 @@ function ExplorePage() {
           <Loader2 className="h-6 w-6 animate-spin text-primary" />
         </div>
       ) : (
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {(people ?? []).map((p) => {
             const initial = (p.display_name || p.username).slice(0, 1).toUpperCase();
             const isSelf = user?.id === p.id;
             return (
               <div
                 key={p.id}
-                className="rounded-2xl border bg-white p-5 shadow-sm hover:shadow-md hover:border-primary/30 transition"
+                className="group rounded-2xl border bg-white overflow-hidden shadow-sm hover:shadow-lg hover:border-primary/40 transition-all"
               >
-                <Link
-                  to="/profile/$username"
-                  params={{ username: p.username }}
-                  className="flex items-center gap-3"
-                >
-                  <Avatar className="h-14 w-14 ring-2 ring-primary/10">
-                    <AvatarImage src={p.avatar_url ?? undefined} />
-                    <AvatarFallback className="bg-primary text-primary-foreground font-bold">
-                      {initial}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="min-w-0 flex-1">
-                    <div className="font-bold truncate">{p.display_name || p.username}</div>
-                    <div className="text-xs text-gray-500 truncate">@{p.username}</div>
-                    {p.location && (
-                      <div className="text-xs text-gray-500 mt-0.5 flex items-center gap-1 truncate">
-                        <MapPin className="h-3 w-3" />
-                        {p.location}
-                      </div>
-                    )}
-                  </div>
-                </Link>
-                {p.bio && (
-                  <p className="text-sm text-gray-600 mt-3 line-clamp-2">{p.bio}</p>
-                )}
-                <div className="mt-4 flex items-center justify-between text-xs text-gray-500">
-                  <span className="inline-flex items-center gap-1">
-                    <Users className="h-3.5 w-3.5" />
-                    <strong className="text-gray-900">{p.followers}</strong> followers
-                  </span>
+                <div className="h-20 bg-gradient-to-br from-primary via-primary-glow to-primary/80 relative">
+                  <div className="absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.6),transparent)]" />
                 </div>
-                {!isSelf && (
-                  <div className="mt-3 flex gap-2">
-                    <Button
-                      size="sm"
-                      variant={p.isFollowing ? "outline" : "default"}
-                      className="flex-1 gap-1"
-                      disabled={toggleFollow.isPending}
-                      onClick={() =>
-                        toggleFollow.mutate({ id: p.id, isFollowing: p.isFollowing })
-                      }
-                    >
-                      {p.isFollowing ? (
-                        <>
-                          <UserCheck className="h-4 w-4" /> Following
-                        </>
-                      ) : (
-                        <>
-                          <UserPlus className="h-4 w-4" /> Follow
-                        </>
-                      )}
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      className="gap-1"
-                      onClick={() => message(p.id)}
-                      aria-label="Message"
-                    >
-                      <MessageCircle className="h-4 w-4" />
-                    </Button>
+                <div className="px-5 pb-5 -mt-10">
+                  <Link
+                    to="/profile/$username"
+                    params={{ username: p.username }}
+                    className="block"
+                  >
+                    <Avatar className="h-20 w-20 ring-4 ring-white shadow-md">
+                      <AvatarImage src={p.avatar_url ?? undefined} />
+                      <AvatarFallback className="bg-primary text-primary-foreground text-xl font-bold">
+                        {initial}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="mt-3">
+                      <div className="font-bold truncate group-hover:text-primary transition">
+                        {p.display_name || p.username}
+                      </div>
+                      <div className="text-xs text-gray-500 truncate">@{p.username}</div>
+                    </div>
+                  </Link>
+                  {p.location && (
+                    <div className="text-xs text-gray-500 mt-1.5 flex items-center gap-1 truncate">
+                      <MapPin className="h-3 w-3" />
+                      {p.location}
+                    </div>
+                  )}
+                  {p.bio && (
+                    <p className="text-sm text-gray-600 mt-3 line-clamp-2">{p.bio}</p>
+                  )}
+                  <div className="mt-4 pt-3 border-t flex items-center justify-between text-xs">
+                    <span className="inline-flex items-center gap-1 text-gray-500">
+                      <Users className="h-3.5 w-3.5" />
+                      <strong className="text-gray-900">{p.followers}</strong>
+                      <span>followers</span>
+                    </span>
                   </div>
-                )}
+                  {!isSelf && (
+                    <div className="mt-3 flex gap-2">
+                      <Button
+                        size="sm"
+                        variant={p.isFollowing ? "outline" : "default"}
+                        className="flex-1 gap-1"
+                        disabled={toggleFollow.isPending}
+                        onClick={() =>
+                          toggleFollow.mutate({ id: p.id, isFollowing: p.isFollowing })
+                        }
+                      >
+                        {p.isFollowing ? (
+                          <>
+                            <UserCheck className="h-4 w-4" /> Following
+                          </>
+                        ) : (
+                          <>
+                            <UserPlus className="h-4 w-4" /> Follow
+                          </>
+                        )}
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="gap-1 border-primary/30 text-primary hover:bg-primary/10"
+                        onClick={() => message(p.id)}
+                      >
+                        <MessageCircle className="h-4 w-4" /> Chat
+                      </Button>
+                    </div>
+                  )}
+                </div>
               </div>
             );
           })}
