@@ -11,7 +11,7 @@ import {
   Camera,
   MessageCircle,
 } from "lucide-react";
-import { formatDistanceToNow, format } from "date-fns";
+import { format } from "date-fns";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -236,32 +236,14 @@ function ProfilePage() {
         </div>
       </div>
 
-      <div>
-        <h2 className="text-lg font-bold mb-3 px-1">Posts</h2>
-        {posts && posts.length > 0 ? (
-          <div className="space-y-4">
-            {posts.map((p) => (
-              <article key={p.id} className="rounded-2xl border bg-white p-5 shadow-sm">
-                <div className="text-xs text-gray-500 mb-2">
-                  {formatDistanceToNow(new Date(p.created_at), { addSuffix: true })}
-                </div>
-                <p className="text-[15px] leading-relaxed whitespace-pre-wrap">{p.content}</p>
-                {p.image_url && (
-                  <div className="mt-3 rounded-xl overflow-hidden border">
-                    <img src={p.image_url} alt="" className="w-full max-h-[520px] object-cover" />
-                  </div>
-                )}
-                <div className="mt-3 text-xs text-gray-500">
-                  {p.likes.length} likes · {p.comments.length} comments
-                </div>
-              </article>
-            ))}
-          </div>
-        ) : (
-          <div className="rounded-2xl border bg-white p-10 text-center text-sm text-gray-500">
-            No posts yet.
-          </div>
-        )}
+      <div className="rounded-2xl border bg-white p-8 text-center shadow-sm">
+        <h2 className="text-lg font-bold mb-1">Posts live in the feed</h2>
+        <p className="text-sm text-gray-500">
+          {profile.display_name || profile.username} has {posts?.length ?? 0} post{(posts?.length ?? 0) === 1 ? "" : "s"} — visit the home feed to like and comment.
+        </p>
+        <Link to="/" className="inline-block mt-4 text-primary font-semibold text-sm">
+          Open community feed →
+        </Link>
       </div>
     </div>
   );

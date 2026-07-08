@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import authHero from "@/assets/auth-hero-new.png.asset.json";
+import logoAsset from "@/assets/logo.png.asset.json";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -106,9 +107,9 @@ function AuthPage() {
       <div className="flex items-center justify-center p-6 sm:p-10">
         <div className="w-full max-w-md">
           <div className="rounded-2xl border bg-card shadow-soft p-6 sm:p-8 pt-6">
-            <div className="text-center mb-5">
-              <h2 className="text-2xl font-bold text-gray-900">Banyamulenge Community</h2>
-              <p className="text-xs text-muted-foreground mt-1">Community Heritage Platform</p>
+            <div className="flex flex-col items-center mb-5">
+              <img src={logoAsset.url} alt="Banyamulenge Community Heritage" className="h-16 w-auto object-contain" />
+              <p className="text-xs text-muted-foreground mt-2">Community Heritage Platform</p>
             </div>
 
             <div className="grid grid-cols-2 gap-1 rounded-lg bg-muted p-1 mb-6">

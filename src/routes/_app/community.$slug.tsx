@@ -1,5 +1,6 @@
 import { createFileRoute, useParams, Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
 import { ArrowLeft, Loader2, Users } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -47,6 +48,23 @@ function GroupPage() {
       return (data as unknown as FeedPost[]) ?? [];
     },
   });
+
+  const qc = useQueryClient();
+  useEffect(() => {
+    if (!group?.id) return;
+    const gid = group.id;
+    const ch = supabase
+      .channel(`group-feed-${gid}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "posts", filter: `group_id=eq.${gid}` },
+        () => qc.invalidateQueries({ queryKey: ["group-feed", gid] }))
+      .on("postgres_changes", { event: "*", schema: "public", table: "likes" },
+        () => qc.invalidateQueries({ queryKey: ["group-feed", gid] }))
+      .on("postgres_changes", { event: "*", schema: "public", table: "comments" },
+        () => qc.invalidateQueries({ queryKey: ["group-feed", gid] }))
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, [group?.id, qc]);
+
 
   if (loadingGroup) {
     return (
