@@ -289,42 +289,53 @@ export function PostComposer({
   const { user, profile, isAdmin } = useAuth();
   const qc = useQueryClient();
   const [content, setContent] = useState("");
-  const [imageData, setImageData] = useState<string | null>(null);
+  const [file, setFile] = useState<File | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
   const [isAnnouncement, setIsAnnouncement] = useState(false);
   const [busy, setBusy] = useState(false);
 
   const initial = (profile?.display_name || profile?.username || "U").slice(0, 1).toUpperCase();
 
   function pickImage(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (file.size > 2 * 1024 * 1024) {
-      toast.error("Image must be under 2 MB");
+    const f = e.target.files?.[0];
+    if (!f) return;
+    if (f.size > 5 * 1024 * 1024) {
+      toast.error("Image must be under 5 MB");
       return;
     }
-    const reader = new FileReader();
-    reader.onload = () => setImageData(reader.result as string);
-    reader.readAsDataURL(file);
+    setFile(f);
+    setPreview(URL.createObjectURL(f));
   }
 
   async function submit() {
     if (!user || !content.trim()) return;
     setBusy(true);
-    const { error } = await supabase.from("posts").insert({
-      user_id: user.id,
-      content: content.trim(),
-      image_url: imageData,
-      is_announcement: isAnnouncement && isAdmin,
-      group_id: groupId ?? null,
-    });
-    setBusy(false);
-    if (error) return toast.error(error.message);
-    setContent("");
-    setImageData(null);
-    setIsAnnouncement(false);
-    toast.success("Posted");
-    logActivity(user.id, "post.create", "post");
-    qc.invalidateQueries({ queryKey });
+    try {
+      let image_url: string | null = null;
+      if (file) {
+        const { uploadPostImage } = await import("@/lib/upload");
+        image_url = await uploadPostImage(file, user.id);
+      }
+      const { error } = await supabase.from("posts").insert({
+        user_id: user.id,
+        content: content.trim(),
+        image_url,
+        is_announcement: isAnnouncement && isAdmin,
+        group_id: groupId ?? null,
+      });
+      if (error) throw error;
+      setContent("");
+      setFile(null);
+      setPreview(null);
+      setIsAnnouncement(false);
+      toast.success("Posted");
+      logActivity(user.id, "post.create", "post");
+      qc.invalidateQueries({ queryKey });
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setBusy(false);
+    }
   }
 
   return (
