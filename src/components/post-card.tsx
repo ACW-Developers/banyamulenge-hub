@@ -100,7 +100,7 @@ export function PostCard({
     queryFn: async () => {
       const { data } = await supabase
         .from("comments")
-        .select("id, content, created_at, user_id, profiles!comments_user_id_fkey(username, display_name, avatar_url)")
+        .select("id, content, created_at, user_id, profiles!comments_author_profile_fkey(username, display_name, avatar_url)")
         .eq("post_id", post.id)
         .order("created_at", { ascending: true });
       return (data ?? []) as unknown as CommentRow[];

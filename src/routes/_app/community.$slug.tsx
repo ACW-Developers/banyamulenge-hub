@@ -38,7 +38,7 @@ function GroupPage() {
         .from("posts")
         .select(
           `id, user_id, content, image_url, created_at, is_announcement,
-           author:profiles!posts_user_id_fkey(username, display_name, avatar_url),
+           author:profiles!posts_author_profile_fkey(username, display_name, avatar_url),
            likes(user_id),
            comments(id)`,
         )
