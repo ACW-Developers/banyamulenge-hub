@@ -19,6 +19,7 @@ type PersonRow = {
   username: string;
   display_name: string | null;
   avatar_url: string | null;
+  cover_url: string | null;
   bio: string | null;
   location: string | null;
   followers: number;
@@ -35,7 +36,7 @@ function ExplorePage() {
     queryFn: async (): Promise<PersonRow[]> => {
       const { data: profiles, error } = await supabase
         .from("profiles")
-        .select("id, username, display_name, avatar_url, bio, location")
+        .select("id, username, display_name, avatar_url, cover_url, bio, location")
         .order("created_at", { ascending: false })
         .limit(60);
       if (error) throw error;
@@ -123,7 +124,10 @@ function ExplorePage() {
                 key={p.id}
                 className="group rounded-2xl border bg-white overflow-hidden shadow-sm hover:shadow-lg hover:border-primary/40 transition-all"
               >
-                <div className="h-20 bg-gradient-to-br from-primary via-primary-glow to-primary/80 relative">
+                <div
+                  className="h-20 bg-gradient-to-br from-primary via-primary-glow to-primary/80 relative bg-cover bg-center"
+                  style={p.cover_url ? { backgroundImage: `url(${p.cover_url})` } : undefined}
+                >
                   <div className="absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.6),transparent)]" />
                 </div>
                 <div className="px-5 pb-5 -mt-10">

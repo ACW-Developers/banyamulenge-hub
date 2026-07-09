@@ -15,6 +15,7 @@ import { format } from "date-fns";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
+import { uploadPostImage } from "@/lib/upload";
 import { useAuth } from "@/lib/auth-context";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -43,6 +44,7 @@ type ProfileFull = {
   display_name: string | null;
   bio: string | null;
   avatar_url: string | null;
+  cover_url: string | null;
   location: string | null;
   created_at: string;
 };
@@ -50,7 +52,7 @@ type ProfileFull = {
 async function fetchProfile(username: string) {
   const { data, error } = await supabase
     .from("profiles")
-    .select("id, username, display_name, bio, avatar_url, location, created_at")
+    .select("id, username, display_name, bio, avatar_url, cover_url, location, created_at")
     .eq("username", username)
     .maybeSingle();
   if (error) throw error;
@@ -156,7 +158,11 @@ function ProfilePage() {
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div className="rounded-2xl border bg-white shadow-sm overflow-hidden">
-        <div className="h-40 bg-gradient-to-r from-primary via-primary-glow to-primary" />
+        <div
+          className="h-40 bg-gradient-to-r from-primary via-primary-glow to-primary bg-cover bg-center"
+          style={profile.cover_url ? { backgroundImage: `url(${profile.cover_url})` } : undefined}
+        />
+
         <div className="p-5 pt-0">
           <div className="flex items-end justify-between -mt-12">
             <Avatar className="h-24 w-24 ring-4 ring-white">
@@ -286,8 +292,11 @@ function EditProfileDialog({
   const [bio, setBio] = useState(profile.bio ?? "");
   const [location, setLocation] = useState(profile.location ?? "");
   const [avatarUrl, setAvatarUrl] = useState(profile.avatar_url ?? "");
+  const [coverUrl, setCoverUrl] = useState(profile.cover_url ?? "");
   const [saving, setSaving] = useState(false);
+  const [uploadingCover, setUploadingCover] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+  const coverRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (open) {
@@ -295,6 +304,7 @@ function EditProfileDialog({
       setBio(profile.bio ?? "");
       setLocation(profile.location ?? "");
       setAvatarUrl(profile.avatar_url ?? "");
+      setCoverUrl(profile.cover_url ?? "");
     }
   }, [open, profile]);
 
@@ -313,6 +323,19 @@ function EditProfileDialog({
     }
   }
 
+  async function pickCover(e: React.ChangeEvent<HTMLInputElement>) {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    setUploadingCover(true);
+    try {
+      const url = await uploadPostImage(f, profile.id);
+      setCoverUrl(url);
+    } catch (err) {
+      toast.error((err as Error).message);
+    }
+    setUploadingCover(false);
+  }
+
   async function save() {
     setSaving(true);
     const { error } = await supabase
@@ -322,6 +345,7 @@ function EditProfileDialog({
         bio: bio || null,
         location: location || null,
         avatar_url: avatarUrl || null,
+        cover_url: coverUrl || null,
       })
       .eq("id", profile.id);
     setSaving(false);
@@ -350,6 +374,24 @@ function EditProfileDialog({
           <DialogDescription>Update how you appear in the community.</DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
+          <div className="space-y-1.5">
+            <Label>Cover image</Label>
+            <div
+              className="h-28 w-full rounded-lg border bg-gradient-to-r from-primary via-primary-glow to-primary bg-cover bg-center relative overflow-hidden"
+              style={coverUrl ? { backgroundImage: `url(${coverUrl})` } : undefined}
+            >
+              <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/20">
+                <input ref={coverRef} type="file" accept="image/*" hidden onChange={pickCover} />
+                <Button type="button" size="sm" variant="secondary" className="gap-2" disabled={uploadingCover} onClick={() => coverRef.current?.click()}>
+                  {uploadingCover ? <Loader2 className="h-4 w-4 animate-spin" /> : <Camera className="h-4 w-4" />}
+                  {coverUrl ? "Change cover" : "Upload cover"}
+                </Button>
+                {coverUrl && (
+                  <Button type="button" size="sm" variant="outline" onClick={() => setCoverUrl("")}>Remove</Button>
+                )}
+              </div>
+            </div>
+          </div>
           <div className="flex items-center gap-4">
             <Avatar className="h-20 w-20">
               <AvatarImage src={avatarUrl || undefined} />
