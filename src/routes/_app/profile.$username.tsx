@@ -157,7 +157,11 @@ function ProfilePage() {
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div className="rounded-2xl border bg-white shadow-sm overflow-hidden">
-        <div className="h-40 bg-gradient-to-r from-primary via-primary-glow to-primary" />
+        <div
+          className="h-40 bg-gradient-to-r from-primary via-primary-glow to-primary bg-cover bg-center"
+          style={profile.cover_url ? { backgroundImage: `url(${profile.cover_url})` } : undefined}
+        />
+
         <div className="p-5 pt-0">
           <div className="flex items-end justify-between -mt-12">
             <Avatar className="h-24 w-24 ring-4 ring-white">
