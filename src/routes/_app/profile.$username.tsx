@@ -291,8 +291,11 @@ function EditProfileDialog({
   const [bio, setBio] = useState(profile.bio ?? "");
   const [location, setLocation] = useState(profile.location ?? "");
   const [avatarUrl, setAvatarUrl] = useState(profile.avatar_url ?? "");
+  const [coverUrl, setCoverUrl] = useState(profile.cover_url ?? "");
   const [saving, setSaving] = useState(false);
+  const [uploadingCover, setUploadingCover] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+  const coverRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (open) {
@@ -300,6 +303,7 @@ function EditProfileDialog({
       setBio(profile.bio ?? "");
       setLocation(profile.location ?? "");
       setAvatarUrl(profile.avatar_url ?? "");
+      setCoverUrl(profile.cover_url ?? "");
     }
   }, [open, profile]);
 
@@ -318,6 +322,19 @@ function EditProfileDialog({
     }
   }
 
+  async function pickCover(e: React.ChangeEvent<HTMLInputElement>) {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    setUploadingCover(true);
+    try {
+      const url = await uploadPostImage(f, profile.id);
+      setCoverUrl(url);
+    } catch (err) {
+      toast.error((err as Error).message);
+    }
+    setUploadingCover(false);
+  }
+
   async function save() {
     setSaving(true);
     const { error } = await supabase
@@ -327,6 +344,7 @@ function EditProfileDialog({
         bio: bio || null,
         location: location || null,
         avatar_url: avatarUrl || null,
+        cover_url: coverUrl || null,
       })
       .eq("id", profile.id);
     setSaving(false);
