@@ -36,7 +36,7 @@ function ExplorePage() {
     queryFn: async (): Promise<PersonRow[]> => {
       const { data: profiles, error } = await supabase
         .from("profiles")
-        .select("id, username, display_name, avatar_url, bio, location")
+        .select("id, username, display_name, avatar_url, cover_url, bio, location")
         .order("created_at", { ascending: false })
         .limit(60);
       if (error) throw error;
