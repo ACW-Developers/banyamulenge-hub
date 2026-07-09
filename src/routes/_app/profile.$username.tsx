@@ -43,6 +43,7 @@ type ProfileFull = {
   display_name: string | null;
   bio: string | null;
   avatar_url: string | null;
+  cover_url: string | null;
   location: string | null;
   created_at: string;
 };
@@ -50,7 +51,7 @@ type ProfileFull = {
 async function fetchProfile(username: string) {
   const { data, error } = await supabase
     .from("profiles")
-    .select("id, username, display_name, bio, avatar_url, location, created_at")
+    .select("id, username, display_name, bio, avatar_url, cover_url, location, created_at")
     .eq("username", username)
     .maybeSingle();
   if (error) throw error;
