@@ -374,6 +374,24 @@ function EditProfileDialog({
           <DialogDescription>Update how you appear in the community.</DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
+          <div className="space-y-1.5">
+            <Label>Cover image</Label>
+            <div
+              className="h-28 w-full rounded-lg border bg-gradient-to-r from-primary via-primary-glow to-primary bg-cover bg-center relative overflow-hidden"
+              style={coverUrl ? { backgroundImage: `url(${coverUrl})` } : undefined}
+            >
+              <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/20">
+                <input ref={coverRef} type="file" accept="image/*" hidden onChange={pickCover} />
+                <Button type="button" size="sm" variant="secondary" className="gap-2" disabled={uploadingCover} onClick={() => coverRef.current?.click()}>
+                  {uploadingCover ? <Loader2 className="h-4 w-4 animate-spin" /> : <Camera className="h-4 w-4" />}
+                  {coverUrl ? "Change cover" : "Upload cover"}
+                </Button>
+                {coverUrl && (
+                  <Button type="button" size="sm" variant="outline" onClick={() => setCoverUrl("")}>Remove</Button>
+                )}
+              </div>
+            </div>
+          </div>
           <div className="flex items-center gap-4">
             <Avatar className="h-20 w-20">
               <AvatarImage src={avatarUrl || undefined} />
