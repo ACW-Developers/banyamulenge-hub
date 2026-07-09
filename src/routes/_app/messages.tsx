@@ -54,7 +54,7 @@ function MessagesPage() {
         .from("conversations")
         .select(
           `id, last_message_at,
-           conversation_participants(user_id, profiles(username, display_name, avatar_url))`,
+           conversation_participants(user_id, profiles!cp_user_profile_fkey(username, display_name, avatar_url))`,
         )
         .order("last_message_at", { ascending: false });
       return (data ?? []) as unknown as ConversationRow[];
