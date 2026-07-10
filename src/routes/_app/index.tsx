@@ -7,8 +7,28 @@ import { supabase } from "@/integrations/supabase/client";
 import { PostCard, PostComposer, type FeedPost } from "@/components/post-card";
 import { AdvertsPanel } from "@/components/adverts-panel";
 import { markFeedSeen } from "@/lib/notifications";
+import { getRequestOrigin } from "@/lib/origin.functions";
 
 export const Route = createFileRoute("/_app/")({
+  loader: async () => {
+    const origin = await getRequestOrigin();
+    return { origin };
+  },
+  head: ({ loaderData }) => {
+    const origin = loaderData?.origin ?? "";
+    const imageUrl = origin ? `${origin}/favicon.png` : "/favicon.png";
+    return {
+      meta: [
+        { property: "og:url", content: "/" },
+        { property: "og:image", content: imageUrl },
+        { property: "og:image:type", content: "image/png" },
+        { property: "og:image:width", content: "457" },
+        { property: "og:image:height", content: "426" },
+        { name: "twitter:image", content: imageUrl },
+      ],
+      links: [{ rel: "canonical", href: "/" }],
+    };
+  },
   component: FeedPage,
 });
 
