@@ -29,7 +29,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  const loadProfile = async (userId: string) => {
+  const loadProfile = async (user: User) => {
+    const userId = user.id;
     const [{ data: prof }, { data: roles }] = await Promise.all([
       supabase
         .from("profiles")
@@ -38,7 +39,43 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .maybeSingle(),
       supabase.from("user_roles").select("role").eq("user_id", userId),
     ]);
-    setProfile(prof as Profile | null);
+
+    let effective = prof as Profile | null;
+    // Auto-create a profile row on first sign-in so the account is visible
+    // across the app (feed, messages, admin users, etc).
+    if (!effective) {
+      const meta = (user.user_metadata ?? {}) as Record<string, unknown>;
+      const emailBase = user.email?.split("@")[0] ?? `user_${userId.slice(0, 8)}`;
+      const raw = ((meta.username as string | undefined) ?? emailBase).toLowerCase();
+      let username = raw.replace(/[^a-z0-9_]/g, "") || `user_${userId.slice(0, 8)}`;
+      // Resolve unique username collisions with a numeric suffix.
+      for (let i = 0; i < 20; i++) {
+        const { data: clash } = await supabase
+          .from("profiles")
+          .select("id")
+          .eq("username", username)
+          .maybeSingle();
+        if (!clash) break;
+        username = `${raw}${i + 1}`;
+      }
+      const insert = {
+        id: userId,
+        username,
+        display_name:
+          (meta.display_name as string | undefined) ||
+          (meta.full_name as string | undefined) ||
+          username,
+        avatar_url: (meta.avatar_url as string | undefined) ?? null,
+      };
+      const { data: created } = await supabase
+        .from("profiles")
+        .insert(insert)
+        .select("id, username, display_name, bio, avatar_url, location")
+        .maybeSingle();
+      effective = (created as Profile | null) ?? (insert as unknown as Profile);
+    }
+
+    setProfile(effective);
     setIsAdmin(!!roles?.some((r) => r.role === "admin"));
   };
 
@@ -46,7 +83,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => {
       setSession(s);
       if (s?.user) {
-        setTimeout(() => loadProfile(s.user.id), 0);
+        setTimeout(() => loadProfile(s.user), 0);
       } else {
         setProfile(null);
         setIsAdmin(false);
@@ -54,7 +91,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
     supabase.auth.getSession().then(({ data }) => {
       setSession(data.session);
-      if (data.session?.user) loadProfile(data.session.user.id);
+      if (data.session?.user) loadProfile(data.session.user);
       setLoading(false);
     });
     return () => sub.subscription.unsubscribe();
@@ -67,7 +104,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     isAdmin,
     loading,
     refreshProfile: async () => {
-      if (session?.user) await loadProfile(session.user.id);
+      if (session?.user) await loadProfile(session.user);
     },
     signOut: async () => {
       await supabase.auth.signOut();
