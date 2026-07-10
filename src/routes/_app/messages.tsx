@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { MessageCircle, Send, Loader2, Plus, Search } from "lucide-react";
+import { MessageCircle, Send, Loader2, Plus, Search, Check, CheckCheck } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { toast } from "sonner";
 
@@ -73,13 +73,32 @@ function MessagesPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("messages")
-        .select("id, sender_id, content, created_at")
+        .select("id, sender_id, content, created_at, delivered_at, read_at")
         .eq("conversation_id", activeId!)
         .order("created_at", { ascending: true });
       if (error) throw error;
       return data ?? [];
     },
   });
+
+  // Mark incoming messages as delivered as soon as they land in our client,
+  // and as read when we have the conversation open.
+  useEffect(() => {
+    if (!user || !activeId || !messages) return;
+    const incoming = messages.filter((m) => m.sender_id !== user.id);
+    const needDelivered = incoming.filter((m) => !m.delivered_at).map((m) => m.id);
+    const needRead = incoming.filter((m) => !m.read_at).map((m) => m.id);
+    (async () => {
+      const now = new Date().toISOString();
+      if (needDelivered.length) {
+        await supabase.from("messages").update({ delivered_at: now }).in("id", needDelivered);
+      }
+      if (needRead.length) {
+        await supabase.from("messages").update({ read_at: now }).in("id", needRead);
+        qc.invalidateQueries({ queryKey: ["notifications", user.id] });
+      }
+    })();
+  }, [user, activeId, messages, qc]);
 
   // Realtime updates for messages and conversations
   useEffect(() => {
