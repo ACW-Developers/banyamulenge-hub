@@ -87,7 +87,7 @@ function AuthPage() {
       <div
         className="relative hidden lg:flex flex-col justify-end overflow-hidden bg-gray-900"
         style={{
-          backgroundImage: `url(${authHero.url})`,
+          backgroundImage: `url(${authHero})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
         }}
