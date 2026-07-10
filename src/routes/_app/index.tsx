@@ -14,17 +14,21 @@ export const Route = createFileRoute("/_app/")({
     const origin = await getRequestOrigin();
     return { origin };
   },
-  head: ({ loaderData }) => ({
-    meta: [
-      { property: "og:url", content: "/" },
-      { property: "og:image", content: `${loaderData.origin}/favicon.png` },
-      { property: "og:image:type", content: "image/png" },
-      { property: "og:image:width", content: "457" },
-      { property: "og:image:height", content: "426" },
-      { name: "twitter:image", content: `${loaderData.origin}/favicon.png` },
-    ],
-    links: [{ rel: "canonical", href: "/" }],
-  }),
+  head: ({ loaderData }) => {
+    const origin = loaderData?.origin ?? "";
+    const imageUrl = origin ? `${origin}/favicon.png` : "/favicon.png";
+    return {
+      meta: [
+        { property: "og:url", content: "/" },
+        { property: "og:image", content: imageUrl },
+        { property: "og:image:type", content: "image/png" },
+        { property: "og:image:width", content: "457" },
+        { property: "og:image:height", content: "426" },
+        { name: "twitter:image", content: imageUrl },
+      ],
+      links: [{ rel: "canonical", href: "/" }],
+    };
+  },
   component: FeedPage,
 });
 
