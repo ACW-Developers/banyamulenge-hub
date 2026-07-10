@@ -11,11 +11,5 @@ export function Logo({
   variant?: Variant;
 }) {
   const src = variant === "stacked" ? logoStacked : logoHorizontal;
-  return (
-    <img
-      src={src}
-      alt="Banyamulenge Heritage Hub"
-      className={className}
-    />
-  );
+  return <img src={src} alt="Banyamulenge Heritage Hub" className={className} />;
 }

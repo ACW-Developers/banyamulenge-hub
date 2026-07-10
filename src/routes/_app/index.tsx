@@ -61,38 +61,38 @@ function FeedPage() {
       <div className="text-center max-w-2xl mx-auto">
         <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight">Community</h1>
         <p className="mt-2 text-sm sm:text-base text-gray-500">
-          Share your stories, celebrate our heritage, and interact with fellow Banyamulenge across the globe.
+          Share your stories, celebrate our heritage, and interact with fellow Banyamulenge across
+          the globe.
         </p>
       </div>
       <div className="grid lg:grid-cols-[minmax(0,1fr)_340px] gap-6">
-      <div className="min-w-0 space-y-6">
-        <PostComposer queryKey={feedKey} />
+        <div className="min-w-0 space-y-6">
+          <PostComposer queryKey={feedKey} />
 
-        {isLoading ? (
-          <div className="flex justify-center py-12">
-            <Loader2 className="h-6 w-6 animate-spin text-primary" />
-          </div>
-        ) : posts && posts.length > 0 ? (
-          <div className="space-y-4">
-            {posts.map((p) => (
-              <PostCard key={p.id} post={p} queryKey={feedKey} />
-            ))}
-          </div>
-        ) : (
-          <div className="rounded-2xl border bg-white p-12 text-center shadow-sm">
-            <h3 className="text-lg font-bold">The feed is quiet</h3>
-            <p className="text-sm text-gray-500 mt-1">
-              Be the first to share something with the community.
-            </p>
-          </div>
-        )}
-      </div>
+          {isLoading ? (
+            <div className="flex justify-center py-12">
+              <Loader2 className="h-6 w-6 animate-spin text-primary" />
+            </div>
+          ) : posts && posts.length > 0 ? (
+            <div className="space-y-4">
+              {posts.map((p) => (
+                <PostCard key={p.id} post={p} queryKey={feedKey} />
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-2xl border bg-white p-12 text-center shadow-sm">
+              <h3 className="text-lg font-bold">The feed is quiet</h3>
+              <p className="text-sm text-gray-500 mt-1">
+                Be the first to share something with the community.
+              </p>
+            </div>
+          )}
+        </div>
 
-      <div className="lg:sticky lg:top-20 lg:self-start">
-        <AdvertsPanel />
-      </div>
+        <div className="lg:sticky lg:top-20 lg:self-start">
+          <AdvertsPanel />
+        </div>
       </div>
     </div>
   );
 }
-

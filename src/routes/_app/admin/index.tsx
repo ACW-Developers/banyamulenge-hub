@@ -47,8 +47,18 @@ function AdminDashboard() {
     { label: "Total Users", value: stats?.users, icon: Users, color: "text-blue-600 bg-blue-50" },
     { label: "Posts", value: stats?.posts, icon: FileText, color: "text-orange-600 bg-orange-50" },
     { label: "Groups", value: stats?.groups, icon: Users, color: "text-purple-600 bg-purple-50" },
-    { label: "Messages", value: stats?.msgs, icon: MessageCircle, color: "text-emerald-600 bg-emerald-50" },
-    { label: "Activity Logs", value: stats?.logs, icon: Activity, color: "text-pink-600 bg-pink-50" },
+    {
+      label: "Messages",
+      value: stats?.msgs,
+      icon: MessageCircle,
+      color: "text-emerald-600 bg-emerald-50",
+    },
+    {
+      label: "Activity Logs",
+      value: stats?.logs,
+      icon: Activity,
+      color: "text-pink-600 bg-pink-50",
+    },
     { label: "Admins", value: stats?.admins, icon: Shield, color: "text-amber-600 bg-amber-50" },
   ];
 
@@ -59,7 +69,9 @@ function AdminDashboard() {
       <div className="flex items-end justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
-          <p className="text-sm text-gray-500 mt-1">Banyamulenge Community Heritage — Platform Overview</p>
+          <p className="text-sm text-gray-500 mt-1">
+            Banyamulenge Community Heritage - Platform Overview
+          </p>
         </div>
         <div className="text-sm text-gray-500">{format(today, "EEEE, MMMM d, yyyy")}</div>
       </div>
@@ -77,7 +89,7 @@ function AdminDashboard() {
                   <div className="text-xs font-medium text-gray-500 uppercase tracking-wide">
                     {c.label}
                   </div>
-                  <div className="text-2xl font-bold mt-1">{c.value ?? "—"}</div>
+                  <div className="text-2xl font-bold mt-1">{c.value ?? "-"}</div>
                 </div>
                 <div className={`h-9 w-9 rounded-lg flex items-center justify-center ${c.color}`}>
                   <Icon className="h-5 w-5" />

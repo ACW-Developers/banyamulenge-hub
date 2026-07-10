@@ -28,7 +28,9 @@ function LogsAdmin() {
         })
         .order("created_at", { ascending: false })
         .range(from, to);
-      const ids = Array.from(new Set((logs ?? []).map((l) => l.user_id).filter(Boolean))) as string[];
+      const ids = Array.from(
+        new Set((logs ?? []).map((l) => l.user_id).filter(Boolean)),
+      ) as string[];
       const { data: profiles } = ids.length
         ? await supabase
             .from("profiles")

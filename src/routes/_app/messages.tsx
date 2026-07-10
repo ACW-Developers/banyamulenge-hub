@@ -30,7 +30,10 @@ export const Route = createFileRoute("/_app/messages")({
 type ConversationRow = {
   id: string;
   last_message_at: string;
-  conversation_participants: { user_id: string; profiles: { username: string; display_name: string | null; avatar_url: string | null } | null }[];
+  conversation_participants: {
+    user_id: string;
+    profiles: { username: string; display_name: string | null; avatar_url: string | null } | null;
+  }[];
 };
 
 function MessagesPage() {
@@ -61,10 +64,7 @@ function MessagesPage() {
     },
   });
 
-  const active = useMemo(
-    () => convos?.find((c) => c.id === activeId) ?? null,
-    [convos, activeId],
-  );
+  const active = useMemo(() => convos?.find((c) => c.id === activeId) ?? null, [convos, activeId]);
   const otherParticipant = active?.conversation_participants.find((p) => p.user_id !== user?.id);
 
   const { data: messages } = useQuery({
@@ -105,21 +105,15 @@ function MessagesPage() {
     if (!user) return;
     const ch = supabase
       .channel(`msg-rt-${user.id}`)
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "messages" },
-        (payload) => {
-          const row = (payload.new ?? payload.old) as { conversation_id?: string } | null;
-          qc.invalidateQueries({ queryKey: ["conversations", user.id] });
-          if (row?.conversation_id) {
-            qc.invalidateQueries({ queryKey: ["messages", row.conversation_id] });
-          }
-        },
-      )
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "conversations" },
-        () => qc.invalidateQueries({ queryKey: ["conversations", user.id] }),
+      .on("postgres_changes", { event: "*", schema: "public", table: "messages" }, (payload) => {
+        const row = (payload.new ?? payload.old) as { conversation_id?: string } | null;
+        qc.invalidateQueries({ queryKey: ["conversations", user.id] });
+        if (row?.conversation_id) {
+          qc.invalidateQueries({ queryKey: ["messages", row.conversation_id] });
+        }
+      })
+      .on("postgres_changes", { event: "*", schema: "public", table: "conversations" }, () =>
+        qc.invalidateQueries({ queryKey: ["conversations", user.id] }),
       )
       .subscribe();
     return () => {
@@ -156,7 +150,9 @@ function MessagesPage() {
       <div className="flex items-center justify-between mb-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Messages</h1>
-          <p className="text-sm text-gray-500 mt-1">Private conversations with community members.</p>
+          <p className="text-sm text-gray-500 mt-1">
+            Private conversations with community members.
+          </p>
         </div>
         <NewChatDialog onOpened={setActiveId} />
       </div>
@@ -210,9 +206,7 @@ function MessagesPage() {
                 );
               })
             ) : (
-              <div className="p-6 text-center text-sm text-gray-500">
-                No conversations yet.
-              </div>
+              <div className="p-6 text-center text-sm text-gray-500">No conversations yet.</div>
             )}
           </div>
         </div>
@@ -225,16 +219,14 @@ function MessagesPage() {
                 <Avatar className="h-10 w-10">
                   <AvatarImage src={otherParticipant.profiles.avatar_url ?? undefined} />
                   <AvatarFallback className="bg-primary/10 text-primary font-semibold">
-                    {(otherParticipant.profiles.display_name ||
-                      otherParticipant.profiles.username)
+                    {(otherParticipant.profiles.display_name || otherParticipant.profiles.username)
                       .slice(0, 1)
                       .toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
                 <div>
                   <div className="font-semibold text-sm">
-                    {otherParticipant.profiles.display_name ||
-                      otherParticipant.profiles.username}
+                    {otherParticipant.profiles.display_name || otherParticipant.profiles.username}
                   </div>
                   <div className="text-xs text-gray-500">@{otherParticipant.profiles.username}</div>
                 </div>
@@ -243,10 +235,7 @@ function MessagesPage() {
                 {messages?.map((m) => {
                   const mine = m.sender_id === user?.id;
                   return (
-                    <div
-                      key={m.id}
-                      className={`flex ${mine ? "justify-end" : "justify-start"}`}
-                    >
+                    <div key={m.id} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
                       <div
                         className={`max-w-[70%] rounded-2xl px-4 py-2 text-sm ${
                           mine
@@ -255,17 +244,20 @@ function MessagesPage() {
                         }`}
                       >
                         <div className="whitespace-pre-wrap break-words">{m.content}</div>
-                        <div className={`text-[10px] mt-1 flex items-center gap-1 ${mine ? "opacity-90 justify-end" : "text-gray-400"}`}>
-                          <span>{formatDistanceToNow(new Date(m.created_at), { addSuffix: true })}</span>
-                          {mine && (
-                            m.read_at ? (
+                        <div
+                          className={`text-[10px] mt-1 flex items-center gap-1 ${mine ? "opacity-90 justify-end" : "text-gray-400"}`}
+                        >
+                          <span>
+                            {formatDistanceToNow(new Date(m.created_at), { addSuffix: true })}
+                          </span>
+                          {mine &&
+                            (m.read_at ? (
                               <CheckCheck className="h-3.5 w-3.5 text-sky-300" aria-label="Read" />
                             ) : m.delivered_at ? (
                               <CheckCheck className="h-3.5 w-3.5" aria-label="Delivered" />
                             ) : (
                               <Check className="h-3.5 w-3.5" aria-label="Sent" />
-                            )
-                          )}
+                            ))}
                         </div>
                       </div>
                     </div>
@@ -291,7 +283,11 @@ function MessagesPage() {
                   className="bg-gray-50 border-gray-200"
                 />
                 <Button onClick={send} disabled={sending || !text.trim()} className="gap-2">
-                  {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                  {sending ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Send className="h-4 w-4" />
+                  )}
                 </Button>
               </div>
             </>
@@ -299,7 +295,9 @@ function MessagesPage() {
             <div className="flex-1 flex flex-col items-center justify-center text-center p-6">
               <MessageCircle className="h-12 w-12 text-primary mb-3" />
               <h3 className="font-bold">Select a conversation</h3>
-              <p className="text-sm text-gray-500 mt-1">Or start a new one from anyone's profile.</p>
+              <p className="text-sm text-gray-500 mt-1">
+                Or start a new one from anyone's profile.
+              </p>
             </div>
           )}
         </div>

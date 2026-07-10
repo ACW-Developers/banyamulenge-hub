@@ -15,7 +15,7 @@ import logoStacked from "@/assets/logo-stacked.png";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Sign in — Banyamulenge Community Heritage" },
+      { title: "Sign in - Banyamulenge Community Heritage" },
       {
         name: "description",
         content: "Sign in or join the Banyamulenge Community Heritage platform.",
@@ -58,7 +58,7 @@ function AuthPage() {
           },
         });
         if (error) throw error;
-        toast.success("Account created — welcome!");
+        toast.success("Account created - welcome!");
       }
     } catch (err) {
       toast.error((err as Error).message);
@@ -83,7 +83,7 @@ function AuthPage() {
 
   return (
     <div className="min-h-screen grid lg:grid-cols-2 bg-background">
-      {/* Left visual — full-bleed hero with darkened bottom */}
+      {/* Left visual - full-bleed hero with darkened bottom */}
       <div
         className="relative hidden lg:flex flex-col justify-end overflow-hidden bg-gray-900"
         style={{
@@ -93,7 +93,7 @@ function AuthPage() {
         }}
       >
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-        <div className="relative z-10 p-10 text-white max-w-md">
+        <div className="relative z-10 p-10 text-white max-w-xl">
           <h1 className="text-3xl font-bold leading-tight drop-shadow-lg">
             One community. One heritage. Everywhere in the world.
           </h1>
@@ -108,7 +108,11 @@ function AuthPage() {
         <div className="w-full max-w-md">
           <div className="rounded-2xl border bg-card shadow-soft p-6 sm:p-8 pt-6">
             <div className="flex flex-col items-center mb-5">
-              <img src={logoStacked} alt="Banyamulenge Heritage Hub" className="h-24 w-auto object-contain" />
+              <img
+                src={logoStacked}
+                alt="Banyamulenge Heritage Hub"
+                className="h-24 w-auto object-contain"
+              />
               <p className="text-xs text-muted-foreground mt-2">Community Heritage Platform</p>
             </div>
 
@@ -194,12 +198,14 @@ function AuthPage() {
                 </div>
               </div>
 
-              <Button
-                type="submit"
-                disabled={busy}
-                className="w-full h-11 text-base font-semibold"
-              >
-                {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : mode === "signin" ? "Sign In" : "Create Account"}
+              <Button type="submit" disabled={busy} className="w-full h-11 text-base font-semibold">
+                {busy ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : mode === "signin" ? (
+                  "Sign In"
+                ) : (
+                  "Create Account"
+                )}
               </Button>
             </form>
 

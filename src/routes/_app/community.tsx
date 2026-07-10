@@ -34,7 +34,7 @@ function slugify(s: string) {
 function CommunityPage() {
   const { user } = useAuth();
   const qc = useQueryClient();
-  
+
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [desc, setDesc] = useState("");
@@ -119,7 +119,11 @@ function CommunityPage() {
             <div className="space-y-3">
               <div className="space-y-1.5">
                 <Label>Name</Label>
-                <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Nairobi Chapter" />
+                <Input
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Nairobi Chapter"
+                />
               </div>
               <div className="space-y-1.5">
                 <Label>Description</Label>
@@ -146,7 +150,9 @@ function CommunityPage() {
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {groups.map((g) => {
             const members = g.group_members ?? [];
-            const isMember = user ? members.some((m: { user_id: string }) => m.user_id === user.id) : false;
+            const isMember = user
+              ? members.some((m: { user_id: string }) => m.user_id === user.id)
+              : false;
             return (
               <div
                 key={g.id}

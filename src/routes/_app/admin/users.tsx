@@ -81,7 +81,12 @@ function UsersAdmin() {
           .insert({ user_id: userId, role: "admin" });
         if (error) throw error;
       }
-      logActivity(user?.id ?? null, isAdmin ? "role.revoke.admin" : "role.grant.admin", "user", userId);
+      logActivity(
+        user?.id ?? null,
+        isAdmin ? "role.revoke.admin" : "role.grant.admin",
+        "user",
+        userId,
+      );
     },
     onSuccess: () => {
       toast.success("Updated");
@@ -131,7 +136,9 @@ function UsersAdmin() {
   const sync = useMutation({
     mutationFn: () => runSync(),
     onSuccess: (r) => {
-      toast.success(`Synced ${r.total} account${r.total === 1 ? "" : "s"} · ${r.created} new profile${r.created === 1 ? "" : "s"}`);
+      toast.success(
+        `Synced ${r.total} account${r.total === 1 ? "" : "s"} · ${r.created} new profile${r.created === 1 ? "" : "s"}`,
+      );
       qc.invalidateQueries({ queryKey: ["admin-users"] });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -146,8 +153,17 @@ function UsersAdmin() {
             View all members. Edit profiles, remove accounts, grant or revoke admin.
           </p>
         </div>
-        <Button variant="outline" className="gap-2" disabled={sync.isPending} onClick={() => sync.mutate()}>
-          {sync.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+        <Button
+          variant="outline"
+          className="gap-2"
+          disabled={sync.isPending}
+          onClick={() => sync.mutate()}
+        >
+          {sync.isPending ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <RefreshCw className="h-4 w-4" />
+          )}
           Sync accounts
         </Button>
       </div>
@@ -202,7 +218,7 @@ function UsersAdmin() {
                     </div>
                   </td>
                   <td className="px-4 py-3 text-gray-600 hidden md:table-cell">
-                    {u.location || <span className="text-gray-300">—</span>}
+                    {u.location || <span className="text-gray-300">-</span>}
                   </td>
                   <td className="px-4 py-3">
                     {isAdminUser ? (
@@ -227,9 +243,7 @@ function UsersAdmin() {
                         variant={isAdminUser ? "outline" : "default"}
                         size="sm"
                         disabled={toggleAdmin.isPending || self}
-                        onClick={() =>
-                          toggleAdmin.mutate({ userId: u.id, isAdmin: isAdminUser })
-                        }
+                        onClick={() => toggleAdmin.mutate({ userId: u.id, isAdmin: isAdminUser })}
                         className="gap-1"
                       >
                         {isAdminUser ? (

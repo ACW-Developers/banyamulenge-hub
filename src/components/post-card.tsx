@@ -43,13 +43,7 @@ export type FeedPost = {
   comments: { id: string }[];
 };
 
-export function PostCard({
-  post,
-  queryKey,
-}: {
-  post: FeedPost;
-  queryKey: readonly unknown[];
-}) {
+export function PostCard({ post, queryKey }: { post: FeedPost; queryKey: readonly unknown[] }) {
   const { user } = useAuth();
   const qc = useQueryClient();
   const [showComments, setShowComments] = useState(false);
@@ -100,7 +94,9 @@ export function PostCard({
     queryFn: async () => {
       const { data } = await supabase
         .from("comments")
-        .select("id, content, created_at, user_id, profiles!comments_author_profile_fkey(username, display_name, avatar_url)")
+        .select(
+          "id, content, created_at, user_id, profiles!comments_author_profile_fkey(username, display_name, avatar_url)",
+        )
         .eq("post_id", post.id)
         .order("created_at", { ascending: true });
       return (data ?? []) as unknown as CommentRow[];
@@ -164,7 +160,8 @@ export function PostCard({
               {post.author?.display_name || post.author?.username}
             </div>
             <div className="text-xs text-gray-500 truncate">
-              @{post.author?.username} · {formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}
+              @{post.author?.username} ·{" "}
+              {formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}
             </div>
           </div>
         </Link>
@@ -176,10 +173,7 @@ export function PostCard({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem
-                onClick={() => del.mutate()}
-                className="text-red-600"
-              >
+              <DropdownMenuItem onClick={() => del.mutate()} className="text-red-600">
                 <Trash2 className="h-4 w-4 mr-2" /> Delete
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -256,11 +250,7 @@ export function PostCard({
                   }
                 }}
               />
-              <Button
-                size="icon"
-                onClick={submitComment}
-                disabled={!commentText.trim()}
-              >
+              <Button size="icon" onClick={submitComment} disabled={!commentText.trim()}>
                 <Send className="h-4 w-4" />
               </Button>
             </div>
@@ -374,12 +364,7 @@ export function PostComposer({
             <label className="cursor-pointer inline-flex items-center gap-2 px-3 py-2 rounded-lg border text-sm text-gray-600 hover:bg-gray-50">
               <ImageIcon />
               Photo
-              <input
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={pickImage}
-              />
+              <input type="file" accept="image/*" className="hidden" onChange={pickImage} />
             </label>
             {isAdmin && !groupId && (
               <button
@@ -388,7 +373,7 @@ export function PostComposer({
                 className={`inline-flex items-center gap-2 px-3 py-2 rounded-lg border text-sm transition ${
                   isAnnouncement
                     ? "border-amber-400 bg-amber-50 text-amber-700"
-                    : "text-gray-600 hover:bg-gray-50"
+                    : "text-gray-600 hover:bg-orange-50"
                 }`}
               >
                 <Megaphone className="h-4 w-4" />
@@ -396,16 +381,8 @@ export function PostComposer({
               </button>
             )}
             <div className="ml-auto">
-              <Button
-                disabled={!content.trim() || busy}
-                onClick={submit}
-                className="gap-2"
-              >
-                {busy ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Send className="h-4 w-4" />
-                )}
+              <Button disabled={!content.trim() || busy} onClick={submit} className="gap-2">
+                {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
                 Post
               </Button>
             </div>

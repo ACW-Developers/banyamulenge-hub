@@ -83,7 +83,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         name: "description",
         content:
-          "A digital home for Banyamulenge people worldwide — preserve heritage, connect the diaspora, share stories, and grow together.",
+          "A digital home for Banyamulenge people worldwide - preserve heritage, connect the diaspora, share stories, and grow together.",
       },
       { property: "og:title", content: "Banyamulenge Community Heritage" },
       {

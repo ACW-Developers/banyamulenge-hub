@@ -1,14 +1,7 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
-import {
-  Megaphone,
-  Plus,
-  Loader2,
-  Trash2,
-  ExternalLink,
-  Image as ImageIcon,
-} from "lucide-react";
+import { Megaphone, Plus, Loader2, Trash2, ExternalLink, Image as ImageIcon } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -95,9 +88,7 @@ export function AdvertsPanel() {
             ))}
           </div>
         ) : (
-          <p className="text-xs text-gray-500 text-center py-6">
-            No posts on the board yet.
-          </p>
+          <p className="text-xs text-gray-500 text-center py-6">No posts on the board yet.</p>
         )}
       </div>
     </aside>
@@ -122,12 +113,7 @@ function AdvertCard({ advert }: { advert: Advert }) {
   return (
     <article className="rounded-xl border bg-white overflow-hidden hover:border-primary/30 transition">
       {advert.image_url && (
-        <img
-          src={advert.image_url}
-          alt=""
-          className="w-full h-32 object-cover"
-          loading="lazy"
-        />
+        <img src={advert.image_url} alt="" className="w-full h-46 object-cover" loading="lazy" />
       )}
       <div className="p-3">
         <div className="flex items-start justify-between gap-2">
@@ -230,7 +216,11 @@ function NewAdvertDialog() {
         <div className="space-y-3">
           <div className="space-y-1.5">
             <Label>Title</Label>
-            <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Community announcement" />
+            <Input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Community announcement"
+            />
           </div>
           <div className="space-y-1.5">
             <Label>Content</Label>
@@ -247,7 +237,11 @@ function NewAdvertDialog() {
               <input type="file" accept="image/*" className="hidden" onChange={pick} />
             </label>
             {preview && (
-              <img src={preview} alt="preview" className="mt-2 w-full max-h-40 object-cover rounded-lg border" />
+              <img
+                src={preview}
+                alt="preview"
+                className="mt-2 w-full max-h-40 object-cover rounded-lg border"
+              />
             )}
           </div>
         </div>

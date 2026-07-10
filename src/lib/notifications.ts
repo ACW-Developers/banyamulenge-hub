@@ -83,20 +83,14 @@ export function useNotifications(): NotificationCounts {
     if (!user) return;
     const ch = supabase
       .channel(`notif-${user.id}`)
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "messages" },
-        () => qc.invalidateQueries({ queryKey: ["notifications", user.id] }),
+      .on("postgres_changes", { event: "*", schema: "public", table: "messages" }, () =>
+        qc.invalidateQueries({ queryKey: ["notifications", user.id] }),
       )
-      .on(
-        "postgres_changes",
-        { event: "INSERT", schema: "public", table: "posts" },
-        () => qc.invalidateQueries({ queryKey: ["notifications", user.id] }),
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "posts" }, () =>
+        qc.invalidateQueries({ queryKey: ["notifications", user.id] }),
       )
-      .on(
-        "postgres_changes",
-        { event: "INSERT", schema: "public", table: "follows" },
-        () => qc.invalidateQueries({ queryKey: ["notifications", user.id] }),
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "follows" }, () =>
+        qc.invalidateQueries({ queryKey: ["notifications", user.id] }),
       )
       .subscribe();
     return () => {

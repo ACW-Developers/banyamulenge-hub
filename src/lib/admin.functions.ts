@@ -72,9 +72,7 @@ export const syncAuthUsersToProfiles = createServerFn({ method: "POST" })
           username = `${row.username}${i + 1}`;
         }
 
-        const { error: insErr } = await supabaseAdmin
-          .from("profiles")
-          .insert({ ...row, username });
+        const { error: insErr } = await supabaseAdmin.from("profiles").insert({ ...row, username });
         if (!insErr) created += 1;
       }
 

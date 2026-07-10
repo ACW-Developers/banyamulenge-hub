@@ -18,8 +18,8 @@ function parseUA(ua: string) {
   const device = /Mobi|Android|iPhone|iPod/.test(ua)
     ? "Mobile"
     : /iPad|Tablet/.test(ua)
-    ? "Tablet"
-    : "Desktop";
+      ? "Tablet"
+      : "Desktop";
 
   return { browser, os, device };
 }

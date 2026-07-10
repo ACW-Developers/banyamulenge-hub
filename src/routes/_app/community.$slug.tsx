@@ -70,14 +70,21 @@ function GroupPage() {
     const gid = group.id;
     const ch = supabase
       .channel(`group-feed-${gid}`)
-      .on("postgres_changes", { event: "*", schema: "public", table: "posts", filter: `group_id=eq.${gid}` },
-        () => qc.invalidateQueries({ queryKey: ["group-feed", gid] }))
-      .on("postgres_changes", { event: "*", schema: "public", table: "likes" },
-        () => qc.invalidateQueries({ queryKey: ["group-feed", gid] }))
-      .on("postgres_changes", { event: "*", schema: "public", table: "comments" },
-        () => qc.invalidateQueries({ queryKey: ["group-feed", gid] }))
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "posts", filter: `group_id=eq.${gid}` },
+        () => qc.invalidateQueries({ queryKey: ["group-feed", gid] }),
+      )
+      .on("postgres_changes", { event: "*", schema: "public", table: "likes" }, () =>
+        qc.invalidateQueries({ queryKey: ["group-feed", gid] }),
+      )
+      .on("postgres_changes", { event: "*", schema: "public", table: "comments" }, () =>
+        qc.invalidateQueries({ queryKey: ["group-feed", gid] }),
+      )
       .subscribe();
-    return () => { supabase.removeChannel(ch); };
+    return () => {
+      supabase.removeChannel(ch);
+    };
   }, [group?.id, qc]);
 
   if (loadingGroup) {
@@ -120,16 +127,16 @@ function GroupPage() {
             <div className="text-xs text-gray-500 mt-1">{members.length} members</div>
           </div>
         </div>
-        {group.description && (
-          <p className="mt-4 text-sm text-gray-600">{group.description}</p>
-        )}
+        {group.description && <p className="mt-4 text-sm text-gray-600">{group.description}</p>}
       </div>
 
       <div className="flex gap-2 border-b">
         <button
           onClick={() => setTab("posts")}
           className={`px-4 py-2 text-sm font-semibold inline-flex items-center gap-2 border-b-2 -mb-px transition ${
-            tab === "posts" ? "border-primary text-primary" : "border-transparent text-gray-500 hover:text-gray-800"
+            tab === "posts"
+              ? "border-primary text-primary"
+              : "border-transparent text-gray-500 hover:text-gray-800"
           }`}
         >
           <FileText className="h-4 w-4" /> Posts
@@ -137,7 +144,9 @@ function GroupPage() {
         <button
           onClick={() => setTab("chat")}
           className={`px-4 py-2 text-sm font-semibold inline-flex items-center gap-2 border-b-2 -mb-px transition ${
-            tab === "chat" ? "border-primary text-primary" : "border-transparent text-gray-500 hover:text-gray-800"
+            tab === "chat"
+              ? "border-primary text-primary"
+              : "border-transparent text-gray-500 hover:text-gray-800"
           }`}
         >
           <MessageSquare className="h-4 w-4" /> Group chat
@@ -191,7 +200,9 @@ function GroupChat({ groupId, isMember }: { groupId: string; isMember: boolean }
     queryFn: async (): Promise<GroupMessage[]> => {
       const { data, error } = await supabase
         .from("group_messages")
-        .select("id, group_id, sender_id, content, created_at, sender:profiles!group_messages_sender_id_fkey(username, display_name, avatar_url)")
+        .select(
+          "id, group_id, sender_id, content, created_at, sender:profiles!group_messages_sender_id_fkey(username, display_name, avatar_url)",
+        )
         .eq("group_id", groupId)
         .order("created_at", { ascending: true })
         .limit(200);
@@ -206,7 +217,12 @@ function GroupChat({ groupId, isMember }: { groupId: string; isMember: boolean }
       .channel(`group-chat-${groupId}`)
       .on(
         "postgres_changes",
-        { event: "INSERT", schema: "public", table: "group_messages", filter: `group_id=eq.${groupId}` },
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "group_messages",
+          filter: `group_id=eq.${groupId}`,
+        },
         () => qc.invalidateQueries({ queryKey: key }),
       )
       .subscribe();

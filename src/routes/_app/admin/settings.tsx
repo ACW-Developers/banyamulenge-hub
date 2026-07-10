@@ -241,7 +241,9 @@ function TrafficSection() {
                 const Icon = k.icon;
                 return (
                   <div key={k.label} className="rounded-xl border bg-gray-50/50 p-4">
-                    <div className={`h-10 w-10 rounded-lg flex items-center justify-center ${k.accent}`}>
+                    <div
+                      className={`h-10 w-10 rounded-lg flex items-center justify-center ${k.accent}`}
+                    >
                       <Icon className="h-5 w-5" />
                     </div>
                     <div className="mt-3 text-2xl font-bold">{k.value}</div>

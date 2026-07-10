@@ -203,7 +203,11 @@ function ProfilePage() {
                     disabled={toggleFollow.isPending}
                     className="gap-2"
                   >
-                    {isFollowing ? <UserCheck className="h-4 w-4" /> : <UserPlus className="h-4 w-4" />}
+                    {isFollowing ? (
+                      <UserCheck className="h-4 w-4" />
+                    ) : (
+                      <UserPlus className="h-4 w-4" />
+                    )}
                     {isFollowing ? "Following" : "Follow"}
                   </Button>
                 </>
@@ -221,7 +225,8 @@ function ProfilePage() {
                 </span>
               )}
               <span className="inline-flex items-center gap-1">
-                <Calendar className="h-3.5 w-3.5" /> Joined {format(new Date(profile.created_at), "MMM yyyy")}
+                <Calendar className="h-3.5 w-3.5" /> Joined{" "}
+                {format(new Date(profile.created_at), "MMM yyyy")}
               </span>
             </div>
             <div className="flex gap-6 mt-4 text-sm">
@@ -249,7 +254,8 @@ function ProfilePage() {
       <div className="rounded-2xl border bg-white p-8 text-center shadow-sm">
         <h2 className="text-lg font-bold mb-1">Posts live in the feed</h2>
         <p className="text-sm text-gray-500">
-          {profile.display_name || profile.username} has {posts?.length ?? 0} post{(posts?.length ?? 0) === 1 ? "" : "s"} — visit the home feed to like and comment.
+          {profile.display_name || profile.username} has {posts?.length ?? 0} post
+          {(posts?.length ?? 0) === 1 ? "" : "s"} - visit the home feed to like and comment.
         </p>
         <Link to="/" className="inline-block mt-4 text-primary font-semibold text-sm">
           Open community feed →
@@ -284,13 +290,7 @@ async function fileToDataUrl(file: File, maxDim = 512): Promise<string> {
   });
 }
 
-function EditProfileDialog({
-  profile,
-  onSaved,
-}: {
-  profile: ProfileFull;
-  onSaved: () => void;
-}) {
+function EditProfileDialog({ profile, onSaved }: { profile: ProfileFull; onSaved: () => void }) {
   const [open, setOpen] = useState(false);
   const [displayName, setDisplayName] = useState(profile.display_name ?? "");
   const [bio, setBio] = useState(profile.bio ?? "");
@@ -386,12 +386,25 @@ function EditProfileDialog({
             >
               <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/20">
                 <input ref={coverRef} type="file" accept="image/*" hidden onChange={pickCover} />
-                <Button type="button" size="sm" variant="secondary" className="gap-2" disabled={uploadingCover} onClick={() => coverRef.current?.click()}>
-                  {uploadingCover ? <Loader2 className="h-4 w-4 animate-spin" /> : <Camera className="h-4 w-4" />}
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="secondary"
+                  className="gap-2"
+                  disabled={uploadingCover}
+                  onClick={() => coverRef.current?.click()}
+                >
+                  {uploadingCover ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Camera className="h-4 w-4" />
+                  )}
                   {coverUrl ? "Change cover" : "Upload cover"}
                 </Button>
                 {coverUrl && (
-                  <Button type="button" size="sm" variant="outline" onClick={() => setCoverUrl("")}>Remove</Button>
+                  <Button type="button" size="sm" variant="outline" onClick={() => setCoverUrl("")}>
+                    Remove
+                  </Button>
                 )}
               </div>
             </div>
@@ -404,13 +417,7 @@ function EditProfileDialog({
               </AvatarFallback>
             </Avatar>
             <div className="flex flex-col gap-2">
-              <input
-                ref={fileRef}
-                type="file"
-                accept="image/*"
-                hidden
-                onChange={pickFile}
-              />
+              <input ref={fileRef} type="file" accept="image/*" hidden onChange={pickFile} />
               <Button
                 type="button"
                 variant="outline"
@@ -484,18 +491,30 @@ function FollowersDialog({
       if (mode === "followers") {
         const { data } = await supabase
           .from("follows")
-          .select("follower:profiles!follows_follower_profile_fkey(id, username, display_name, avatar_url, bio)")
+          .select(
+            "follower:profiles!follows_follower_profile_fkey(id, username, display_name, avatar_url, bio)",
+          )
           .eq("following_id", userId);
         return (data ?? []).map((r: { follower: unknown }) => r.follower).filter(Boolean) as Array<{
-          id: string; username: string; display_name: string | null; avatar_url: string | null; bio: string | null;
+          id: string;
+          username: string;
+          display_name: string | null;
+          avatar_url: string | null;
+          bio: string | null;
         }>;
       }
       const { data } = await supabase
         .from("follows")
-        .select("following:profiles!follows_following_profile_fkey(id, username, display_name, avatar_url, bio)")
+        .select(
+          "following:profiles!follows_following_profile_fkey(id, username, display_name, avatar_url, bio)",
+        )
         .eq("follower_id", userId);
       return (data ?? []).map((r: { following: unknown }) => r.following).filter(Boolean) as Array<{
-        id: string; username: string; display_name: string | null; avatar_url: string | null; bio: string | null;
+        id: string;
+        username: string;
+        display_name: string | null;
+        avatar_url: string | null;
+        bio: string | null;
       }>;
     },
   });
@@ -506,8 +525,7 @@ function FollowersDialog({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <button className="text-left hover:text-primary transition">
-          <span className="font-bold">{count}</span>{" "}
-          <span className="text-gray-500">{label}</span>
+          <span className="font-bold">{count}</span> <span className="text-gray-500">{label}</span>
         </button>
       </DialogTrigger>
       <DialogContent>
@@ -555,4 +573,3 @@ function FollowersDialog({
     </Dialog>
   );
 }
-

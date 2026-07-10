@@ -131,11 +131,7 @@ function ExplorePage() {
                   <div className="absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.6),transparent)]" />
                 </div>
                 <div className="px-5 pb-5 -mt-10">
-                  <Link
-                    to="/profile/$username"
-                    params={{ username: p.username }}
-                    className="block"
-                  >
+                  <Link to="/profile/$username" params={{ username: p.username }} className="block">
                     <Avatar className="h-20 w-20 ring-4 ring-white shadow-md">
                       <AvatarImage src={p.avatar_url ?? undefined} />
                       <AvatarFallback className="bg-primary text-primary-foreground text-xl font-bold">
@@ -155,9 +151,7 @@ function ExplorePage() {
                       {p.location}
                     </div>
                   )}
-                  {p.bio && (
-                    <p className="text-sm text-gray-600 mt-3 line-clamp-2">{p.bio}</p>
-                  )}
+                  {p.bio && <p className="text-sm text-gray-600 mt-3 line-clamp-2">{p.bio}</p>}
                   <div className="mt-4 pt-3 border-t flex items-center justify-between text-xs">
                     <span className="inline-flex items-center gap-1 text-gray-500">
                       <Users className="h-3.5 w-3.5" />
