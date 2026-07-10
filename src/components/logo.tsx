@@ -1,5 +1,21 @@
-import logoAsset from "@/assets/logo.png.asset.json";
+import logoHorizontal from "@/assets/logo-horizontal.png";
+import logoStacked from "@/assets/logo-stacked.png";
 
-export function Logo({ className }: { className?: string }) {
-  return <img src={logoAsset.url} alt="Banyamulenge Community Heritage" className={className} />;
+type Variant = "horizontal" | "stacked";
+
+export function Logo({
+  className,
+  variant = "horizontal",
+}: {
+  className?: string;
+  variant?: Variant;
+}) {
+  const src = variant === "stacked" ? logoStacked : logoHorizontal;
+  return (
+    <img
+      src={src}
+      alt="Banyamulenge Heritage Hub"
+      className={className}
+    />
+  );
 }
