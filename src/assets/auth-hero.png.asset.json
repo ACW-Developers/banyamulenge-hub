@@ -1,11 +1,11 @@
 {
-  "version": 1,
   "asset_id": "6c069abc-a2f4-4228-b450-aa85cf6de703",
-  "project_id": "009e83bb-e265-4dc4-a58f-2f14f7f62639",
-  "url": "/__l5e/assets-v1/6c069abc-a2f4-4228-b450-aa85cf6de703/auth-hero.png",
-  "r2_key": "a/v1/009e83bb-e265-4dc4-a58f-2f14f7f62639/6c069abc-a2f4-4228-b450-aa85cf6de703/auth-hero.png",
-  "original_filename": "auth-hero.png",
-  "size": 965412,
   "content_type": "image/png",
-  "created_at": "2026-07-06T12:29:06Z"
+  "created_at": "2026-07-06T12:29:06Z",
+  "original_filename": "auth-hero.png",
+  "project_id": "b0b87b03-ed7f-478e-8e23-548029db89f9",
+  "r2_key": "a/v1/b0b87b03-ed7f-478e-8e23-548029db89f9/6c069abc-a2f4-4228-b450-aa85cf6de703/auth-hero.png",
+  "size": 965412,
+  "url": "/__l5e/assets-v1/6c069abc-a2f4-4228-b450-aa85cf6de703/auth-hero.png",
+  "version": 1
 }
