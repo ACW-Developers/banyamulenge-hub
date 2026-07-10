@@ -131,3 +131,10 @@
     font-feature-settings: "ss01", "cv02";
   }
 }
+
+@media (max-width: 768px) {
+  html {
+    font-size: 0.925rem;
+  }
+}
+
