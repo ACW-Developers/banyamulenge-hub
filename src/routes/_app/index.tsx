@@ -51,7 +51,14 @@ function FeedPage() {
   }, [qc]);
 
   return (
-    <div className="max-w-7xl mx-auto grid lg:grid-cols-[minmax(0,1fr)_340px] gap-6">
+    <div className="max-w-7xl mx-auto space-y-6">
+      <div className="text-center max-w-2xl mx-auto">
+        <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight">Community</h1>
+        <p className="mt-2 text-sm sm:text-base text-gray-500">
+          Share your stories, celebrate our heritage, and interact with fellow Banyamulenge across the globe.
+        </p>
+      </div>
+      <div className="grid lg:grid-cols-[minmax(0,1fr)_340px] gap-6">
       <div className="min-w-0 space-y-6">
         <PostComposer queryKey={feedKey} />
 
