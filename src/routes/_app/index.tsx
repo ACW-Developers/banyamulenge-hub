@@ -85,6 +85,8 @@ function FeedPage() {
       <div className="lg:sticky lg:top-20 lg:self-start">
         <AdvertsPanel />
       </div>
+      </div>
     </div>
   );
 }
+
