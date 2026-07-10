@@ -37,6 +37,11 @@ function FeedPage() {
     queryFn: fetchFeed,
   });
 
+  // Mark feed as seen once loaded
+  useEffect(() => {
+    if (posts) markFeedSeen();
+  }, [posts]);
+
   // Realtime updates for posts, likes, comments
   useEffect(() => {
     const invalidate = () => qc.invalidateQueries({ queryKey: feedKey });
