@@ -6,6 +6,7 @@ import { Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { PostCard, PostComposer, type FeedPost } from "@/components/post-card";
 import { AdvertsPanel } from "@/components/adverts-panel";
+import { markFeedSeen } from "@/lib/notifications";
 
 export const Route = createFileRoute("/_app/")({
   component: FeedPage,
