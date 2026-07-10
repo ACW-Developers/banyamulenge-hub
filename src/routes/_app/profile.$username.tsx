@@ -456,3 +456,103 @@ function EditProfileDialog({
     </Dialog>
   );
 }
+
+function FollowersDialog({
+  userId,
+  mode,
+  count,
+  isSelf,
+}: {
+  userId: string;
+  mode: "followers" | "following";
+  count: number;
+  isSelf: boolean;
+}) {
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    if (open && isSelf && mode === "followers") {
+      // Mark followers as seen when the owner opens the list
+      import("@/lib/notifications").then(({ markFollowersSeen }) => markFollowersSeen());
+    }
+  }, [open, isSelf, mode]);
+
+  const { data: people, isLoading } = useQuery({
+    queryKey: ["follow-list", userId, mode],
+    enabled: open,
+    queryFn: async () => {
+      if (mode === "followers") {
+        const { data } = await supabase
+          .from("follows")
+          .select("follower:profiles!follows_follower_profile_fkey(id, username, display_name, avatar_url, bio)")
+          .eq("following_id", userId);
+        return (data ?? []).map((r: { follower: unknown }) => r.follower).filter(Boolean) as Array<{
+          id: string; username: string; display_name: string | null; avatar_url: string | null; bio: string | null;
+        }>;
+      }
+      const { data } = await supabase
+        .from("follows")
+        .select("following:profiles!follows_following_profile_fkey(id, username, display_name, avatar_url, bio)")
+        .eq("follower_id", userId);
+      return (data ?? []).map((r: { following: unknown }) => r.following).filter(Boolean) as Array<{
+        id: string; username: string; display_name: string | null; avatar_url: string | null; bio: string | null;
+      }>;
+    },
+  });
+
+  const label = mode === "followers" ? "Followers" : "Following";
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <button className="text-left hover:text-primary transition">
+          <span className="font-bold">{count}</span>{" "}
+          <span className="text-gray-500">{label}</span>
+        </button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>{label}</DialogTitle>
+        </DialogHeader>
+        <div className="max-h-96 overflow-y-auto -mx-2">
+          {isLoading ? (
+            <div className="flex justify-center py-8">
+              <Loader2 className="h-5 w-5 animate-spin text-primary" />
+            </div>
+          ) : people && people.length > 0 ? (
+            people.map((p) => {
+              const initial = (p.display_name || p.username).slice(0, 1).toUpperCase();
+              return (
+                <Link
+                  key={p.id}
+                  to="/profile/$username"
+                  params={{ username: p.username }}
+                  onClick={() => setOpen(false)}
+                  className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100"
+                >
+                  <Avatar className="h-10 w-10">
+                    <AvatarImage src={p.avatar_url ?? undefined} />
+                    <AvatarFallback className="bg-primary/10 text-primary font-semibold">
+                      {initial}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="min-w-0 flex-1">
+                    <div className="text-sm font-semibold truncate">
+                      {p.display_name || p.username}
+                    </div>
+                    <div className="text-xs text-gray-500 truncate">@{p.username}</div>
+                  </div>
+                </Link>
+              );
+            })
+          ) : (
+            <div className="p-6 text-center text-sm text-gray-500">
+              No {label.toLowerCase()} yet.
+            </div>
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
