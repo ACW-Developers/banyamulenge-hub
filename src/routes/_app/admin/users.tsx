@@ -1,10 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
-import { Search, Shield, ShieldOff, Loader2, Pencil, Trash2 } from "lucide-react";
+import { Search, Shield, ShieldOff, Loader2, Pencil, Trash2, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
+import { syncAuthUsersToProfiles } from "@/lib/admin.functions";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -125,13 +127,29 @@ function UsersAdmin() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const runSync = useServerFn(syncAuthUsersToProfiles);
+  const sync = useMutation({
+    mutationFn: () => runSync(),
+    onSuccess: (r) => {
+      toast.success(`Synced ${r.total} account${r.total === 1 ? "" : "s"} · ${r.created} new profile${r.created === 1 ? "" : "s"}`);
+      qc.invalidateQueries({ queryKey: ["admin-users"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">User Management</h1>
-        <p className="text-sm text-gray-500 mt-1">
-          View all members. Edit profiles, remove accounts, grant or revoke admin.
-        </p>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">User Management</h1>
+          <p className="text-sm text-gray-500 mt-1">
+            View all members. Edit profiles, remove accounts, grant or revoke admin.
+          </p>
+        </div>
+        <Button variant="outline" className="gap-2" disabled={sync.isPending} onClick={() => sync.mutate()}>
+          {sync.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+          Sync accounts
+        </Button>
       </div>
 
       <div className="relative max-w-md">
