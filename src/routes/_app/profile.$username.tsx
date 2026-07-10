@@ -225,14 +225,18 @@ function ProfilePage() {
               </span>
             </div>
             <div className="flex gap-6 mt-4 text-sm">
-              <div>
-                <span className="font-bold">{stats?.followers ?? 0}</span>{" "}
-                <span className="text-gray-500">Followers</span>
-              </div>
-              <div>
-                <span className="font-bold">{stats?.following ?? 0}</span>{" "}
-                <span className="text-gray-500">Following</span>
-              </div>
+              <FollowersDialog
+                userId={profile.id}
+                mode="followers"
+                count={stats?.followers ?? 0}
+                isSelf={isSelf}
+              />
+              <FollowersDialog
+                userId={profile.id}
+                mode="following"
+                count={stats?.following ?? 0}
+                isSelf={isSelf}
+              />
               <div>
                 <span className="font-bold">{posts?.length ?? 0}</span>{" "}
                 <span className="text-gray-500">Posts</span>
