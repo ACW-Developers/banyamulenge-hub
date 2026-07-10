@@ -255,8 +255,17 @@ function MessagesPage() {
                         }`}
                       >
                         <div className="whitespace-pre-wrap break-words">{m.content}</div>
-                        <div className={`text-[10px] mt-1 ${mine ? "opacity-80" : "text-gray-400"}`}>
-                          {formatDistanceToNow(new Date(m.created_at), { addSuffix: true })}
+                        <div className={`text-[10px] mt-1 flex items-center gap-1 ${mine ? "opacity-90 justify-end" : "text-gray-400"}`}>
+                          <span>{formatDistanceToNow(new Date(m.created_at), { addSuffix: true })}</span>
+                          {mine && (
+                            m.read_at ? (
+                              <CheckCheck className="h-3.5 w-3.5 text-sky-300" aria-label="Read" />
+                            ) : m.delivered_at ? (
+                              <CheckCheck className="h-3.5 w-3.5" aria-label="Delivered" />
+                            ) : (
+                              <Check className="h-3.5 w-3.5" aria-label="Sent" />
+                            )
+                          )}
                         </div>
                       </div>
                     </div>
