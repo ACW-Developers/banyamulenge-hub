@@ -34,9 +34,15 @@ type GroupMessage = {
 
 function GroupPage() {
   const { slug } = useParams({ from: "/_app/community/$slug" });
+  const search = useSearch({ from: "/_app/community/$slug" });
   const { user } = useAuth();
   const qc = useQueryClient();
-  const [tab, setTab] = useState<"posts" | "chat">("posts");
+  const [tab, setTab] = useState<"posts" | "chat">(search.tab ?? "posts");
+
+  useEffect(() => {
+    if (search.tab) setTab(search.tab);
+  }, [search.tab]);
+
 
   const { data: group, isLoading: loadingGroup } = useQuery({
     queryKey: ["group", slug],
