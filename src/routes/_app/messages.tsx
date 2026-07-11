@@ -187,6 +187,17 @@ function MessagesPage() {
                 const p = other?.profiles;
                 if (!p) return null;
                 const initial = (p.display_name || p.username).slice(0, 1).toUpperCase();
+                const sortedMsgs = [...(c.messages ?? [])].sort(
+                  (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+                );
+                const lastMsg = sortedMsgs[0];
+                const unread = (c.messages ?? []).filter(
+                  (m) => m.sender_id !== user?.id && !m.read_at,
+                ).length;
+                const lastIsMine = lastMsg && lastMsg.sender_id === user?.id;
+                const preview = lastMsg
+                  ? `${lastIsMine ? "You: " : ""}${lastMsg.content}`
+                  : "No messages yet";
                 return (
                   <button
                     key={c.id}
@@ -202,15 +213,50 @@ function MessagesPage() {
                       </AvatarFallback>
                     </Avatar>
                     <div className="min-w-0 flex-1">
-                      <div className="flex items-center justify-between">
-                        <div className="font-semibold text-sm truncate">
+                      <div className="flex items-center justify-between gap-2">
+                        <div
+                          className={`text-sm truncate ${unread > 0 ? "font-bold text-gray-900" : "font-semibold text-gray-800"}`}
+                        >
                           {p.display_name || p.username}
                         </div>
                         <div className="text-[10px] text-gray-400 shrink-0">
                           {formatDistanceToNow(new Date(c.last_message_at), { addSuffix: false })}
                         </div>
                       </div>
-                      <div className="text-xs text-gray-500 truncate">@{p.username}</div>
+                      <div className="flex items-center justify-between gap-2 mt-0.5">
+                        <div
+                          className={`text-xs truncate flex-1 ${unread > 0 ? "text-gray-900 font-semibold" : "text-gray-500"}`}
+                        >
+                          {preview}
+                        </div>
+                        <div className="flex items-center gap-1 shrink-0">
+                          {lastIsMine && lastMsg && (
+                            <>
+                              {lastMsg.read_at ? (
+                                <CheckCheck
+                                  className="h-3.5 w-3.5 text-sky-500"
+                                  aria-label="Read"
+                                />
+                              ) : lastMsg.delivered_at ? (
+                                <CheckCheck
+                                  className="h-3.5 w-3.5 text-gray-400"
+                                  aria-label="Delivered"
+                                />
+                              ) : (
+                                <Check
+                                  className="h-3.5 w-3.5 text-gray-400"
+                                  aria-label="Sent"
+                                />
+                              )}
+                            </>
+                          )}
+                          {unread > 0 && (
+                            <span className="min-w-[18px] h-[18px] px-1 rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center">
+                              {unread > 9 ? "9+" : unread}
+                            </span>
+                          )}
+                        </div>
+                      </div>
                     </div>
                   </button>
                 );
@@ -218,6 +264,7 @@ function MessagesPage() {
             ) : (
               <div className="p-6 text-center text-sm text-gray-500">No conversations yet.</div>
             )}
+
           </div>
         </div>
 
