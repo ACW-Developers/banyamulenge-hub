@@ -34,6 +34,14 @@ type ConversationRow = {
     user_id: string;
     profiles: { username: string; display_name: string | null; avatar_url: string | null } | null;
   }[];
+  messages: {
+    id: string;
+    sender_id: string;
+    content: string;
+    created_at: string;
+    delivered_at: string | null;
+    read_at: string | null;
+  }[];
 };
 
 function MessagesPage() {
@@ -57,12 +65,14 @@ function MessagesPage() {
         .from("conversations")
         .select(
           `id, last_message_at,
-           conversation_participants(user_id, profiles!cp_user_profile_fkey(username, display_name, avatar_url))`,
+           conversation_participants(user_id, profiles!cp_user_profile_fkey(username, display_name, avatar_url)),
+           messages(id, sender_id, content, created_at, delivered_at, read_at)`,
         )
         .order("last_message_at", { ascending: false });
       return (data ?? []) as unknown as ConversationRow[];
     },
   });
+
 
   const active = useMemo(() => convos?.find((c) => c.id === activeId) ?? null, [convos, activeId]);
   const otherParticipant = active?.conversation_participants.find((p) => p.user_id !== user?.id);
