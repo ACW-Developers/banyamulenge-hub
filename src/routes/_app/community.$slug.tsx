@@ -1,9 +1,10 @@
-import { createFileRoute, useParams, Link } from "@tanstack/react-router";
+import { createFileRoute, useParams, useSearch, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { ArrowLeft, Loader2, Users, Send, MessageSquare, FileText } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
+import { z } from "zod";
 
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
@@ -12,9 +13,15 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
+const groupSearchSchema = z.object({
+  tab: z.enum(["posts", "chat"]).optional(),
+});
+
 export const Route = createFileRoute("/_app/community/$slug")({
+  validateSearch: groupSearchSchema,
   component: GroupPage,
 });
+
 
 type GroupMessage = {
   id: string;
