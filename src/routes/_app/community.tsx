@@ -188,14 +188,17 @@ function CommunityPage() {
                       </>
                     )}
                   </Button>
-                  {isMember && (
-                    <Button size="sm" variant="secondary" asChild className="gap-1">
-                      <Link to="/community/$slug" params={{ slug: g.slug }}>
-                        View <ArrowRight className="h-3.5 w-3.5" />
-                      </Link>
-                    </Button>
-                  )}
+                  <Button size="sm" variant="secondary" asChild className="gap-1">
+                    <Link
+                      to="/community/$slug"
+                      params={{ slug: g.slug }}
+                      search={{ tab: "chat" }}
+                    >
+                      View <ArrowRight className="h-3.5 w-3.5" />
+                    </Link>
+                  </Button>
                 </div>
+
               </div>
             );
           })}
