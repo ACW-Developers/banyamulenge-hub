@@ -56,7 +56,9 @@ function AppLayout() {
     if (!user) return;
     trackVisit(pathname, user.id);
     logActivity(user.id, "page.view", "route", pathname);
-  }, [pathname, user]);
+    if (pathname === "/") notif.markSeen("feed");
+    else if (pathname === "/explore") notif.markSeen("followers");
+  }, [pathname, user, notif]);
 
   if (loading || !session) {
     return (
@@ -293,6 +295,7 @@ function AppLayout() {
                 <TooltipTrigger asChild>
                   <Link
                     to="/messages"
+                    onClick={() => notif.markSeen("all")}
                     className="relative inline-flex items-center justify-center h-10 w-10 rounded-md hover:bg-gray-100 text-gray-600"
                     aria-label="Notifications"
                   >
