@@ -1,5 +1,5 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 
@@ -25,7 +25,7 @@ export type NotificationCounts = {
   newFollowers: number;
 };
 
-export function useNotifications(): NotificationCounts {
+export function useNotifications() {
   const { user } = useAuth();
   const qc = useQueryClient();
 
@@ -36,7 +36,6 @@ export function useNotifications(): NotificationCounts {
     queryFn: async (): Promise<NotificationCounts> => {
       if (!user) return { unreadMessages: 0, newPosts: 0, newFollowers: 0 };
 
-      // Unread messages: messages in my conversations that aren't mine and aren't read
       const { data: myConvs } = await supabase
         .from("conversation_participants")
         .select("conversation_id")
@@ -78,7 +77,6 @@ export function useNotifications(): NotificationCounts {
     },
   });
 
-  // Realtime refresh when any relevant table changes
   useEffect(() => {
     if (!user) return;
     const ch = supabase
@@ -98,5 +96,17 @@ export function useNotifications(): NotificationCounts {
     };
   }, [user, qc]);
 
-  return data ?? { unreadMessages: 0, newPosts: 0, newFollowers: 0 };
+  const markSeen = useCallback(
+    (kind: "feed" | "followers" | "all") => {
+      if (kind === "feed" || kind === "all") markFeedSeen();
+      if (kind === "followers" || kind === "all") markFollowersSeen();
+      if (user) qc.invalidateQueries({ queryKey: ["notifications", user.id] });
+    },
+    [qc, user],
+  );
+
+  return {
+    ...(data ?? { unreadMessages: 0, newPosts: 0, newFollowers: 0 }),
+    markSeen,
+  };
 }
