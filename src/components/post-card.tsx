@@ -425,11 +425,29 @@ export function PostComposer({
               </button>
             </div>
           )}
+          {videoPreview && (
+            <div className="relative rounded-xl overflow-hidden border bg-black">
+              <video src={videoPreview} controls playsInline className="w-full max-h-72" />
+              <button
+                onClick={() => { setVideoFile(null); setVideoPreview(null); }}
+                className="absolute top-2 right-2 rounded-full bg-black/60 text-white p-1 hover:bg-black"
+                aria-label="Remove video"
+                type="button"
+              >
+                <TrashIcon />
+              </button>
+            </div>
+          )}
           <div className="flex flex-wrap items-center gap-2">
             <label className="cursor-pointer inline-flex items-center gap-2 px-3 py-2 rounded-lg border text-sm text-gray-600 hover:bg-gray-50">
               <ImageIcon />
               Photo
               <input type="file" accept="image/*" className="hidden" onChange={pickImage} />
+            </label>
+            <label className="cursor-pointer inline-flex items-center gap-2 px-3 py-2 rounded-lg border text-sm text-gray-600 hover:bg-gray-50">
+              <VideoIcon />
+              Video
+              <input type="file" accept="video/*" className="hidden" onChange={pickVideo} />
             </label>
             {isAdmin && !groupId && (
               <button
