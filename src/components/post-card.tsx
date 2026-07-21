@@ -32,6 +32,7 @@ export type FeedPost = {
   user_id: string;
   content: string;
   image_url: string | null;
+  video_url: string | null;
   created_at: string;
   is_announcement?: boolean;
   author: {
@@ -44,7 +45,7 @@ export type FeedPost = {
 };
 
 export function PostCard({ post, queryKey }: { post: FeedPost; queryKey: readonly unknown[] }) {
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const qc = useQueryClient();
   const [showComments, setShowComments] = useState(false);
   const [commentText, setCommentText] = useState("");
@@ -83,6 +84,21 @@ export function PostCard({ post, queryKey }: { post: FeedPost; queryKey: readonl
     },
     onSuccess: () => {
       toast.success("Post deleted");
+      qc.invalidateQueries({ queryKey });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const toggleAnnouncement = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase
+        .from("posts")
+        .update({ is_announcement: !post.is_announcement })
+        .eq("id", post.id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success(post.is_announcement ? "Unmarked as announcement" : "Marked as announcement");
       qc.invalidateQueries({ queryKey });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -165,7 +181,7 @@ export function PostCard({ post, queryKey }: { post: FeedPost; queryKey: readonl
             </div>
           </div>
         </Link>
-        {canDelete && (
+        {(canDelete || isAdmin) && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="h-8 w-8">
@@ -173,9 +189,17 @@ export function PostCard({ post, queryKey }: { post: FeedPost; queryKey: readonl
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => del.mutate()} className="text-red-600">
-                <Trash2 className="h-4 w-4 mr-2" /> Delete
-              </DropdownMenuItem>
+              {isAdmin && (
+                <DropdownMenuItem onClick={() => toggleAnnouncement.mutate()}>
+                  <Megaphone className="h-4 w-4 mr-2" />
+                  {post.is_announcement ? "Unmark announcement" : "Mark as announcement"}
+                </DropdownMenuItem>
+              )}
+              {(canDelete || isAdmin) && (
+                <DropdownMenuItem onClick={() => del.mutate()} className="text-red-600">
+                  <Trash2 className="h-4 w-4 mr-2" /> Delete
+                </DropdownMenuItem>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         )}
@@ -184,6 +208,16 @@ export function PostCard({ post, queryKey }: { post: FeedPost; queryKey: readonl
       {post.image_url && (
         <div className="mt-3 rounded-xl overflow-hidden border">
           <img src={post.image_url} alt="" className="w-full max-h-[520px] object-cover" />
+        </div>
+      )}
+      {post.video_url && (
+        <div className="mt-3 rounded-xl overflow-hidden border bg-black">
+          <video
+            src={post.video_url}
+            controls
+            playsInline
+            className="w-full max-h-[520px] object-contain bg-black"
+          />
         </div>
       )}
       <footer className="flex items-center gap-1 mt-4 pt-3 border-t">
@@ -281,6 +315,8 @@ export function PostComposer({
   const [content, setContent] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
+  const [videoFile, setVideoFile] = useState<File | null>(null);
+  const [videoPreview, setVideoPreview] = useState<string | null>(null);
   const [isAnnouncement, setIsAnnouncement] = useState(false);
   const [busy, setBusy] = useState(false);
 
@@ -297,26 +333,55 @@ export function PostComposer({
     setPreview(URL.createObjectURL(f));
   }
 
+  async function pickVideo(e: React.ChangeEvent<HTMLInputElement>) {
+    const f = e.target.files?.[0];
+    e.target.value = "";
+    if (!f) return;
+    if (f.size > 15 * 1024 * 1024) {
+      toast.error("Video must be under 15 MB");
+      return;
+    }
+    // Validate duration
+    const url = URL.createObjectURL(f);
+    const v = document.createElement("video");
+    v.preload = "metadata";
+    v.onloadedmetadata = () => {
+      if (v.duration > 120.5) {
+        URL.revokeObjectURL(url);
+        toast.error("Video must be 2 minutes or shorter");
+        return;
+      }
+      setVideoFile(f);
+      setVideoPreview(url);
+    };
+    v.onerror = () => {
+      URL.revokeObjectURL(url);
+      toast.error("Could not read that video file");
+    };
+    v.src = url;
+  }
+
   async function submit() {
     if (!user || !content.trim()) return;
     setBusy(true);
     try {
+      const uploadMod = await import("@/lib/upload");
       let image_url: string | null = null;
-      if (file) {
-        const { uploadPostImage } = await import("@/lib/upload");
-        image_url = await uploadPostImage(file, user.id);
-      }
+      let video_url: string | null = null;
+      if (file) image_url = await uploadMod.uploadPostImage(file, user.id);
+      if (videoFile) video_url = await uploadMod.uploadPostVideo(videoFile, user.id);
       const { error } = await supabase.from("posts").insert({
         user_id: user.id,
         content: content.trim(),
         image_url,
+        video_url,
         is_announcement: isAnnouncement && isAdmin,
         group_id: groupId ?? null,
       });
       if (error) throw error;
       setContent("");
-      setFile(null);
-      setPreview(null);
+      setFile(null); setPreview(null);
+      setVideoFile(null); setVideoPreview(null);
       setIsAnnouncement(false);
       toast.success("Posted");
       logActivity(user.id, "post.create", "post");
@@ -360,11 +425,29 @@ export function PostComposer({
               </button>
             </div>
           )}
+          {videoPreview && (
+            <div className="relative rounded-xl overflow-hidden border bg-black">
+              <video src={videoPreview} controls playsInline className="w-full max-h-72" />
+              <button
+                onClick={() => { setVideoFile(null); setVideoPreview(null); }}
+                className="absolute top-2 right-2 rounded-full bg-black/60 text-white p-1 hover:bg-black"
+                aria-label="Remove video"
+                type="button"
+              >
+                <TrashIcon />
+              </button>
+            </div>
+          )}
           <div className="flex flex-wrap items-center gap-2">
             <label className="cursor-pointer inline-flex items-center gap-2 px-3 py-2 rounded-lg border text-sm text-gray-600 hover:bg-gray-50">
               <ImageIcon />
               Photo
               <input type="file" accept="image/*" className="hidden" onChange={pickImage} />
+            </label>
+            <label className="cursor-pointer inline-flex items-center gap-2 px-3 py-2 rounded-lg border text-sm text-gray-600 hover:bg-gray-50">
+              <VideoIcon />
+              Video
+              <input type="file" accept="video/*" className="hidden" onChange={pickVideo} />
             </label>
             {isAdmin && !groupId && (
               <button
@@ -404,4 +487,12 @@ function ImageIcon() {
 }
 function TrashIcon() {
   return <Trash2 className="h-4 w-4" />;
+}
+function VideoIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-4 w-4">
+      <rect x="2" y="6" width="14" height="12" rx="2" />
+      <path d="m22 8-6 4 6 4V8Z" />
+    </svg>
+  );
 }

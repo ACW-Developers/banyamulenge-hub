@@ -15,6 +15,8 @@ import {
   PhoneOff,
   FileText,
   X,
+  Users,
+  UsersRound,
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { toast } from "sonner";
@@ -58,6 +60,8 @@ type MessageRow = {
 type ConversationRow = {
   id: string;
   last_message_at: string;
+  title: string | null;
+  is_group: boolean;
   conversation_participants: {
     user_id: string;
     profiles: { username: string; display_name: string | null; avatar_url: string | null } | null;
@@ -88,7 +92,7 @@ function MessagesPage() {
       const { data } = await supabase
         .from("conversations")
         .select(
-          `id, last_message_at,
+          `id, last_message_at, title, is_group,
            conversation_participants(user_id, profiles!cp_user_profile_fkey(username, display_name, avatar_url)),
            messages(id, sender_id, content, created_at, delivered_at, read_at, attachment_url, attachment_type, attachment_name)`,
         )
@@ -210,7 +214,10 @@ function MessagesPage() {
             Private conversations with community members.
           </p>
         </div>
-        <NewChatDialog onOpened={setActiveId} />
+        <div className="flex items-center gap-2">
+          <NewGroupDialog onOpened={setActiveId} />
+          <NewChatDialog onOpened={setActiveId} />
+        </div>
       </div>
 
       <div className="grid md:grid-cols-[320px_1fr] gap-4 h-[calc(100vh-220px)] min-h-[500px]">
@@ -230,7 +237,13 @@ function MessagesPage() {
             ) : convos && convos.length > 0 ? (
               convos.map((c) => {
                 const other = c.conversation_participants.find((p) => p.user_id !== user?.id);
-                const p = other?.profiles;
+                const p = c.is_group
+                  ? {
+                      username: c.title ?? "Group",
+                      display_name: c.title ?? "Group",
+                      avatar_url: null as string | null,
+                    }
+                  : other?.profiles;
                 if (!p) return null;
                 const initial = (p.display_name || p.username).slice(0, 1).toUpperCase();
                 const sortedMsgs = [...(c.messages ?? [])].sort(
@@ -261,16 +274,23 @@ function MessagesPage() {
                   >
                     <Avatar className="h-11 w-11">
                       <AvatarImage src={p.avatar_url ?? undefined} />
-                      <AvatarFallback className="bg-primary/10 text-primary font-semibold">
-                        {initial}
+                      <AvatarFallback
+                        className={`${c.is_group ? "bg-amber-100 text-amber-700" : "bg-primary/10 text-primary"} font-semibold`}
+                      >
+                        {c.is_group ? <Users className="h-5 w-5" /> : initial}
                       </AvatarFallback>
                     </Avatar>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center justify-between gap-2">
                         <div
-                          className={`text-sm truncate ${unread > 0 ? "font-bold text-gray-900" : "font-semibold text-gray-800"}`}
+                          className={`text-sm truncate flex items-center gap-1.5 ${unread > 0 ? "font-bold text-gray-900" : "font-semibold text-gray-800"}`}
                         >
-                          {p.display_name || p.username}
+                          {c.is_group && (
+                            <span className="text-[9px] uppercase tracking-wider bg-amber-100 text-amber-700 rounded px-1.5 py-0.5 shrink-0">
+                              Group
+                            </span>
+                          )}
+                          <span className="truncate">{p.display_name || p.username}</span>
                         </div>
                         <div className="text-[10px] text-gray-400 shrink-0">
                           {formatDistanceToNow(new Date(c.last_message_at), { addSuffix: false })}
@@ -283,7 +303,7 @@ function MessagesPage() {
                           {preview}
                         </div>
                         <div className="flex items-center gap-1 shrink-0">
-                          {lastIsMine && lastMsg && (
+                          {lastIsMine && lastMsg && !c.is_group && (
                             <>
                               {lastMsg.read_at ? (
                                 <CheckCheck className="h-3.5 w-3.5 text-sky-500" aria-label="Read" />
@@ -313,12 +333,18 @@ function MessagesPage() {
 
         {/* Message pane */}
         <div className="rounded-2xl border bg-white flex flex-col overflow-hidden">
-          {active && otherParticipant?.profiles && user ? (
+          {active && user ? (
             <ChatPane
               key={active.id}
               convoId={active.id}
               userId={user.id}
-              other={otherParticipant.profiles}
+              isGroup={active.is_group}
+              groupTitle={active.title ?? "Group"}
+              participants={active.conversation_participants.map((cp) => ({
+                user_id: cp.user_id,
+                profile: cp.profiles,
+              }))}
+              other={otherParticipant?.profiles ?? null}
               messages={messages ?? []}
               text={text}
               setText={setText}
@@ -367,9 +393,14 @@ function MessagesPage() {
   );
 }
 
+type Profile = { username: string; display_name: string | null; avatar_url: string | null };
+
 function ChatPane({
   convoId,
   userId,
+  isGroup,
+  groupTitle,
+  participants,
   other,
   messages,
   text,
@@ -383,7 +414,10 @@ function ChatPane({
 }: {
   convoId: string;
   userId: string;
-  other: { username: string; display_name: string | null; avatar_url: string | null };
+  isGroup: boolean;
+  groupTitle: string;
+  participants: { user_id: string; profile: Profile | null }[];
+  other: Profile | null;
   messages: MessageRow[];
   text: string;
   setText: (s: string) => void;
@@ -399,7 +433,7 @@ function ChatPane({
   const remoteAudioRef = useRef<HTMLAudioElement>(null);
 
   useEffect(() => {
-    if (!userId) return;
+    if (!userId || isGroup) return;
     const s = new CallSession(convoId, userId, {
       onStatus: setCallStatus,
       onRemoteStream: (stream) => {
@@ -416,41 +450,43 @@ function ChatPane({
       s.dispose();
       sessionRef.current = null;
     };
-  }, [convoId, userId]);
+  }, [convoId, userId, isGroup]);
 
   const startCall = () => sessionRef.current?.call();
   const acceptCall = () => sessionRef.current?.accept();
   const hangup = () => sessionRef.current?.hangup();
 
-  const initial = (other.display_name || other.username).slice(0, 1).toUpperCase();
-  const inCall = callStatus !== "idle" && callStatus !== "ended";
+  const headerName = isGroup ? groupTitle : other?.display_name || other?.username || "Unknown";
+  const headerSub = isGroup
+    ? `${participants.length} members`
+    : other?.username ? `@${other.username}` : "";
+  const initial = (headerName || "?").slice(0, 1).toUpperCase();
+  const inCall = !isGroup && callStatus !== "idle" && callStatus !== "ended";
+
+  // Map user_id -> profile for group sender labels
+  const profilesById = new Map(participants.map((p) => [p.user_id, p.profile] as const));
 
   return (
     <>
       <div className="p-4 border-b flex items-center gap-3">
         <Avatar className="h-10 w-10">
-          <AvatarImage src={other.avatar_url ?? undefined} />
-          <AvatarFallback className="bg-primary/10 text-primary font-semibold">
-            {initial}
+          <AvatarImage src={other?.avatar_url ?? undefined} />
+          <AvatarFallback
+            className={`${isGroup ? "bg-amber-100 text-amber-700" : "bg-primary/10 text-primary"} font-semibold`}
+          >
+            {isGroup ? <Users className="h-5 w-5" /> : initial}
           </AvatarFallback>
         </Avatar>
         <div className="min-w-0 flex-1">
-          <div className="font-semibold text-sm truncate">
-            {other.display_name || other.username}
-          </div>
-          <div className="text-xs text-gray-500 truncate">@{other.username}</div>
+          <div className="font-semibold text-sm truncate">{headerName}</div>
+          <div className="text-xs text-gray-500 truncate">{headerSub}</div>
         </div>
-        {!inCall ? (
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={startCall}
-            aria-label="Start audio call"
-            title="Start audio call"
-          >
+        {!isGroup && !inCall && (
+          <Button variant="outline" size="icon" onClick={startCall} aria-label="Start audio call" title="Start audio call">
             <Phone className="h-4 w-4 text-primary" />
           </Button>
-        ) : (
+        )}
+        {!isGroup && inCall && (
           <Button variant="destructive" size="icon" onClick={hangup} aria-label="End call">
             <PhoneOff className="h-4 w-4" />
           </Button>
@@ -483,6 +519,7 @@ function ChatPane({
       <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-2 bg-gray-50/50">
         {messages.map((m) => {
           const mine = m.sender_id === userId;
+          const senderProfile = isGroup && !mine ? profilesById.get(m.sender_id) ?? null : null;
           return (
             <div key={m.id} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
               <div
@@ -492,6 +529,11 @@ function ChatPane({
                     : "bg-white border rounded-bl-sm"
                 }`}
               >
+                {senderProfile && (
+                  <div className="text-[11px] font-semibold text-primary mb-0.5">
+                    {senderProfile.display_name || senderProfile.username}
+                  </div>
+                )}
                 {m.attachment_url && (
                   <AttachmentBubble
                     url={m.attachment_url}
@@ -697,6 +739,135 @@ function NewChatDialog({ onOpened }: { onOpened: (id: string) => void }) {
               </button>
             );
           })}
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function NewGroupDialog({ onOpened }: { onOpened: (id: string) => void }) {
+  const { user } = useAuth();
+  const [open, setOpen] = useState(false);
+  const [title, setTitle] = useState("");
+  const [query, setQuery] = useState("");
+  const [picked, setPicked] = useState<Set<string>>(new Set());
+  const [busy, setBusy] = useState(false);
+
+  const { data: people } = useQuery({
+    queryKey: ["group-people-search", query],
+    enabled: open,
+    queryFn: async () => {
+      let q = supabase
+        .from("profiles")
+        .select("id, username, display_name, avatar_url")
+        .neq("id", user?.id ?? "")
+        .limit(30);
+      if (query) q = q.or(`username.ilike.%${query}%,display_name.ilike.%${query}%`);
+      const { data } = await q;
+      return data ?? [];
+    },
+  });
+
+  function toggle(id: string) {
+    setPicked((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  async function create() {
+    if (!user) return;
+    const trimmed = title.trim();
+    if (!trimmed) return toast.error("Please give the group a name");
+    if (picked.size < 1) return toast.error("Pick at least one member");
+    setBusy(true);
+    try {
+      const { data, error } = await supabase.rpc("create_group_conversation", {
+        _title: trimmed,
+        _members: Array.from(picked),
+      });
+      if (error) throw error;
+      if (!data) throw new Error("Could not create group");
+      onOpened(data as string);
+      setOpen(false);
+      setTitle("");
+      setPicked(new Set());
+      setQuery("");
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant="outline" className="gap-2">
+          <UsersRound className="h-4 w-4" /> New group
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Create a group chat</DialogTitle>
+        </DialogHeader>
+        <Input
+          placeholder="Group name (e.g. Family Elders)"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+        />
+        <Input
+          placeholder="Search members to add..."
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+        />
+        {picked.size > 0 && (
+          <div className="text-xs text-gray-500">{picked.size} selected</div>
+        )}
+        <div className="max-h-72 overflow-y-auto -mx-2">
+          {people?.map((p) => {
+            const initial = (p.display_name || p.username).slice(0, 1).toUpperCase();
+            const isPicked = picked.has(p.id);
+            return (
+              <button
+                key={p.id}
+                onClick={() => toggle(p.id)}
+                className={`w-full flex items-center gap-3 p-2 rounded-lg text-left transition ${
+                  isPicked ? "bg-primary/10" : "hover:bg-gray-100"
+                }`}
+              >
+                <Avatar className="h-9 w-9">
+                  <AvatarImage src={p.avatar_url ?? undefined} />
+                  <AvatarFallback className="bg-primary/10 text-primary font-semibold">
+                    {initial}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm font-semibold truncate">
+                    {p.display_name || p.username}
+                  </div>
+                  <div className="text-xs text-gray-500 truncate">@{p.username}</div>
+                </div>
+                <div
+                  className={`h-5 w-5 rounded-md border flex items-center justify-center ${
+                    isPicked ? "bg-primary border-primary text-primary-foreground" : "border-gray-300"
+                  }`}
+                >
+                  {isPicked && <Check className="h-3.5 w-3.5" />}
+                </div>
+              </button>
+            );
+          })}
+        </div>
+        <div className="flex justify-end gap-2 pt-2">
+          <Button variant="ghost" onClick={() => setOpen(false)}>
+            Cancel
+          </Button>
+          <Button onClick={create} disabled={busy} className="gap-2">
+            {busy && <Loader2 className="h-4 w-4 animate-spin" />} Create group
+          </Button>
         </div>
       </DialogContent>
     </Dialog>

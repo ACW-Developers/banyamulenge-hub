@@ -13,6 +13,8 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as AppIndexRouteImport } from './routes/_app/index'
 import { Route as AppMessagesRouteImport } from './routes/_app/messages'
+import { Route as AppHeritageRouteImport } from './routes/_app/heritage'
+import { Route as AppFamilyTreeRouteImport } from './routes/_app/family-tree'
 import { Route as AppExploreRouteImport } from './routes/_app/explore'
 import { Route as AppCommunityRouteImport } from './routes/_app/community'
 import { Route as AppAdminRouteImport } from './routes/_app/admin'
@@ -40,6 +42,16 @@ const AppIndexRoute = AppIndexRouteImport.update({
 const AppMessagesRoute = AppMessagesRouteImport.update({
   id: '/messages',
   path: '/messages',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppHeritageRoute = AppHeritageRouteImport.update({
+  id: '/heritage',
+  path: '/heritage',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppFamilyTreeRoute = AppFamilyTreeRouteImport.update({
+  id: '/family-tree',
+  path: '/family-tree',
   getParentRoute: () => AppRoute,
 } as any)
 const AppExploreRoute = AppExploreRouteImport.update({
@@ -94,6 +106,8 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AppAdminRouteWithChildren
   '/community': typeof AppCommunityRouteWithChildren
   '/explore': typeof AppExploreRoute
+  '/family-tree': typeof AppFamilyTreeRoute
+  '/heritage': typeof AppHeritageRoute
   '/messages': typeof AppMessagesRoute
   '/admin/logs': typeof AppAdminLogsRoute
   '/admin/settings': typeof AppAdminSettingsRoute
@@ -106,6 +120,8 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/community': typeof AppCommunityRouteWithChildren
   '/explore': typeof AppExploreRoute
+  '/family-tree': typeof AppFamilyTreeRoute
+  '/heritage': typeof AppHeritageRoute
   '/messages': typeof AppMessagesRoute
   '/': typeof AppIndexRoute
   '/admin/logs': typeof AppAdminLogsRoute
@@ -122,6 +138,8 @@ export interface FileRoutesById {
   '/_app/admin': typeof AppAdminRouteWithChildren
   '/_app/community': typeof AppCommunityRouteWithChildren
   '/_app/explore': typeof AppExploreRoute
+  '/_app/family-tree': typeof AppFamilyTreeRoute
+  '/_app/heritage': typeof AppHeritageRoute
   '/_app/messages': typeof AppMessagesRoute
   '/_app/': typeof AppIndexRoute
   '/_app/admin/logs': typeof AppAdminLogsRoute
@@ -139,6 +157,8 @@ export interface FileRouteTypes {
     | '/admin'
     | '/community'
     | '/explore'
+    | '/family-tree'
+    | '/heritage'
     | '/messages'
     | '/admin/logs'
     | '/admin/settings'
@@ -151,6 +171,8 @@ export interface FileRouteTypes {
     | '/auth'
     | '/community'
     | '/explore'
+    | '/family-tree'
+    | '/heritage'
     | '/messages'
     | '/'
     | '/admin/logs'
@@ -166,6 +188,8 @@ export interface FileRouteTypes {
     | '/_app/admin'
     | '/_app/community'
     | '/_app/explore'
+    | '/_app/family-tree'
+    | '/_app/heritage'
     | '/_app/messages'
     | '/_app/'
     | '/_app/admin/logs'
@@ -209,6 +233,20 @@ declare module '@tanstack/react-router' {
       path: '/messages'
       fullPath: '/messages'
       preLoaderRoute: typeof AppMessagesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/heritage': {
+      id: '/_app/heritage'
+      path: '/heritage'
+      fullPath: '/heritage'
+      preLoaderRoute: typeof AppHeritageRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/family-tree': {
+      id: '/_app/family-tree'
+      path: '/family-tree'
+      fullPath: '/family-tree'
+      preLoaderRoute: typeof AppFamilyTreeRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/explore': {
@@ -311,6 +349,8 @@ interface AppRouteChildren {
   AppAdminRoute: typeof AppAdminRouteWithChildren
   AppCommunityRoute: typeof AppCommunityRouteWithChildren
   AppExploreRoute: typeof AppExploreRoute
+  AppFamilyTreeRoute: typeof AppFamilyTreeRoute
+  AppHeritageRoute: typeof AppHeritageRoute
   AppMessagesRoute: typeof AppMessagesRoute
   AppIndexRoute: typeof AppIndexRoute
   AppProfileUsernameRoute: typeof AppProfileUsernameRoute
@@ -320,6 +360,8 @@ const AppRouteChildren: AppRouteChildren = {
   AppAdminRoute: AppAdminRouteWithChildren,
   AppCommunityRoute: AppCommunityRouteWithChildren,
   AppExploreRoute: AppExploreRoute,
+  AppFamilyTreeRoute: AppFamilyTreeRoute,
+  AppHeritageRoute: AppHeritageRoute,
   AppMessagesRoute: AppMessagesRoute,
   AppIndexRoute: AppIndexRoute,
   AppProfileUsernameRoute: AppProfileUsernameRoute,

@@ -38,7 +38,7 @@ async function fetchFeed(): Promise<FeedPost[]> {
   const { data, error } = await supabase
     .from("posts")
     .select(
-      `id, user_id, content, image_url, created_at, is_announcement,
+      `id, user_id, content, image_url, video_url, created_at, is_announcement,
        author:profiles!posts_author_profile_fkey(username, display_name, avatar_url),
        likes(user_id),
        comments(id)`,

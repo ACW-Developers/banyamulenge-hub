@@ -16,7 +16,11 @@ import {
   ChevronDown,
   Menu,
   X,
+  Landmark,
+  Trees,
 } from "lucide-react";
+
+import { LanguageSelector } from "@/components/language-selector";
 
 import { useAuth } from "@/lib/auth-context";
 import { Logo } from "@/components/logo";
@@ -75,6 +79,8 @@ function AppLayout() {
     { to: "/explore", label: "Explore", icon: Compass, badge: notif.newFollowers },
     { to: "/community", label: "Community", icon: Users, badge: 0 },
     { to: "/messages", label: "Messages", icon: MessageCircle, badge: notif.unreadMessages },
+    { to: "/heritage", label: "Our Heritage", icon: Landmark, badge: 0 },
+    { to: "/family-tree", label: "Family Tree", icon: Trees, badge: 0 },
     {
       to: profile?.username ? `/profile/${profile.username}` : "/",
       label: "Profile",
@@ -291,6 +297,7 @@ function AppLayout() {
               <Input placeholder="Search..." className="pl-9 h-10 bg-gray-50 border-gray-200" />
             </div>
             <div className="ml-auto flex items-center gap-2">
+              <LanguageSelector />
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Link
@@ -375,7 +382,7 @@ function AppLayout() {
         {/* Mobile bottom nav */}
         <nav className="lg:hidden fixed bottom-0 inset-x-0 z-30 border-t bg-white">
           <div className="grid grid-cols-5">
-            {nav.map((item) => {
+            {[nav[0], nav[1], nav[2], nav[3], nav[nav.length - 1]].map((item) => {
               const active = isActive(item.to);
               const Icon = item.icon;
               return (
