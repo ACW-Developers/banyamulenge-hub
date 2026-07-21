@@ -16,7 +16,11 @@ import {
   ChevronDown,
   Menu,
   X,
+  Landmark,
+  Trees,
 } from "lucide-react";
+
+import { LanguageSelector } from "@/components/language-selector";
 
 import { useAuth } from "@/lib/auth-context";
 import { Logo } from "@/components/logo";
@@ -75,6 +79,8 @@ function AppLayout() {
     { to: "/explore", label: "Explore", icon: Compass, badge: notif.newFollowers },
     { to: "/community", label: "Community", icon: Users, badge: 0 },
     { to: "/messages", label: "Messages", icon: MessageCircle, badge: notif.unreadMessages },
+    { to: "/heritage", label: "Our Heritage", icon: Landmark, badge: 0 },
+    { to: "/family-tree", label: "Family Tree", icon: Trees, badge: 0 },
     {
       to: profile?.username ? `/profile/${profile.username}` : "/",
       label: "Profile",
