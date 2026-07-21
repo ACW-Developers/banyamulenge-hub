@@ -519,6 +519,7 @@ function ChatPane({
       <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-2 bg-gray-50/50">
         {messages.map((m) => {
           const mine = m.sender_id === userId;
+          const senderProfile = isGroup && !mine ? profilesById.get(m.sender_id) ?? null : null;
           return (
             <div key={m.id} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
               <div
@@ -528,6 +529,11 @@ function ChatPane({
                     : "bg-white border rounded-bl-sm"
                 }`}
               >
+                {senderProfile && (
+                  <div className="text-[11px] font-semibold text-primary mb-0.5">
+                    {senderProfile.display_name || senderProfile.username}
+                  </div>
+                )}
                 {m.attachment_url && (
                   <AttachmentBubble
                     url={m.attachment_url}
