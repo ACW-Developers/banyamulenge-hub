@@ -315,6 +315,8 @@ export function PostComposer({
   const [content, setContent] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
+  const [videoFile, setVideoFile] = useState<File | null>(null);
+  const [videoPreview, setVideoPreview] = useState<string | null>(null);
   const [isAnnouncement, setIsAnnouncement] = useState(false);
   const [busy, setBusy] = useState(false);
 
@@ -331,26 +333,55 @@ export function PostComposer({
     setPreview(URL.createObjectURL(f));
   }
 
+  async function pickVideo(e: React.ChangeEvent<HTMLInputElement>) {
+    const f = e.target.files?.[0];
+    e.target.value = "";
+    if (!f) return;
+    if (f.size > 15 * 1024 * 1024) {
+      toast.error("Video must be under 15 MB");
+      return;
+    }
+    // Validate duration
+    const url = URL.createObjectURL(f);
+    const v = document.createElement("video");
+    v.preload = "metadata";
+    v.onloadedmetadata = () => {
+      if (v.duration > 120.5) {
+        URL.revokeObjectURL(url);
+        toast.error("Video must be 2 minutes or shorter");
+        return;
+      }
+      setVideoFile(f);
+      setVideoPreview(url);
+    };
+    v.onerror = () => {
+      URL.revokeObjectURL(url);
+      toast.error("Could not read that video file");
+    };
+    v.src = url;
+  }
+
   async function submit() {
     if (!user || !content.trim()) return;
     setBusy(true);
     try {
+      const uploadMod = await import("@/lib/upload");
       let image_url: string | null = null;
-      if (file) {
-        const { uploadPostImage } = await import("@/lib/upload");
-        image_url = await uploadPostImage(file, user.id);
-      }
+      let video_url: string | null = null;
+      if (file) image_url = await uploadMod.uploadPostImage(file, user.id);
+      if (videoFile) video_url = await uploadMod.uploadPostVideo(videoFile, user.id);
       const { error } = await supabase.from("posts").insert({
         user_id: user.id,
         content: content.trim(),
         image_url,
+        video_url,
         is_announcement: isAnnouncement && isAdmin,
         group_id: groupId ?? null,
       });
       if (error) throw error;
       setContent("");
-      setFile(null);
-      setPreview(null);
+      setFile(null); setPreview(null);
+      setVideoFile(null); setVideoPreview(null);
       setIsAnnouncement(false);
       toast.success("Posted");
       logActivity(user.id, "post.create", "post");
