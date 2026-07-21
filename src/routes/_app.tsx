@@ -297,6 +297,7 @@ function AppLayout() {
               <Input placeholder="Search..." className="pl-9 h-10 bg-gray-50 border-gray-200" />
             </div>
             <div className="ml-auto flex items-center gap-2">
+              <LanguageSelector />
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Link
