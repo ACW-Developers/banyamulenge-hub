@@ -785,8 +785,8 @@ function NewGroupDialog({ onOpened }: { onOpened: (id: string) => void }) {
     setBusy(true);
     try {
       const { data, error } = await supabase.rpc("create_group_conversation", {
-        title: trimmed,
-        member_ids: Array.from(picked),
+        _title: trimmed,
+        _members: Array.from(picked),
       });
       if (error) throw error;
       if (!data) throw new Error("Could not create group");
