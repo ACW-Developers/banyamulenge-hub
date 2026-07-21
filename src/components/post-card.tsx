@@ -181,7 +181,7 @@ export function PostCard({ post, queryKey }: { post: FeedPost; queryKey: readonl
             </div>
           </div>
         </Link>
-        {canDelete && (
+        {(canDelete || isAdmin) && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="h-8 w-8">
@@ -189,9 +189,17 @@ export function PostCard({ post, queryKey }: { post: FeedPost; queryKey: readonl
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => del.mutate()} className="text-red-600">
-                <Trash2 className="h-4 w-4 mr-2" /> Delete
-              </DropdownMenuItem>
+              {isAdmin && (
+                <DropdownMenuItem onClick={() => toggleAnnouncement.mutate()}>
+                  <Megaphone className="h-4 w-4 mr-2" />
+                  {post.is_announcement ? "Unmark announcement" : "Mark as announcement"}
+                </DropdownMenuItem>
+              )}
+              {(canDelete || isAdmin) && (
+                <DropdownMenuItem onClick={() => del.mutate()} className="text-red-600">
+                  <Trash2 className="h-4 w-4 mr-2" /> Delete
+                </DropdownMenuItem>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         )}
@@ -200,6 +208,16 @@ export function PostCard({ post, queryKey }: { post: FeedPost; queryKey: readonl
       {post.image_url && (
         <div className="mt-3 rounded-xl overflow-hidden border">
           <img src={post.image_url} alt="" className="w-full max-h-[520px] object-cover" />
+        </div>
+      )}
+      {post.video_url && (
+        <div className="mt-3 rounded-xl overflow-hidden border bg-black">
+          <video
+            src={post.video_url}
+            controls
+            playsInline
+            className="w-full max-h-[520px] object-contain bg-black"
+          />
         </div>
       )}
       <footer className="flex items-center gap-1 mt-4 pt-3 border-t">
