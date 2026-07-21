@@ -166,19 +166,72 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          is_group: boolean
           last_message_at: string
+          title: string | null
         }
         Insert: {
           created_at?: string
           id?: string
+          is_group?: boolean
           last_message_at?: string
+          title?: string | null
         }
         Update: {
           created_at?: string
           id?: string
+          is_group?: boolean
           last_message_at?: string
+          title?: string | null
         }
         Relationships: []
+      }
+      family_members: {
+        Row: {
+          added_by: string
+          birth_year: number | null
+          created_at: string
+          id: string
+          lineage: string
+          name: string
+          notes: string | null
+          parent_id: string | null
+          relationship: string | null
+          updated_at: string
+        }
+        Insert: {
+          added_by: string
+          birth_year?: number | null
+          created_at?: string
+          id?: string
+          lineage: string
+          name: string
+          notes?: string | null
+          parent_id?: string | null
+          relationship?: string | null
+          updated_at?: string
+        }
+        Update: {
+          added_by?: string
+          birth_year?: number | null
+          created_at?: string
+          id?: string
+          lineage?: string
+          name?: string
+          notes?: string | null
+          parent_id?: string | null
+          relationship?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "family_members_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "family_members"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       follows: {
         Row: {
@@ -459,6 +512,7 @@ export type Database = {
           is_announcement: boolean
           updated_at: string
           user_id: string
+          video_url: string | null
         }
         Insert: {
           content: string
@@ -469,6 +523,7 @@ export type Database = {
           is_announcement?: boolean
           updated_at?: string
           user_id: string
+          video_url?: string | null
         }
         Update: {
           content?: string
@@ -479,6 +534,7 @@ export type Database = {
           is_announcement?: boolean
           updated_at?: string
           user_id?: string
+          video_url?: string | null
         }
         Relationships: [
           {
@@ -561,6 +617,10 @@ export type Database = {
     Functions: {
       create_direct_conversation: {
         Args: { other_user: string }
+        Returns: string
+      }
+      create_group_conversation: {
+        Args: { _members: string[]; _title: string }
         Returns: string
       }
       has_role: {
