@@ -232,7 +232,13 @@ function MessagesPage() {
             ) : convos && convos.length > 0 ? (
               convos.map((c) => {
                 const other = c.conversation_participants.find((p) => p.user_id !== user?.id);
-                const p = other?.profiles;
+                const p = c.is_group
+                  ? {
+                      username: c.title ?? "Group",
+                      display_name: c.title ?? "Group",
+                      avatar_url: null as string | null,
+                    }
+                  : other?.profiles;
                 if (!p) return null;
                 const initial = (p.display_name || p.username).slice(0, 1).toUpperCase();
                 const sortedMsgs = [...(c.messages ?? [])].sort(
@@ -263,16 +269,23 @@ function MessagesPage() {
                   >
                     <Avatar className="h-11 w-11">
                       <AvatarImage src={p.avatar_url ?? undefined} />
-                      <AvatarFallback className="bg-primary/10 text-primary font-semibold">
-                        {initial}
+                      <AvatarFallback
+                        className={`${c.is_group ? "bg-amber-100 text-amber-700" : "bg-primary/10 text-primary"} font-semibold`}
+                      >
+                        {c.is_group ? <Users className="h-5 w-5" /> : initial}
                       </AvatarFallback>
                     </Avatar>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center justify-between gap-2">
                         <div
-                          className={`text-sm truncate ${unread > 0 ? "font-bold text-gray-900" : "font-semibold text-gray-800"}`}
+                          className={`text-sm truncate flex items-center gap-1.5 ${unread > 0 ? "font-bold text-gray-900" : "font-semibold text-gray-800"}`}
                         >
-                          {p.display_name || p.username}
+                          {c.is_group && (
+                            <span className="text-[9px] uppercase tracking-wider bg-amber-100 text-amber-700 rounded px-1.5 py-0.5 shrink-0">
+                              Group
+                            </span>
+                          )}
+                          <span className="truncate">{p.display_name || p.username}</span>
                         </div>
                         <div className="text-[10px] text-gray-400 shrink-0">
                           {formatDistanceToNow(new Date(c.last_message_at), { addSuffix: false })}
@@ -285,7 +298,7 @@ function MessagesPage() {
                           {preview}
                         </div>
                         <div className="flex items-center gap-1 shrink-0">
-                          {lastIsMine && lastMsg && (
+                          {lastIsMine && lastMsg && !c.is_group && (
                             <>
                               {lastMsg.read_at ? (
                                 <CheckCheck className="h-3.5 w-3.5 text-sky-500" aria-label="Read" />
