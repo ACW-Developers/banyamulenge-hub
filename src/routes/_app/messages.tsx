@@ -393,9 +393,14 @@ function MessagesPage() {
   );
 }
 
+type Profile = { username: string; display_name: string | null; avatar_url: string | null };
+
 function ChatPane({
   convoId,
   userId,
+  isGroup,
+  groupTitle,
+  participants,
   other,
   messages,
   text,
@@ -409,7 +414,10 @@ function ChatPane({
 }: {
   convoId: string;
   userId: string;
-  other: { username: string; display_name: string | null; avatar_url: string | null };
+  isGroup: boolean;
+  groupTitle: string;
+  participants: { user_id: string; profile: Profile | null }[];
+  other: Profile | null;
   messages: MessageRow[];
   text: string;
   setText: (s: string) => void;
@@ -425,7 +433,7 @@ function ChatPane({
   const remoteAudioRef = useRef<HTMLAudioElement>(null);
 
   useEffect(() => {
-    if (!userId) return;
+    if (!userId || isGroup) return;
     const s = new CallSession(convoId, userId, {
       onStatus: setCallStatus,
       onRemoteStream: (stream) => {
@@ -442,41 +450,43 @@ function ChatPane({
       s.dispose();
       sessionRef.current = null;
     };
-  }, [convoId, userId]);
+  }, [convoId, userId, isGroup]);
 
   const startCall = () => sessionRef.current?.call();
   const acceptCall = () => sessionRef.current?.accept();
   const hangup = () => sessionRef.current?.hangup();
 
-  const initial = (other.display_name || other.username).slice(0, 1).toUpperCase();
-  const inCall = callStatus !== "idle" && callStatus !== "ended";
+  const headerName = isGroup ? groupTitle : other?.display_name || other?.username || "Unknown";
+  const headerSub = isGroup
+    ? `${participants.length} members`
+    : other?.username ? `@${other.username}` : "";
+  const initial = (headerName || "?").slice(0, 1).toUpperCase();
+  const inCall = !isGroup && callStatus !== "idle" && callStatus !== "ended";
+
+  // Map user_id -> profile for group sender labels
+  const profilesById = new Map(participants.map((p) => [p.user_id, p.profile] as const));
 
   return (
     <>
       <div className="p-4 border-b flex items-center gap-3">
         <Avatar className="h-10 w-10">
-          <AvatarImage src={other.avatar_url ?? undefined} />
-          <AvatarFallback className="bg-primary/10 text-primary font-semibold">
-            {initial}
+          <AvatarImage src={other?.avatar_url ?? undefined} />
+          <AvatarFallback
+            className={`${isGroup ? "bg-amber-100 text-amber-700" : "bg-primary/10 text-primary"} font-semibold`}
+          >
+            {isGroup ? <Users className="h-5 w-5" /> : initial}
           </AvatarFallback>
         </Avatar>
         <div className="min-w-0 flex-1">
-          <div className="font-semibold text-sm truncate">
-            {other.display_name || other.username}
-          </div>
-          <div className="text-xs text-gray-500 truncate">@{other.username}</div>
+          <div className="font-semibold text-sm truncate">{headerName}</div>
+          <div className="text-xs text-gray-500 truncate">{headerSub}</div>
         </div>
-        {!inCall ? (
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={startCall}
-            aria-label="Start audio call"
-            title="Start audio call"
-          >
+        {!isGroup && !inCall && (
+          <Button variant="outline" size="icon" onClick={startCall} aria-label="Start audio call" title="Start audio call">
             <Phone className="h-4 w-4 text-primary" />
           </Button>
-        ) : (
+        )}
+        {!isGroup && inCall && (
           <Button variant="destructive" size="icon" onClick={hangup} aria-label="End call">
             <PhoneOff className="h-4 w-4" />
           </Button>
