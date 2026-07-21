@@ -32,6 +32,7 @@ export type FeedPost = {
   user_id: string;
   content: string;
   image_url: string | null;
+  video_url: string | null;
   created_at: string;
   is_announcement?: boolean;
   author: {
@@ -44,7 +45,7 @@ export type FeedPost = {
 };
 
 export function PostCard({ post, queryKey }: { post: FeedPost; queryKey: readonly unknown[] }) {
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const qc = useQueryClient();
   const [showComments, setShowComments] = useState(false);
   const [commentText, setCommentText] = useState("");
@@ -83,6 +84,21 @@ export function PostCard({ post, queryKey }: { post: FeedPost; queryKey: readonl
     },
     onSuccess: () => {
       toast.success("Post deleted");
+      qc.invalidateQueries({ queryKey });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const toggleAnnouncement = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase
+        .from("posts")
+        .update({ is_announcement: !post.is_announcement })
+        .eq("id", post.id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success(post.is_announcement ? "Unmarked as announcement" : "Marked as announcement");
       qc.invalidateQueries({ queryKey });
     },
     onError: (e: Error) => toast.error(e.message),
