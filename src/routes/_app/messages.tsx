@@ -214,7 +214,10 @@ function MessagesPage() {
             Private conversations with community members.
           </p>
         </div>
-        <NewChatDialog onOpened={setActiveId} />
+        <div className="flex items-center gap-2">
+          <NewGroupDialog onOpened={setActiveId} />
+          <NewChatDialog onOpened={setActiveId} />
+        </div>
       </div>
 
       <div className="grid md:grid-cols-[320px_1fr] gap-4 h-[calc(100vh-220px)] min-h-[500px]">
@@ -330,12 +333,18 @@ function MessagesPage() {
 
         {/* Message pane */}
         <div className="rounded-2xl border bg-white flex flex-col overflow-hidden">
-          {active && otherParticipant?.profiles && user ? (
+          {active && user ? (
             <ChatPane
               key={active.id}
               convoId={active.id}
               userId={user.id}
-              other={otherParticipant.profiles}
+              isGroup={active.is_group}
+              groupTitle={active.title ?? "Group"}
+              participants={active.conversation_participants.map((cp) => ({
+                user_id: cp.user_id,
+                profile: cp.profiles,
+              }))}
+              other={otherParticipant?.profiles ?? null}
               messages={messages ?? []}
               text={text}
               setText={setText}
