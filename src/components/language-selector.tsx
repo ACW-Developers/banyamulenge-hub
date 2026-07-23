@@ -24,7 +24,7 @@ export function LanguageSelector() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button
-          className="inline-flex items-center gap-1.5 h-10 px-2.5 rounded-md hover:bg-gray-100 text-gray-600 text-sm"
+          className="inline-flex items-center gap-1.5 h-10 px-2.5 rounded-md border border-gray-200 hover:border-primary/40 hover:bg-primary/5 text-gray-600 text-sm transition"
           aria-label="Language"
         >
           <Languages className="h-4 w-4" />

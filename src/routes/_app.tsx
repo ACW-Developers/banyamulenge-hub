@@ -303,12 +303,12 @@ function AppLayout() {
                   <Link
                     to="/messages"
                     onClick={() => notif.markSeen("all")}
-                    className="relative inline-flex items-center justify-center h-10 w-10 rounded-md hover:bg-gray-100 text-gray-600"
+                    className="relative inline-flex items-center justify-center h-10 w-10 rounded-md border border-gray-200 hover:border-primary/40 hover:bg-primary/5 text-gray-600 transition"
                     aria-label="Notifications"
                   >
                     <Bell className="h-5 w-5" />
                     {totalNotif > 0 && (
-                      <span className="absolute top-1.5 right-1.5 min-w-[16px] h-4 px-1 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center">
+                      <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center">
                         {totalNotif > 9 ? "9+" : totalNotif}
                       </span>
                     )}
