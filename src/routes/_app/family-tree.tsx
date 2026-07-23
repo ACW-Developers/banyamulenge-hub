@@ -105,61 +105,81 @@ function FamilyTreePage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
-  const renderNode = (m: Member, depth = 0) => {
+  const renderNode = (m: Member): React.ReactNode => {
     const kids = childrenByParent.get(m.id) ?? [];
     const highlighted = matches.has(m.id);
     const canDelete = user?.id === m.added_by || isAdmin;
     return (
-      <li key={m.id} className="relative pl-6">
-        <span className="absolute left-0 top-4 h-px w-4 bg-gray-300" />
+      <li key={m.id} className="ft-node">
         <div
-          className={`inline-flex items-start gap-2 rounded-xl border bg-white px-3 py-2 shadow-sm transition ${
-            highlighted ? "ring-2 ring-amber-400 border-amber-300 bg-amber-50" : ""
+          className={`ft-card group inline-flex flex-col items-center gap-1 rounded-xl border bg-white px-3 py-2.5 shadow-sm transition min-w-[150px] ${
+            highlighted ? "ring-2 ring-amber-400 border-amber-300 bg-amber-50" : "hover:border-primary/40 hover:shadow-md"
           }`}
         >
-          <div className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-primary/10 text-primary text-xs font-bold">
+          <div className="grid h-10 w-10 place-items-center rounded-full bg-gradient-to-br from-primary to-amber-500 text-white text-sm font-bold shadow-inner">
             {m.name.slice(0, 1).toUpperCase()}
           </div>
-          <div className="min-w-0">
-            <div className="font-semibold text-sm">{m.name}</div>
-            <div className="text-[11px] text-gray-500">
+          <div className="text-center">
+            <div className="font-semibold text-sm leading-tight">{m.name}</div>
+            <div className="text-[10px] text-gray-500 mt-0.5">
               {[m.relationship, m.birth_year ? `b. ${m.birth_year}` : null].filter(Boolean).join(" · ") ||
-                (depth === 0 ? "Ancestor" : "Descendant")}
+                "Family member"}
             </div>
           </div>
-          <div className="flex items-center gap-1 ml-1">
+          <div className="flex items-center gap-1 pt-1 opacity-0 group-hover:opacity-100 transition">
             <AddMemberDialog lineage={lineage} parentId={m.id} parentName={m.name}>
-              <Button variant="ghost" size="icon" className="h-7 w-7" aria-label="Add relative">
-                <UserPlus className="h-3.5 w-3.5" />
+              <Button variant="ghost" size="icon" className="h-6 w-6" aria-label="Add relative">
+                <UserPlus className="h-3 w-3" />
               </Button>
             </AddMemberDialog>
             {canDelete && (
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-7 w-7 text-red-500 hover:text-red-700"
+                className="h-6 w-6 text-red-500 hover:text-red-700"
                 onClick={() => del.mutate(m.id)}
                 aria-label="Delete"
               >
-                <Trash2 className="h-3.5 w-3.5" />
+                <Trash2 className="h-3 w-3" />
               </Button>
             )}
           </div>
         </div>
-        {kids.length > 0 && (
-          <ul className="mt-2 border-l border-gray-300 ml-4 space-y-2">
-            {kids.map((k) => renderNode(k, depth + 1))}
-          </ul>
-        )}
+        {kids.length > 0 && <ul className="ft-children">{kids.map((k) => renderNode(k))}</ul>}
       </li>
     );
   };
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">
+      <style>{`
+        .ft-tree, .ft-tree ul { list-style: none; margin: 0; padding: 0; }
+        .ft-tree { display: flex; justify-content: center; padding-top: 8px; }
+        .ft-tree .ft-children { display: flex; justify-content: center; padding-top: 32px; position: relative; }
+        .ft-tree .ft-children::before {
+          content: ''; position: absolute; top: 0; left: 50%;
+          width: 2px; height: 20px; background: hsl(var(--border, 0 0% 88%));
+        }
+        .ft-tree .ft-node { position: relative; padding: 0 12px; }
+        .ft-tree .ft-node > .ft-card { position: relative; }
+        .ft-tree .ft-children > .ft-node { padding-top: 20px; }
+        .ft-tree .ft-children > .ft-node::before {
+          content: ''; position: absolute; top: 0; left: 50%;
+          width: 2px; height: 20px; background: hsl(var(--border, 0 0% 88%));
+        }
+        .ft-tree .ft-children > .ft-node::after {
+          content: ''; position: absolute; top: 0; height: 2px;
+          background: hsl(var(--border, 0 0% 88%));
+        }
+        .ft-tree .ft-children > .ft-node:only-child::after { display: none; }
+        .ft-tree .ft-children > .ft-node:first-child::after { left: 50%; right: 0; }
+        .ft-tree .ft-children > .ft-node:last-child::after { left: 0; right: 50%; }
+        .ft-tree .ft-children > .ft-node:not(:first-child):not(:last-child)::after { left: 0; right: 0; }
+      `}</style>
+
       <header className="rounded-3xl border bg-gradient-to-br from-amber-500 via-primary to-primary/80 text-white p-8 shadow-lg">
         <div className="flex items-start gap-4">
-          <div className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-white/15 backdrop-blur">
+          <div className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-white/15 backdrop-blur border border-white/20">
             <Trees className="h-7 w-7" />
           </div>
           <div>
@@ -203,21 +223,33 @@ function FamilyTreePage() {
         </div>
       </div>
 
-      <div className="rounded-2xl border bg-white p-4 sm:p-6 shadow-sm min-h-[300px]">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="font-bold text-lg">{lineage}</h2>
-          <span className="text-xs text-gray-500">{members?.length ?? 0} members</span>
+      <div className="rounded-2xl border bg-gradient-to-b from-white to-gray-50/60 p-4 sm:p-8 shadow-sm min-h-[400px] overflow-x-auto">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h2 className="font-bold text-lg">{lineage}</h2>
+            <p className="text-xs text-gray-500">Hover any member to add a relative</p>
+          </div>
+          <span className="text-xs text-gray-500 rounded-full border px-2.5 py-1 bg-white">
+            {members?.length ?? 0} members
+          </span>
         </div>
         {isLoading ? (
           <div className="flex justify-center py-12">
             <Loader2 className="h-5 w-5 animate-spin text-primary" />
           </div>
         ) : roots.length === 0 ? (
-          <div className="text-center py-12 text-sm text-gray-500">
+          <div className="text-center py-16 text-sm text-gray-500">
+            <Trees className="h-10 w-10 mx-auto text-gray-300 mb-3" />
             No one has been added to <strong>{lineage}</strong> yet. Be the first to plant a root.
           </div>
         ) : (
-          <ul className="space-y-3">{roots.map((r) => renderNode(r))}</ul>
+          <div className="min-w-fit">
+            {roots.map((r) => (
+              <ul key={r.id} className="ft-tree mb-10 last:mb-0">
+                {renderNode(r)}
+              </ul>
+            ))}
+          </div>
         )}
       </div>
     </div>
