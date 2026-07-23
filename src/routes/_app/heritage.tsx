@@ -72,7 +72,7 @@ function Section({
         {image && imageSide === "left" && (
           <div className="relative h-64 md:h-auto min-h-[280px]">
             <img src={image} alt={imageAlt ?? title} className="absolute inset-0 h-full w-full object-cover" />
-            <div className="absolute inset-0 bg-gradient-to-r from-black/20 via-transparent to-white md:to-white" />
+            <div className="absolute inset-0 bg-gradient-to-r from-black/20 via-transparent to-transparent md:to-white" />
           </div>
         )}
         <div className="p-6 sm:p-8">
@@ -89,7 +89,7 @@ function Section({
         {image && imageSide === "right" && (
           <div className="relative h-64 md:h-auto min-h-[280px] order-first md:order-last">
             <img src={image} alt={imageAlt ?? title} className="absolute inset-0 h-full w-full object-cover" />
-            <div className="absolute inset-0 bg-gradient-to-l from-black/10 via-transparent to-white md:to-white" />
+            <div className="absolute inset-0 bg-gradient-to-l from-black/10 via-transparent to-transparent md:to-white" />
           </div>
         )}
       </div>
