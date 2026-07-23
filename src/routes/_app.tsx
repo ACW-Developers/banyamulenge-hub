@@ -54,6 +54,38 @@ function AppLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(true); // desktop: expanded vs. collapsed to icons
   const [mobileOpen, setMobileOpen] = useState(false);
   const notif = useNotifications();
+  const qc = useQueryClient();
+  const [refreshing, setRefreshing] = useState(false);
+
+  const handleHardRefresh = async () => {
+    if (refreshing) return;
+    setRefreshing(true);
+    try {
+      qc.clear();
+      if ("caches" in window) {
+        const keys = await caches.keys();
+        await Promise.all(keys.map((k) => caches.delete(k)));
+      }
+      if ("serviceWorker" in navigator) {
+        const regs = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(regs.map((r) => r.unregister()));
+      }
+      try {
+        const lang = localStorage.getItem("app.lang");
+        sessionStorage.clear();
+        // preserve auth + language; clear app-cached UI keys
+        Object.keys(localStorage)
+          .filter((k) => k.startsWith("app.cache.") || k.startsWith("notif."))
+          .forEach((k) => localStorage.removeItem(k));
+        if (lang) localStorage.setItem("app.lang", lang);
+      } catch { /* ignore */ }
+      toast.success("Cache cleared. Reloading…");
+      setTimeout(() => window.location.reload(), 400);
+    } catch {
+      toast.error("Failed to clear cache");
+      setRefreshing(false);
+    }
+  };
 
   useEffect(() => {
     if (!loading && !session) navigate({ to: "/auth" });
