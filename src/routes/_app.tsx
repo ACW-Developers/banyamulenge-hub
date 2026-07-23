@@ -335,6 +335,19 @@ function AppLayout() {
               <LanguageSelector />
               <Tooltip>
                 <TooltipTrigger asChild>
+                  <button
+                    onClick={handleHardRefresh}
+                    disabled={refreshing}
+                    className="inline-flex items-center justify-center h-10 w-10 rounded-md border border-gray-200 hover:border-primary/40 hover:bg-primary/5 text-gray-600 transition disabled:opacity-50"
+                    aria-label="Refresh & clear cache"
+                  >
+                    <RefreshCw className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`} />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">Clear cache & refresh</TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
                   <Link
                     to="/messages"
                     onClick={() => notif.markSeen("all")}
