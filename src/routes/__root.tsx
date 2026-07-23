@@ -110,7 +110,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: "https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap",
       },
     ],
-
   }),
   shellComponent: RootShell,
   component: RootComponent,

@@ -78,7 +78,9 @@ function AppLayout() {
           .filter((k) => k.startsWith("app.cache.") || k.startsWith("notif."))
           .forEach((k) => localStorage.removeItem(k));
         if (lang) localStorage.setItem("app.lang", lang);
-      } catch { /* ignore */ }
+      } catch {
+        /* ignore */
+      }
       toast.success("Cache cleared. Reloading…");
       setTimeout(() => window.location.reload(), 400);
     } catch {

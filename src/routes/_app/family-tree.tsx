@@ -28,20 +28,50 @@ import {
 export const Route = createFileRoute("/_app/family-tree")({
   head: () => ({
     meta: [
-      { title: "Family Tree — Banyamulenge Community" },
-      { name: "description", content: "Build the Banyamulenge family tree — add relatives by lineage." },
-      { property: "og:title", content: "Family Tree — Banyamulenge Community" },
-      { property: "og:description", content: "Add your family and connect the Banyamulenge diaspora." },
+      { title: "Family Tree - Banyamulenge Community" },
+      {
+        name: "description",
+        content: "Build the Banyamulenge family tree - add relatives by lineage.",
+      },
+      { property: "og:title", content: "Family Tree - Banyamulenge Community" },
+      {
+        property: "og:description",
+        content: "Add your family and connect the Banyamulenge diaspora.",
+      },
     ],
   }),
   component: FamilyTreePage,
 });
 
 const LINEAGES = [
-  "Abagorora","Abasinzira","Abega","Abasita","Abasegege","Abanyabzinshi","Abasama","Abitira",
-  "Abahondogo","Abazigaba","Abadasomera","Abahima","Abadahugwa","Abazoza","Abasinga","Abapfurika",
-  "Abashonga","Abahinda","Abatura","Abatakure","Abahiga","Ababano","Abagabika","Abadinzi",
-  "Abongera","Abanyakarama","Abaheto","Abatwari",
+  "Abagorora",
+  "Abasinzira",
+  "Abega",
+  "Abasita",
+  "Abasegege",
+  "Abanyabzinshi",
+  "Abasama",
+  "Abitira",
+  "Abahondogo",
+  "Abazigaba",
+  "Abadasomera",
+  "Abahima",
+  "Abadahugwa",
+  "Abazoza",
+  "Abasinga",
+  "Abapfurika",
+  "Abashonga",
+  "Abahinda",
+  "Abatura",
+  "Abatakure",
+  "Abahiga",
+  "Ababano",
+  "Abagabika",
+  "Abadinzi",
+  "Abongera",
+  "Abanyakarama",
+  "Abaheto",
+  "Abatwari",
 ];
 
 type Member = {
@@ -90,7 +120,9 @@ function FamilyTreePage() {
   const matches = useMemo(() => {
     if (!search.trim()) return new Set<string>();
     const q = search.toLowerCase();
-    return new Set((members ?? []).filter((m) => m.name.toLowerCase().includes(q)).map((m) => m.id));
+    return new Set(
+      (members ?? []).filter((m) => m.name.toLowerCase().includes(q)).map((m) => m.id),
+    );
   }, [members, search]);
 
   const del = useMutation({
@@ -113,7 +145,9 @@ function FamilyTreePage() {
       <li key={m.id} className="ft-node">
         <div
           className={`ft-card group inline-flex flex-col items-center gap-1 rounded-xl border bg-white px-3 py-2.5 shadow-sm transition min-w-[150px] ${
-            highlighted ? "ring-2 ring-amber-400 border-amber-300 bg-amber-50" : "hover:border-primary/40 hover:shadow-md"
+            highlighted
+              ? "ring-2 ring-amber-400 border-amber-300 bg-amber-50"
+              : "hover:border-primary/40 hover:shadow-md"
           }`}
         >
           <div className="grid h-10 w-10 place-items-center rounded-full bg-gradient-to-br from-primary to-amber-500 text-white text-sm font-bold shadow-inner">
@@ -122,8 +156,9 @@ function FamilyTreePage() {
           <div className="text-center">
             <div className="font-semibold text-sm leading-tight">{m.name}</div>
             <div className="text-[10px] text-gray-500 mt-0.5">
-              {[m.relationship, m.birth_year ? `b. ${m.birth_year}` : null].filter(Boolean).join(" · ") ||
-                "Family member"}
+              {[m.relationship, m.birth_year ? `b. ${m.birth_year}` : null]
+                .filter(Boolean)
+                .join(" · ") || "Family member"}
             </div>
           </div>
           <div className="flex items-center gap-1 pt-1 opacity-0 group-hover:opacity-100 transition">
@@ -177,16 +212,16 @@ function FamilyTreePage() {
         .ft-tree .ft-children > .ft-node:not(:first-child):not(:last-child)::after { left: 0; right: 0; }
       `}</style>
 
-      <header className="rounded-3xl border bg-gradient-to-br from-amber-500 via-primary to-primary/80 text-white p-8 shadow-lg">
+      <header className="rounded-3xl border bg-gradient-to-br from-primary via-primary to-primary/80 text-white p-8 shadow-lg">
         <div className="flex items-start gap-4">
           <div className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-white/15 backdrop-blur border border-white/20">
             <Trees className="h-7 w-7" />
           </div>
           <div>
             <h1 className="text-2xl sm:text-4xl font-black leading-tight">Family Tree</h1>
-            <p className="mt-2 text-white/90 max-w-2xl text-sm sm:text-base">
-              Choose your lineage (umurara), add yourself and your relatives, and help us
-              connect the Banyamulenge diaspora — one family at a time.
+            <p className="mt-2 text-white max-w-2xl text-sm sm:text-base">
+              Choose your lineage (umurara), add yourself and your relatives, and help us connect
+              the Banyamulenge diaspora - one family at a time.
             </p>
           </div>
         </div>
@@ -197,10 +232,14 @@ function FamilyTreePage() {
           <div className="space-y-1.5">
             <Label className="text-xs uppercase tracking-wider text-gray-500">Lineage</Label>
             <Select value={lineage} onValueChange={setLineage}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent className="max-h-72">
                 {LINEAGES.map((l) => (
-                  <SelectItem key={l} value={l}>{l}</SelectItem>
+                  <SelectItem key={l} value={l}>
+                    {l}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -218,7 +257,9 @@ function FamilyTreePage() {
             </div>
           </div>
           <AddMemberDialog lineage={lineage}>
-            <Button className="gap-2 h-10"><Plus className="h-4 w-4" /> Add member</Button>
+            <Button className="gap-2 h-10">
+              <Plus className="h-4 w-4" /> Add member
+            </Button>
           </AddMemberDialog>
         </div>
       </div>
@@ -291,7 +332,10 @@ function AddMemberDialog({
     setBusy(false);
     if (error) return toast.error(error.message);
     toast.success("Added to the tree");
-    setName(""); setRelationship(""); setBirthYear(""); setNotes("");
+    setName("");
+    setRelationship("");
+    setBirthYear("");
+    setNotes("");
     setOpen(false);
     qc.invalidateQueries({ queryKey: ["family-tree", lineage] });
   }
@@ -308,7 +352,11 @@ function AddMemberDialog({
         <div className="space-y-3">
           <div className="space-y-1.5">
             <Label>Full name</Label>
-            <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Rukundo Jean" />
+            <Input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="e.g. Rukundo Jean"
+            />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">

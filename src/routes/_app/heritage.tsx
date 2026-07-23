@@ -11,10 +11,16 @@ import clappingImg from "@/assets/heritage/clapping.jpeg";
 export const Route = createFileRoute("/_app/heritage")({
   head: () => ({
     meta: [
-      { title: "Our Heritage — Banyamulenge Community" },
-      { name: "description", content: "The history, culture, lineages and traditions of the Banyamulenge people." },
-      { property: "og:title", content: "Our Heritage — Banyamulenge Community" },
-      { property: "og:description", content: "History, culture and lineages of the Banyamulenge people." },
+      { title: "Our Heritage - Banyamulenge Community" },
+      {
+        name: "description",
+        content: "The history, culture, lineages and traditions of the Banyamulenge people.",
+      },
+      { property: "og:title", content: "Our Heritage - Banyamulenge Community" },
+      {
+        property: "og:description",
+        content: "History, culture and lineages of the Banyamulenge people.",
+      },
     ],
   }),
   component: HeritagePage,
@@ -71,8 +77,12 @@ function Section({
       <div className={`grid gap-0 ${image ? "md:grid-cols-2" : ""}`}>
         {image && imageSide === "left" && (
           <div className="relative h-64 md:h-auto min-h-[280px]">
-            <img src={image} alt={imageAlt ?? title} className="absolute inset-0 h-full w-full object-cover" />
-            <div className="absolute inset-0 bg-gradient-to-r from-black/20 via-transparent to-transparent md:to-white" />
+            <img
+              src={image}
+              alt={imageAlt ?? title}
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+            <div className="absolute inset-0 " />
           </div>
         )}
         <div className="p-6 sm:p-8">
@@ -88,8 +98,12 @@ function Section({
         </div>
         {image && imageSide === "right" && (
           <div className="relative h-64 md:h-auto min-h-[280px] order-first md:order-last">
-            <img src={image} alt={imageAlt ?? title} className="absolute inset-0 h-full w-full object-cover" />
-            <div className="absolute inset-0 bg-gradient-to-l from-black/10 via-transparent to-transparent md:to-white" />
+            <img
+              src={image}
+              alt={imageAlt ?? title}
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+            <div className="absolute inset-0 " />
           </div>
         )}
       </div>
@@ -100,28 +114,36 @@ function Section({
 function HeritagePage() {
   return (
     <div className="max-w-6xl mx-auto space-y-6">
-      <header className="relative overflow-hidden rounded-3xl border shadow-lg">
+      <div className="text-center max-w-2xl mx-auto">
+        <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight">
+          Our Heritage
+        </h1>
+        <p className="mt-2 text-sm sm:text-base text-gray-500">
+          A people of the Mulenge highlands - pastoralists, storytellers and custodians of a rich
+          oral tradition spanning centuries and continents.
+        </p>
+      </div>
+      <header className="relative overflow-hidden rounded-3xl border h-80 shadow-lg">
         <img
           src={groupImg}
           alt="Banyamulenge community in traditional attire"
           className="absolute inset-0 h-full w-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-br from-black/80 via-black/55 to-primary/70" />
-        <div className="relative p-8 sm:p-14 text-white">
-          <div className="inline-flex items-center gap-2 rounded-full bg-white/15 backdrop-blur border border-white/20 px-3 py-1 text-xs font-semibold uppercase tracking-wider mb-4">
-            Our Heritage
-          </div>
-          <h1 className="text-3xl sm:text-5xl font-black leading-tight max-w-3xl drop-shadow">
+        <div className="absolute inset-0 bg-gradient-to-br from-black/10 via-black/35 to-transparent" />
+        <div className="relative p-8 mt-48 sm:p-14 text-white">
+          <h1 className="text-3xl sm:text-3xl font-black leading-tight max-w-3xl drop-shadow">
             The living history of the Banyamulenge
           </h1>
-          <p className="mt-4 text-white/90 max-w-2xl text-sm sm:text-base">
-            A people of the Mulenge highlands — pastoralists, storytellers and custodians of a
-            rich oral tradition spanning centuries and continents.
-          </p>
         </div>
       </header>
 
-      <Section icon={Landmark} title="Introduction" image={gourdsImg} imageAlt="Women in traditional Banyamulenge attire with ceremonial gourds" imageSide="right">
+      <Section
+        icon={Landmark}
+        title="Introduction"
+        image={gourdsImg}
+        imageAlt="Women in traditional Banyamulenge attire with ceremonial gourds"
+        imageSide="right"
+      >
         <p>
           The <strong>Banyamulenge</strong> are a Kinyarwanda-speaking community living
           predominantly on the <strong>Mulenge Highlands</strong> of South Kivu Province in the
@@ -135,7 +157,13 @@ function HeritagePage() {
         </p>
       </Section>
 
-      <Section icon={Globe2} title="Historical Origins" image={menHatsImg} imageAlt="Elders in traditional hats and coats" imageSide="left">
+      <Section
+        icon={Globe2}
+        title="Historical Origins"
+        image={menHatsImg}
+        imageAlt="Elders in traditional hats and coats"
+        imageSide="left"
+      >
         <p>
           According to Banyamulenge oral traditions and numerous historical studies, ancestors of
           the Banyamulenge migrated into the highlands of present-day South Kivu between the
@@ -149,47 +177,65 @@ function HeritagePage() {
         </ul>
       </Section>
 
-      <Section icon={Home} title="Traditional Economy & Leadership" image={clappingImg} imageAlt="Community members clapping in unison" imageSide="right">
+      <Section
+        icon={Home}
+        title="Traditional Economy & Leadership"
+        image={clappingImg}
+        imageAlt="Community members clapping in unison"
+        imageSide="right"
+      >
         <p>
           Historically the Banyamulenge were renowned <strong>pastoralists</strong>. Cattle
-          represented wealth, prestige, family heritage, marriage negotiations and community
-          status. They also practiced agriculture, milk production, local trade, leather
-          craftsmanship and iron exchange.
+          represented wealth, prestige, family heritage, marriage negotiations and community status.
+          They also practiced agriculture, milk production, local trade, leather craftsmanship and
+          iron exchange.
         </p>
         <p>
-          Leadership was based on respected elders, lineage heads and customary mediators.
-          Decisions were reached through consultation rather than centralized kingship.
+          Leadership was based on respected elders, lineage heads and customary mediators. Decisions
+          were reached through consultation rather than centralized kingship.
         </p>
       </Section>
 
-      <Section icon={BookOpen} title="Language, Religion & Values" image={womenImg} imageAlt="Women in vibrant patterned dresses" imageSide="left">
+      <Section
+        icon={BookOpen}
+        title="Language, Religion & Values"
+        image={womenImg}
+        imageAlt="Women in vibrant patterned dresses"
+        imageSide="left"
+      >
         <p>
-          The primary language is <strong>Kinyamulenge</strong>, a local variety of
-          Kinyarwanda. Many also speak Swahili, French, Lingala and English.
+          The primary language is <strong>Kinyamulenge</strong>, a local variety of Kinyarwanda.
+          Many also speak Swahili, French, Lingala and English.
         </p>
         <p>
           Traditional beliefs centred on ancestors and Imana (God). Cultural values emphasize
-          honesty, respect, hospitality, courage, humility, family unity, hard work and
-          peaceful coexistence.
+          honesty, respect, hospitality, courage, humility, family unity, hard work and peaceful
+          coexistence.
         </p>
       </Section>
 
-      <Section icon={Music2} title="Music, Marriage & Dress" image={danceImg} imageAlt="Traditional dance performance" imageSide="right">
+      <Section
+        icon={Music2}
+        title="Music, Marriage & Dress"
+        image={danceImg}
+        imageAlt="Traditional dance performance"
+        imageSide="right"
+      >
         <p>
-          Marriage traditionally involved negotiations between families, exchange of cattle as
-          bride wealth, blessings by elders and community celebrations of music and dance.
-          Traditional music includes praise songs, cattle songs, wedding and warrior songs.
+          Marriage traditionally involved negotiations between families, exchange of cattle as bride
+          wealth, blessings by elders and community celebrations of music and dance. Traditional
+          music includes praise songs, cattle songs, wedding and warrior songs.
         </p>
         <p>
-          Men historically wore animal skins, woven garments and staffs; women wore decorated
-          wraps, beads and handmade ornaments.
+          Men historically wore animal skins, woven garments and staffs; women wore decorated wraps,
+          beads and handmade ornaments.
         </p>
       </Section>
 
       <Section icon={Users} title="The Banyamulenge Lineages (Imirara)">
         <p>
-          Twenty-eight recognized Banyamulenge lineages are remembered in oral tradition.
-          These are <em>lineages or clans</em>, not separate tribes.
+          Twenty-eight recognized Banyamulenge lineages are remembered in oral tradition. These are{" "}
+          <em>lineages or clans</em>, not separate tribes.
         </p>
         <div className="grid sm:grid-cols-2 gap-3 not-prose mt-4">
           {LINEAGES.map(([name, note], i) => (
@@ -214,8 +260,8 @@ function HeritagePage() {
         </p>
         <p>
           Today Banyamulenge communities live across the DRC, Rwanda, Burundi, Uganda, Kenya,
-          Tanzania, Europe, North America and Australia — contributing as professionals,
-          educators, entrepreneurs, clergy, public servants, students and peacebuilders.
+          Tanzania, Europe, North America and Australia - contributing as professionals, educators,
+          entrepreneurs, clergy, public servants, students and peacebuilders.
         </p>
       </Section>
     </div>

@@ -22,7 +22,6 @@ export const Route = createFileRoute("/_app/community/$slug")({
   component: GroupPage,
 });
 
-
 type GroupMessage = {
   id: string;
   group_id: string;
@@ -42,7 +41,6 @@ function GroupPage() {
   useEffect(() => {
     if (search.tab) setTab(search.tab);
   }, [search.tab]);
-
 
   const { data: group, isLoading: loadingGroup } = useQuery({
     queryKey: ["group", slug],

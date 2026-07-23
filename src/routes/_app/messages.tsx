@@ -259,7 +259,7 @@ function MessagesPage() {
                     ? lastMsg.attachment_type?.startsWith("image/")
                       ? "📷 Photo"
                       : `📎 ${lastMsg.attachment_name ?? "Attachment"}`
-                    : lastMsg.content ?? ""
+                    : (lastMsg.content ?? "")
                   : "";
                 const preview = lastMsg
                   ? `${lastIsMine ? "You: " : ""}${lastText}`
@@ -306,9 +306,15 @@ function MessagesPage() {
                           {lastIsMine && lastMsg && !c.is_group && (
                             <>
                               {lastMsg.read_at ? (
-                                <CheckCheck className="h-3.5 w-3.5 text-sky-500" aria-label="Read" />
+                                <CheckCheck
+                                  className="h-3.5 w-3.5 text-sky-500"
+                                  aria-label="Read"
+                                />
                               ) : lastMsg.delivered_at ? (
-                                <CheckCheck className="h-3.5 w-3.5 text-gray-400" aria-label="Delivered" />
+                                <CheckCheck
+                                  className="h-3.5 w-3.5 text-gray-400"
+                                  aria-label="Delivered"
+                                />
                               ) : (
                                 <Check className="h-3.5 w-3.5 text-gray-400" aria-label="Sent" />
                               )}
@@ -459,7 +465,9 @@ function ChatPane({
   const headerName = isGroup ? groupTitle : other?.display_name || other?.username || "Unknown";
   const headerSub = isGroup
     ? `${participants.length} members`
-    : other?.username ? `@${other.username}` : "";
+    : other?.username
+      ? `@${other.username}`
+      : "";
   const initial = (headerName || "?").slice(0, 1).toUpperCase();
   const inCall = !isGroup && callStatus !== "idle" && callStatus !== "ended";
 
@@ -482,7 +490,13 @@ function ChatPane({
           <div className="text-xs text-gray-500 truncate">{headerSub}</div>
         </div>
         {!isGroup && !inCall && (
-          <Button variant="outline" size="icon" onClick={startCall} aria-label="Start audio call" title="Start audio call">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={startCall}
+            aria-label="Start audio call"
+            title="Start audio call"
+          >
             <Phone className="h-4 w-4 text-primary" />
           </Button>
         )}
@@ -519,7 +533,7 @@ function ChatPane({
       <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-2 bg-gray-50/50">
         {messages.map((m) => {
           const mine = m.sender_id === userId;
-          const senderProfile = isGroup && !mine ? profilesById.get(m.sender_id) ?? null : null;
+          const senderProfile = isGroup && !mine ? (profilesById.get(m.sender_id) ?? null) : null;
           return (
             <div key={m.id} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
               <div
@@ -542,9 +556,7 @@ function ChatPane({
                     mine={mine}
                   />
                 )}
-                {m.content && (
-                  <div className="whitespace-pre-wrap break-words">{m.content}</div>
-                )}
+                {m.content && <div className="whitespace-pre-wrap break-words">{m.content}</div>}
                 <div
                   className={`text-[10px] mt-1 flex items-center gap-1 ${mine ? "opacity-90 justify-end" : "text-gray-400"}`}
                 >
@@ -644,7 +656,11 @@ function AttachmentBubble({
             >
               <X className="h-5 w-5" />
             </button>
-            <img src={url} alt={name ?? "attachment"} className="max-h-full max-w-full rounded-lg" />
+            <img
+              src={url}
+              alt={name ?? "attachment"}
+              className="max-h-full max-w-full rounded-lg"
+            />
           </div>
         )}
       </>
@@ -823,9 +839,7 @@ function NewGroupDialog({ onOpened }: { onOpened: (id: string) => void }) {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
-        {picked.size > 0 && (
-          <div className="text-xs text-gray-500">{picked.size} selected</div>
-        )}
+        {picked.size > 0 && <div className="text-xs text-gray-500">{picked.size} selected</div>}
         <div className="max-h-72 overflow-y-auto -mx-2">
           {people?.map((p) => {
             const initial = (p.display_name || p.username).slice(0, 1).toUpperCase();
@@ -852,7 +866,9 @@ function NewGroupDialog({ onOpened }: { onOpened: (id: string) => void }) {
                 </div>
                 <div
                   className={`h-5 w-5 rounded-md border flex items-center justify-center ${
-                    isPicked ? "bg-primary border-primary text-primary-foreground" : "border-gray-300"
+                    isPicked
+                      ? "bg-primary border-primary text-primary-foreground"
+                      : "border-gray-300"
                   }`}
                 >
                   {isPicked && <Check className="h-3.5 w-3.5" />}

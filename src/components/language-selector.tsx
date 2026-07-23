@@ -17,7 +17,7 @@ const LANGS = [
 
 export function LanguageSelector() {
   const [current, setCurrent] = useState<string>(() =>
-    typeof window !== "undefined" ? localStorage.getItem("app.lang") ?? "en" : "en",
+    typeof window !== "undefined" ? (localStorage.getItem("app.lang") ?? "en") : "en",
   );
   const active = LANGS.find((l) => l.code === current) ?? LANGS[0];
   return (
@@ -41,7 +41,9 @@ export function LanguageSelector() {
               setCurrent(l.code);
               try {
                 localStorage.setItem("app.lang", l.code);
-              } catch { /* ignore */ }
+              } catch {
+                /* ignore */
+              }
             }}
             className="cursor-pointer flex items-center gap-2"
           >

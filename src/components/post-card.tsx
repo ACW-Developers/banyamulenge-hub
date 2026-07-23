@@ -380,8 +380,10 @@ export function PostComposer({
       });
       if (error) throw error;
       setContent("");
-      setFile(null); setPreview(null);
-      setVideoFile(null); setVideoPreview(null);
+      setFile(null);
+      setPreview(null);
+      setVideoFile(null);
+      setVideoPreview(null);
       setIsAnnouncement(false);
       toast.success("Posted");
       logActivity(user.id, "post.create", "post");
@@ -429,7 +431,10 @@ export function PostComposer({
             <div className="relative rounded-xl overflow-hidden border bg-black">
               <video src={videoPreview} controls playsInline className="w-full max-h-72" />
               <button
-                onClick={() => { setVideoFile(null); setVideoPreview(null); }}
+                onClick={() => {
+                  setVideoFile(null);
+                  setVideoPreview(null);
+                }}
                 className="absolute top-2 right-2 rounded-full bg-black/60 text-white p-1 hover:bg-black"
                 aria-label="Remove video"
                 type="button"
