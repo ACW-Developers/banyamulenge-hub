@@ -18,7 +18,10 @@ import {
   X,
   Landmark,
   Trees,
+  RefreshCw,
 } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 import { LanguageSelector } from "@/components/language-selector";
 
@@ -51,6 +54,38 @@ function AppLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(true); // desktop: expanded vs. collapsed to icons
   const [mobileOpen, setMobileOpen] = useState(false);
   const notif = useNotifications();
+  const qc = useQueryClient();
+  const [refreshing, setRefreshing] = useState(false);
+
+  const handleHardRefresh = async () => {
+    if (refreshing) return;
+    setRefreshing(true);
+    try {
+      qc.clear();
+      if ("caches" in window) {
+        const keys = await caches.keys();
+        await Promise.all(keys.map((k) => caches.delete(k)));
+      }
+      if ("serviceWorker" in navigator) {
+        const regs = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(regs.map((r) => r.unregister()));
+      }
+      try {
+        const lang = localStorage.getItem("app.lang");
+        sessionStorage.clear();
+        // preserve auth + language; clear app-cached UI keys
+        Object.keys(localStorage)
+          .filter((k) => k.startsWith("app.cache.") || k.startsWith("notif."))
+          .forEach((k) => localStorage.removeItem(k));
+        if (lang) localStorage.setItem("app.lang", lang);
+      } catch { /* ignore */ }
+      toast.success("Cache cleared. Reloading…");
+      setTimeout(() => window.location.reload(), 400);
+    } catch {
+      toast.error("Failed to clear cache");
+      setRefreshing(false);
+    }
+  };
 
   useEffect(() => {
     if (!loading && !session) navigate({ to: "/auth" });
@@ -298,6 +333,19 @@ function AppLayout() {
             </div>
             <div className="ml-auto flex items-center gap-2">
               <LanguageSelector />
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={handleHardRefresh}
+                    disabled={refreshing}
+                    className="inline-flex items-center justify-center h-10 w-10 rounded-md border border-gray-200 hover:border-primary/40 hover:bg-primary/5 text-gray-600 transition disabled:opacity-50"
+                    aria-label="Refresh & clear cache"
+                  >
+                    <RefreshCw className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`} />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">Clear cache & refresh</TooltipContent>
+              </Tooltip>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Link
