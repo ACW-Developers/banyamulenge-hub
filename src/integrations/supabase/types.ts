@@ -186,6 +186,54 @@ export type Database = {
         }
         Relationships: []
       }
+      directory_entries: {
+        Row: {
+          category: string | null
+          created_at: string
+          description: string
+          email: string | null
+          id: string
+          image_url: string | null
+          kind: string
+          location: string | null
+          name: string
+          phone: string | null
+          updated_at: string
+          user_id: string
+          website: string | null
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          description: string
+          email?: string | null
+          id?: string
+          image_url?: string | null
+          kind: string
+          location?: string | null
+          name: string
+          phone?: string | null
+          updated_at?: string
+          user_id: string
+          website?: string | null
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          description?: string
+          email?: string | null
+          id?: string
+          image_url?: string | null
+          kind?: string
+          location?: string | null
+          name?: string
+          phone?: string | null
+          updated_at?: string
+          user_id?: string
+          website?: string | null
+        }
+        Relationships: []
+      }
       family_members: {
         Row: {
           added_by: string
@@ -414,6 +462,60 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      marketplace_listings: {
+        Row: {
+          category: string
+          contact_email: string | null
+          contact_phone: string | null
+          created_at: string
+          currency: string | null
+          description: string
+          id: string
+          image_url: string | null
+          kind: string
+          link_url: string | null
+          location: string | null
+          price: number | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category: string
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          currency?: string | null
+          description: string
+          id?: string
+          image_url?: string | null
+          kind: string
+          link_url?: string | null
+          location?: string | null
+          price?: number | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: string
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          currency?: string | null
+          description?: string
+          id?: string
+          image_url?: string | null
+          kind?: string
+          link_url?: string | null
+          location?: string | null
+          price?: number | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       messages: {
         Row: {
