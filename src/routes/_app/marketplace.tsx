@@ -391,7 +391,12 @@ function MarketplacePage() {
         </div>
       )}
 
-      <ListingDialog open={open} onOpenChange={setOpen} editing={editing} />
+      <ListingDialog
+        key={editing?.id ?? "new"}
+        open={open}
+        onOpenChange={setOpen}
+        editing={editing}
+      />
     </div>
   );
 }

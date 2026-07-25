@@ -17,6 +17,7 @@ import { Route as AppMarketplaceRouteImport } from './routes/_app/marketplace'
 import { Route as AppHeritageRouteImport } from './routes/_app/heritage'
 import { Route as AppFamilyTreeRouteImport } from './routes/_app/family-tree'
 import { Route as AppExploreRouteImport } from './routes/_app/explore'
+import { Route as AppDirectoryRouteImport } from './routes/_app/directory'
 import { Route as AppCommunityRouteImport } from './routes/_app/community'
 import { Route as AppAdminRouteImport } from './routes/_app/admin'
 import { Route as AppAdminIndexRouteImport } from './routes/_app/admin/index'
@@ -65,6 +66,11 @@ const AppExploreRoute = AppExploreRouteImport.update({
   path: '/explore',
   getParentRoute: () => AppRoute,
 } as any)
+const AppDirectoryRoute = AppDirectoryRouteImport.update({
+  id: '/directory',
+  path: '/directory',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppCommunityRoute = AppCommunityRouteImport.update({
   id: '/community',
   path: '/community',
@@ -111,6 +117,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/admin': typeof AppAdminRouteWithChildren
   '/community': typeof AppCommunityRouteWithChildren
+  '/directory': typeof AppDirectoryRoute
   '/explore': typeof AppExploreRoute
   '/family-tree': typeof AppFamilyTreeRoute
   '/heritage': typeof AppHeritageRoute
@@ -126,6 +133,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/community': typeof AppCommunityRouteWithChildren
+  '/directory': typeof AppDirectoryRoute
   '/explore': typeof AppExploreRoute
   '/family-tree': typeof AppFamilyTreeRoute
   '/heritage': typeof AppHeritageRoute
@@ -145,6 +153,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/_app/admin': typeof AppAdminRouteWithChildren
   '/_app/community': typeof AppCommunityRouteWithChildren
+  '/_app/directory': typeof AppDirectoryRoute
   '/_app/explore': typeof AppExploreRoute
   '/_app/family-tree': typeof AppFamilyTreeRoute
   '/_app/heritage': typeof AppHeritageRoute
@@ -165,6 +174,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/admin'
     | '/community'
+    | '/directory'
     | '/explore'
     | '/family-tree'
     | '/heritage'
@@ -180,6 +190,7 @@ export interface FileRouteTypes {
   to:
     | '/auth'
     | '/community'
+    | '/directory'
     | '/explore'
     | '/family-tree'
     | '/heritage'
@@ -198,6 +209,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/_app/admin'
     | '/_app/community'
+    | '/_app/directory'
     | '/_app/explore'
     | '/_app/family-tree'
     | '/_app/heritage'
@@ -273,6 +285,13 @@ declare module '@tanstack/react-router' {
       path: '/explore'
       fullPath: '/explore'
       preLoaderRoute: typeof AppExploreRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/directory': {
+      id: '/_app/directory'
+      path: '/directory'
+      fullPath: '/directory'
+      preLoaderRoute: typeof AppDirectoryRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/community': {
@@ -367,6 +386,7 @@ const AppCommunityRouteWithChildren = AppCommunityRoute._addFileChildren(
 interface AppRouteChildren {
   AppAdminRoute: typeof AppAdminRouteWithChildren
   AppCommunityRoute: typeof AppCommunityRouteWithChildren
+  AppDirectoryRoute: typeof AppDirectoryRoute
   AppExploreRoute: typeof AppExploreRoute
   AppFamilyTreeRoute: typeof AppFamilyTreeRoute
   AppHeritageRoute: typeof AppHeritageRoute
@@ -379,6 +399,7 @@ interface AppRouteChildren {
 const AppRouteChildren: AppRouteChildren = {
   AppAdminRoute: AppAdminRouteWithChildren,
   AppCommunityRoute: AppCommunityRouteWithChildren,
+  AppDirectoryRoute: AppDirectoryRoute,
   AppExploreRoute: AppExploreRoute,
   AppFamilyTreeRoute: AppFamilyTreeRoute,
   AppHeritageRoute: AppHeritageRoute,
