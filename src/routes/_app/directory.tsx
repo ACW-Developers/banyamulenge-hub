@@ -350,7 +350,12 @@ function DirectoryPage() {
         </div>
       )}
 
-      <EntryDialog open={open} onOpenChange={setOpen} editing={editing} />
+      <EntryDialog
+        key={editing?.id ?? "new"}
+        open={open}
+        onOpenChange={setOpen}
+        editing={editing}
+      />
     </div>
   );
 }
