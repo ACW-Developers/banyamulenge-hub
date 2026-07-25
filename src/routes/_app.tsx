@@ -18,6 +18,8 @@ import {
   X,
   Landmark,
   Trees,
+  Store,
+  BookUser,
   RefreshCw,
 } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -115,6 +117,8 @@ function AppLayout() {
     { to: "/", label: "Home", icon: Home, badge: notif.newPosts },
     { to: "/explore", label: "Explore", icon: Compass, badge: notif.newFollowers },
     { to: "/community", label: "Community", icon: Users, badge: 0 },
+    { to: "/marketplace", label: "Marketplace", icon: Store, badge: 0 },
+    { to: "/directory", label: "Directory", icon: BookUser, badge: 0 },
     { to: "/messages", label: "Messages", icon: MessageCircle, badge: notif.unreadMessages },
     { to: "/heritage", label: "Our Heritage", icon: Landmark, badge: 0 },
     { to: "/family-tree", label: "Family Tree", icon: Trees, badge: 0 },

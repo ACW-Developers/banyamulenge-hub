@@ -13,9 +13,11 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as AppIndexRouteImport } from './routes/_app/index'
 import { Route as AppMessagesRouteImport } from './routes/_app/messages'
+import { Route as AppMarketplaceRouteImport } from './routes/_app/marketplace'
 import { Route as AppHeritageRouteImport } from './routes/_app/heritage'
 import { Route as AppFamilyTreeRouteImport } from './routes/_app/family-tree'
 import { Route as AppExploreRouteImport } from './routes/_app/explore'
+import { Route as AppDirectoryRouteImport } from './routes/_app/directory'
 import { Route as AppCommunityRouteImport } from './routes/_app/community'
 import { Route as AppAdminRouteImport } from './routes/_app/admin'
 import { Route as AppAdminIndexRouteImport } from './routes/_app/admin/index'
@@ -44,6 +46,11 @@ const AppMessagesRoute = AppMessagesRouteImport.update({
   path: '/messages',
   getParentRoute: () => AppRoute,
 } as any)
+const AppMarketplaceRoute = AppMarketplaceRouteImport.update({
+  id: '/marketplace',
+  path: '/marketplace',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppHeritageRoute = AppHeritageRouteImport.update({
   id: '/heritage',
   path: '/heritage',
@@ -57,6 +64,11 @@ const AppFamilyTreeRoute = AppFamilyTreeRouteImport.update({
 const AppExploreRoute = AppExploreRouteImport.update({
   id: '/explore',
   path: '/explore',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppDirectoryRoute = AppDirectoryRouteImport.update({
+  id: '/directory',
+  path: '/directory',
   getParentRoute: () => AppRoute,
 } as any)
 const AppCommunityRoute = AppCommunityRouteImport.update({
@@ -105,9 +117,11 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/admin': typeof AppAdminRouteWithChildren
   '/community': typeof AppCommunityRouteWithChildren
+  '/directory': typeof AppDirectoryRoute
   '/explore': typeof AppExploreRoute
   '/family-tree': typeof AppFamilyTreeRoute
   '/heritage': typeof AppHeritageRoute
+  '/marketplace': typeof AppMarketplaceRoute
   '/messages': typeof AppMessagesRoute
   '/admin/logs': typeof AppAdminLogsRoute
   '/admin/settings': typeof AppAdminSettingsRoute
@@ -119,9 +133,11 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/community': typeof AppCommunityRouteWithChildren
+  '/directory': typeof AppDirectoryRoute
   '/explore': typeof AppExploreRoute
   '/family-tree': typeof AppFamilyTreeRoute
   '/heritage': typeof AppHeritageRoute
+  '/marketplace': typeof AppMarketplaceRoute
   '/messages': typeof AppMessagesRoute
   '/': typeof AppIndexRoute
   '/admin/logs': typeof AppAdminLogsRoute
@@ -137,9 +153,11 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/_app/admin': typeof AppAdminRouteWithChildren
   '/_app/community': typeof AppCommunityRouteWithChildren
+  '/_app/directory': typeof AppDirectoryRoute
   '/_app/explore': typeof AppExploreRoute
   '/_app/family-tree': typeof AppFamilyTreeRoute
   '/_app/heritage': typeof AppHeritageRoute
+  '/_app/marketplace': typeof AppMarketplaceRoute
   '/_app/messages': typeof AppMessagesRoute
   '/_app/': typeof AppIndexRoute
   '/_app/admin/logs': typeof AppAdminLogsRoute
@@ -156,9 +174,11 @@ export interface FileRouteTypes {
     | '/auth'
     | '/admin'
     | '/community'
+    | '/directory'
     | '/explore'
     | '/family-tree'
     | '/heritage'
+    | '/marketplace'
     | '/messages'
     | '/admin/logs'
     | '/admin/settings'
@@ -170,9 +190,11 @@ export interface FileRouteTypes {
   to:
     | '/auth'
     | '/community'
+    | '/directory'
     | '/explore'
     | '/family-tree'
     | '/heritage'
+    | '/marketplace'
     | '/messages'
     | '/'
     | '/admin/logs'
@@ -187,9 +209,11 @@ export interface FileRouteTypes {
     | '/auth'
     | '/_app/admin'
     | '/_app/community'
+    | '/_app/directory'
     | '/_app/explore'
     | '/_app/family-tree'
     | '/_app/heritage'
+    | '/_app/marketplace'
     | '/_app/messages'
     | '/_app/'
     | '/_app/admin/logs'
@@ -235,6 +259,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppMessagesRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/marketplace': {
+      id: '/_app/marketplace'
+      path: '/marketplace'
+      fullPath: '/marketplace'
+      preLoaderRoute: typeof AppMarketplaceRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/heritage': {
       id: '/_app/heritage'
       path: '/heritage'
@@ -254,6 +285,13 @@ declare module '@tanstack/react-router' {
       path: '/explore'
       fullPath: '/explore'
       preLoaderRoute: typeof AppExploreRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/directory': {
+      id: '/_app/directory'
+      path: '/directory'
+      fullPath: '/directory'
+      preLoaderRoute: typeof AppDirectoryRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/community': {
@@ -348,9 +386,11 @@ const AppCommunityRouteWithChildren = AppCommunityRoute._addFileChildren(
 interface AppRouteChildren {
   AppAdminRoute: typeof AppAdminRouteWithChildren
   AppCommunityRoute: typeof AppCommunityRouteWithChildren
+  AppDirectoryRoute: typeof AppDirectoryRoute
   AppExploreRoute: typeof AppExploreRoute
   AppFamilyTreeRoute: typeof AppFamilyTreeRoute
   AppHeritageRoute: typeof AppHeritageRoute
+  AppMarketplaceRoute: typeof AppMarketplaceRoute
   AppMessagesRoute: typeof AppMessagesRoute
   AppIndexRoute: typeof AppIndexRoute
   AppProfileUsernameRoute: typeof AppProfileUsernameRoute
@@ -359,9 +399,11 @@ interface AppRouteChildren {
 const AppRouteChildren: AppRouteChildren = {
   AppAdminRoute: AppAdminRouteWithChildren,
   AppCommunityRoute: AppCommunityRouteWithChildren,
+  AppDirectoryRoute: AppDirectoryRoute,
   AppExploreRoute: AppExploreRoute,
   AppFamilyTreeRoute: AppFamilyTreeRoute,
   AppHeritageRoute: AppHeritageRoute,
+  AppMarketplaceRoute: AppMarketplaceRoute,
   AppMessagesRoute: AppMessagesRoute,
   AppIndexRoute: AppIndexRoute,
   AppProfileUsernameRoute: AppProfileUsernameRoute,
