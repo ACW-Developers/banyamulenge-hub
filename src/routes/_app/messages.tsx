@@ -349,6 +349,7 @@ function MessagesPage() {
               userId={user.id}
               isGroup={active.is_group}
               groupTitle={active.title ?? "Group"}
+              createdBy={active.created_by}
               participants={active.conversation_participants.map((cp) => ({
                 user_id: cp.user_id,
                 profile: cp.profiles,
@@ -363,7 +364,9 @@ function MessagesPage() {
               sending={sending}
               uploading={uploading}
               scrollRef={scrollRef}
+              onGroupDeleted={() => setActiveId(null)}
             />
+
           ) : (
             <div className="flex-1 flex flex-col items-center justify-center text-center p-6">
               <MessageCircle className="h-12 w-12 text-primary mb-3" />
