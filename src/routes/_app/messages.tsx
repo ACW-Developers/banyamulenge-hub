@@ -62,12 +62,14 @@ type ConversationRow = {
   last_message_at: string;
   title: string | null;
   is_group: boolean;
+  created_by: string | null;
   conversation_participants: {
     user_id: string;
     profiles: { username: string; display_name: string | null; avatar_url: string | null } | null;
   }[];
   messages: MessageRow[];
 };
+
 
 function MessagesPage() {
   const { user } = useAuth();
