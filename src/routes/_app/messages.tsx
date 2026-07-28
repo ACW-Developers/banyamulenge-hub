@@ -412,6 +412,7 @@ function ChatPane({
   userId,
   isGroup,
   groupTitle,
+  createdBy,
   participants,
   other,
   messages,
@@ -423,11 +424,13 @@ function ChatPane({
   sending,
   uploading,
   scrollRef,
+  onGroupDeleted,
 }: {
   convoId: string;
   userId: string;
   isGroup: boolean;
   groupTitle: string;
+  createdBy: string | null;
   participants: { user_id: string; profile: Profile | null }[];
   other: Profile | null;
   messages: MessageRow[];
@@ -439,10 +442,13 @@ function ChatPane({
   sending: boolean;
   uploading: boolean;
   scrollRef: React.RefObject<HTMLDivElement | null>;
+  onGroupDeleted: () => void;
 }) {
   const [callStatus, setCallStatus] = useState<CallStatus>("idle");
   const sessionRef = useRef<CallSession | null>(null);
   const remoteAudioRef = useRef<HTMLAudioElement>(null);
+  const [membersOpen, setMembersOpen] = useState(false);
+
 
   useEffect(() => {
     if (!userId || isGroup) return;
