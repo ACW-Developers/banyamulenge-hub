@@ -313,7 +313,7 @@ function DirectoryPage() {
                     {e.description}
                   </p>
 
-                  <div className="mt-3 pt-3 border-t flex items-center justify-end gap-3 text-gray-500">
+                  <div className="mt-3 pt-3 border-t flex items-center justify-end gap-5 text-gray-500">
                     {e.email && (
                       <a
                         href={`mailto:${e.email}`}
