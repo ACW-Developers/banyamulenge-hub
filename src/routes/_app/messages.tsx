@@ -497,10 +497,19 @@ function ChatPane({
             {isGroup ? <Users className="h-5 w-5" /> : initial}
           </AvatarFallback>
         </Avatar>
-        <div className="min-w-0 flex-1">
+        <button
+          type="button"
+          onClick={() => isGroup && setMembersOpen(true)}
+          className={`min-w-0 flex-1 text-left ${isGroup ? "hover:opacity-80 cursor-pointer" : "cursor-default"}`}
+          aria-label={isGroup ? "View group members" : undefined}
+        >
           <div className="font-semibold text-sm truncate">{headerName}</div>
-          <div className="text-xs text-gray-500 truncate">{headerSub}</div>
-        </div>
+          <div className="text-xs text-gray-500 truncate">
+            {headerSub}
+            {isGroup && <span className="text-primary ml-1">· tap to manage</span>}
+          </div>
+        </button>
+
         {!isGroup && !inCall && (
           <Button
             variant="outline"
