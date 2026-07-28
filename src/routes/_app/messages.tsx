@@ -638,9 +638,25 @@ function ChatPane({
           {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
         </Button>
       </div>
+      {isGroup && (
+        <GroupMembersDialog
+          open={membersOpen}
+          onOpenChange={setMembersOpen}
+          convoId={convoId}
+          title={groupTitle}
+          createdBy={createdBy}
+          currentUserId={userId}
+          participants={participants}
+          onDeleted={() => {
+            setMembersOpen(false);
+            onGroupDeleted();
+          }}
+        />
+      )}
     </>
   );
 }
+
 
 function AttachmentBubble({
   url,
