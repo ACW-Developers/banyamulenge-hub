@@ -930,3 +930,154 @@ function NewGroupDialog({ onOpened }: { onOpened: (id: string) => void }) {
     </Dialog>
   );
 }
+
+function GroupMembersDialog({
+  open,
+  onOpenChange,
+  convoId,
+  title,
+  createdBy,
+  currentUserId,
+  participants,
+  onDeleted,
+}: {
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+  convoId: string;
+  title: string;
+  createdBy: string | null;
+  currentUserId: string;
+  participants: { user_id: string; profile: Profile | null }[];
+  onDeleted: () => void;
+}) {
+  const qc = useQueryClient();
+  const isCreator = !!createdBy && createdBy === currentUserId;
+  const [busy, setBusy] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
+
+  async function removeMember(uid: string) {
+    if (!confirm("Remove this member from the group?")) return;
+    setBusy(uid);
+    const { error } = await supabase
+      .from("conversation_participants")
+      .delete()
+      .eq("conversation_id", convoId)
+      .eq("user_id", uid);
+    setBusy(null);
+    if (error) return toast.error(error.message);
+    toast.success("Member removed");
+    qc.invalidateQueries({ queryKey: ["conversations", currentUserId] });
+  }
+
+  async function deleteGroup() {
+    if (
+      !confirm("Delete this group and all its messages? This cannot be undone.")
+    )
+      return;
+    setDeleting(true);
+    // Delete messages first, then participants, then the conversation itself.
+    await supabase.from("messages").delete().eq("conversation_id", convoId);
+    await supabase.from("conversation_participants").delete().eq("conversation_id", convoId);
+    const { error } = await supabase.from("conversations").delete().eq("id", convoId);
+    setDeleting(false);
+    if (error) return toast.error(error.message);
+    toast.success("Group deleted");
+    qc.invalidateQueries({ queryKey: ["conversations", currentUserId] });
+    onDeleted();
+  }
+
+  const sorted = [...participants].sort((a, b) => {
+    if (a.user_id === createdBy) return -1;
+    if (b.user_id === createdBy) return 1;
+    return 0;
+  });
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Users className="h-5 w-5 text-primary" />
+            {title}
+          </DialogTitle>
+        </DialogHeader>
+        <div className="text-xs text-gray-500 -mt-2">
+          {participants.length} member{participants.length === 1 ? "" : "s"}
+        </div>
+        <div className="max-h-80 overflow-y-auto -mx-2 mt-2">
+          {sorted.map((p) => {
+            const name = p.profile?.display_name || p.profile?.username || "Unknown";
+            const initial = name.slice(0, 1).toUpperCase();
+            const isOwner = p.user_id === createdBy;
+            const isMe = p.user_id === currentUserId;
+            return (
+              <div
+                key={p.user_id}
+                className="w-full flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50"
+              >
+                <Avatar className="h-9 w-9">
+                  <AvatarImage src={p.profile?.avatar_url ?? undefined} />
+                  <AvatarFallback className="bg-primary/10 text-primary font-semibold">
+                    {initial}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm font-semibold truncate flex items-center gap-1.5">
+                    {name}
+                    {isOwner && (
+                      <span
+                        className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-amber-700 bg-amber-100 rounded px-1.5 py-0.5"
+                        title="Group creator"
+                      >
+                        <Crown className="h-3 w-3" /> Owner
+                      </span>
+                    )}
+                    {isMe && (
+                      <span className="text-[10px] font-medium text-gray-500">(you)</span>
+                    )}
+                  </div>
+                  {p.profile?.username && (
+                    <div className="text-xs text-gray-500 truncate">@{p.profile.username}</div>
+                  )}
+                </div>
+                {isCreator && !isOwner && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => removeMember(p.user_id)}
+                    disabled={busy === p.user_id}
+                    aria-label={`Remove ${name}`}
+                    title="Remove from group"
+                  >
+                    {busy === p.user_id ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <UserMinus className="h-4 w-4 text-red-500" />
+                    )}
+                  </Button>
+                )}
+              </div>
+            );
+          })}
+        </div>
+        {isCreator && (
+          <div className="pt-3 border-t">
+            <Button
+              variant="destructive"
+              onClick={deleteGroup}
+              disabled={deleting}
+              className="w-full gap-2"
+            >
+              {deleting ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Trash2 className="h-4 w-4" />
+              )}
+              Delete group
+            </Button>
+          </div>
+        )}
+      </DialogContent>
+    </Dialog>
+  );
+}
