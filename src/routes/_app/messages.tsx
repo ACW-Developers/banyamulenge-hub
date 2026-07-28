@@ -17,7 +17,11 @@ import {
   X,
   Users,
   UsersRound,
+  UserMinus,
+  Trash2,
+  Crown,
 } from "lucide-react";
+
 import { formatDistanceToNow } from "date-fns";
 import { toast } from "sonner";
 
@@ -62,12 +66,14 @@ type ConversationRow = {
   last_message_at: string;
   title: string | null;
   is_group: boolean;
+  created_by: string | null;
   conversation_participants: {
     user_id: string;
     profiles: { username: string; display_name: string | null; avatar_url: string | null } | null;
   }[];
   messages: MessageRow[];
 };
+
 
 function MessagesPage() {
   const { user } = useAuth();
@@ -92,11 +98,12 @@ function MessagesPage() {
       const { data } = await supabase
         .from("conversations")
         .select(
-          `id, last_message_at, title, is_group,
+          `id, last_message_at, title, is_group, created_by,
            conversation_participants(user_id, profiles!cp_user_profile_fkey(username, display_name, avatar_url)),
            messages(id, sender_id, content, created_at, delivered_at, read_at, attachment_url, attachment_type, attachment_name)`,
         )
         .order("last_message_at", { ascending: false });
+
       return (data ?? []) as unknown as ConversationRow[];
     },
   });
@@ -346,6 +353,7 @@ function MessagesPage() {
               userId={user.id}
               isGroup={active.is_group}
               groupTitle={active.title ?? "Group"}
+              createdBy={active.created_by}
               participants={active.conversation_participants.map((cp) => ({
                 user_id: cp.user_id,
                 profile: cp.profiles,
@@ -360,7 +368,9 @@ function MessagesPage() {
               sending={sending}
               uploading={uploading}
               scrollRef={scrollRef}
+              onGroupDeleted={() => setActiveId(null)}
             />
+
           ) : (
             <div className="flex-1 flex flex-col items-center justify-center text-center p-6">
               <MessageCircle className="h-12 w-12 text-primary mb-3" />
@@ -406,6 +416,7 @@ function ChatPane({
   userId,
   isGroup,
   groupTitle,
+  createdBy,
   participants,
   other,
   messages,
@@ -417,11 +428,13 @@ function ChatPane({
   sending,
   uploading,
   scrollRef,
+  onGroupDeleted,
 }: {
   convoId: string;
   userId: string;
   isGroup: boolean;
   groupTitle: string;
+  createdBy: string | null;
   participants: { user_id: string; profile: Profile | null }[];
   other: Profile | null;
   messages: MessageRow[];
@@ -433,10 +446,13 @@ function ChatPane({
   sending: boolean;
   uploading: boolean;
   scrollRef: React.RefObject<HTMLDivElement | null>;
+  onGroupDeleted: () => void;
 }) {
   const [callStatus, setCallStatus] = useState<CallStatus>("idle");
   const sessionRef = useRef<CallSession | null>(null);
   const remoteAudioRef = useRef<HTMLAudioElement>(null);
+  const [membersOpen, setMembersOpen] = useState(false);
+
 
   useEffect(() => {
     if (!userId || isGroup) return;
@@ -485,10 +501,19 @@ function ChatPane({
             {isGroup ? <Users className="h-5 w-5" /> : initial}
           </AvatarFallback>
         </Avatar>
-        <div className="min-w-0 flex-1">
+        <button
+          type="button"
+          onClick={() => isGroup && setMembersOpen(true)}
+          className={`min-w-0 flex-1 text-left ${isGroup ? "hover:opacity-80 cursor-pointer" : "cursor-default"}`}
+          aria-label={isGroup ? "View group members" : undefined}
+        >
           <div className="font-semibold text-sm truncate">{headerName}</div>
-          <div className="text-xs text-gray-500 truncate">{headerSub}</div>
-        </div>
+          <div className="text-xs text-gray-500 truncate">
+            {headerSub}
+            {isGroup && <span className="text-primary ml-1">· tap to manage</span>}
+          </div>
+        </button>
+
         {!isGroup && !inCall && (
           <Button
             variant="outline"
@@ -617,9 +642,25 @@ function ChatPane({
           {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
         </Button>
       </div>
+      {isGroup && (
+        <GroupMembersDialog
+          open={membersOpen}
+          onOpenChange={setMembersOpen}
+          convoId={convoId}
+          title={groupTitle}
+          createdBy={createdBy}
+          currentUserId={userId}
+          participants={participants}
+          onDeleted={() => {
+            setMembersOpen(false);
+            onGroupDeleted();
+          }}
+        />
+      )}
     </>
   );
 }
+
 
 function AttachmentBubble({
   url,
@@ -885,6 +926,157 @@ function NewGroupDialog({ onOpened }: { onOpened: (id: string) => void }) {
             {busy && <Loader2 className="h-4 w-4 animate-spin" />} Create group
           </Button>
         </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function GroupMembersDialog({
+  open,
+  onOpenChange,
+  convoId,
+  title,
+  createdBy,
+  currentUserId,
+  participants,
+  onDeleted,
+}: {
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+  convoId: string;
+  title: string;
+  createdBy: string | null;
+  currentUserId: string;
+  participants: { user_id: string; profile: Profile | null }[];
+  onDeleted: () => void;
+}) {
+  const qc = useQueryClient();
+  const isCreator = !!createdBy && createdBy === currentUserId;
+  const [busy, setBusy] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
+
+  async function removeMember(uid: string) {
+    if (!confirm("Remove this member from the group?")) return;
+    setBusy(uid);
+    const { error } = await supabase
+      .from("conversation_participants")
+      .delete()
+      .eq("conversation_id", convoId)
+      .eq("user_id", uid);
+    setBusy(null);
+    if (error) return toast.error(error.message);
+    toast.success("Member removed");
+    qc.invalidateQueries({ queryKey: ["conversations", currentUserId] });
+  }
+
+  async function deleteGroup() {
+    if (
+      !confirm("Delete this group and all its messages? This cannot be undone.")
+    )
+      return;
+    setDeleting(true);
+    // Delete messages first, then participants, then the conversation itself.
+    await supabase.from("messages").delete().eq("conversation_id", convoId);
+    await supabase.from("conversation_participants").delete().eq("conversation_id", convoId);
+    const { error } = await supabase.from("conversations").delete().eq("id", convoId);
+    setDeleting(false);
+    if (error) return toast.error(error.message);
+    toast.success("Group deleted");
+    qc.invalidateQueries({ queryKey: ["conversations", currentUserId] });
+    onDeleted();
+  }
+
+  const sorted = [...participants].sort((a, b) => {
+    if (a.user_id === createdBy) return -1;
+    if (b.user_id === createdBy) return 1;
+    return 0;
+  });
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Users className="h-5 w-5 text-primary" />
+            {title}
+          </DialogTitle>
+        </DialogHeader>
+        <div className="text-xs text-gray-500 -mt-2">
+          {participants.length} member{participants.length === 1 ? "" : "s"}
+        </div>
+        <div className="max-h-80 overflow-y-auto -mx-2 mt-2">
+          {sorted.map((p) => {
+            const name = p.profile?.display_name || p.profile?.username || "Unknown";
+            const initial = name.slice(0, 1).toUpperCase();
+            const isOwner = p.user_id === createdBy;
+            const isMe = p.user_id === currentUserId;
+            return (
+              <div
+                key={p.user_id}
+                className="w-full flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50"
+              >
+                <Avatar className="h-9 w-9">
+                  <AvatarImage src={p.profile?.avatar_url ?? undefined} />
+                  <AvatarFallback className="bg-primary/10 text-primary font-semibold">
+                    {initial}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm font-semibold truncate flex items-center gap-1.5">
+                    {name}
+                    {isOwner && (
+                      <span
+                        className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-amber-700 bg-amber-100 rounded px-1.5 py-0.5"
+                        title="Group creator"
+                      >
+                        <Crown className="h-3 w-3" /> Owner
+                      </span>
+                    )}
+                    {isMe && (
+                      <span className="text-[10px] font-medium text-gray-500">(you)</span>
+                    )}
+                  </div>
+                  {p.profile?.username && (
+                    <div className="text-xs text-gray-500 truncate">@{p.profile.username}</div>
+                  )}
+                </div>
+                {isCreator && !isOwner && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => removeMember(p.user_id)}
+                    disabled={busy === p.user_id}
+                    aria-label={`Remove ${name}`}
+                    title="Remove from group"
+                  >
+                    {busy === p.user_id ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <UserMinus className="h-4 w-4 text-red-500" />
+                    )}
+                  </Button>
+                )}
+              </div>
+            );
+          })}
+        </div>
+        {isCreator && (
+          <div className="pt-3 border-t">
+            <Button
+              variant="destructive"
+              onClick={deleteGroup}
+              disabled={deleting}
+              className="w-full gap-2"
+            >
+              {deleting ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Trash2 className="h-4 w-4" />
+              )}
+              Delete group
+            </Button>
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   );

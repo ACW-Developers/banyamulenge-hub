@@ -250,8 +250,9 @@ function DirectoryPage() {
                 className="group rounded-2xl border bg-white overflow-hidden hover:border-primary/40 hover:shadow-lg transition flex flex-col"
               >
                 <div
-                  className={`h-24 bg-gradient-to-br ${meta?.color ?? "from-gray-500 to-gray-700"} relative`}
+                  className={`h-44 bg-gradient-to-br ${meta?.color ?? "from-gray-500 to-gray-700"} relative`}
                 >
+
                   {e.image_url ? (
                     <img
                       src={e.image_url}
@@ -312,7 +313,7 @@ function DirectoryPage() {
                     {e.description}
                   </p>
 
-                  <div className="mt-3 pt-3 border-t flex items-center justify-end gap-3 text-gray-500">
+                  <div className="mt-3 pt-3 border-t flex items-center justify-end gap-5 text-gray-500">
                     {e.email && (
                       <a
                         href={`mailto:${e.email}`}
