@@ -31,7 +31,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-export const Route = createFileRoute("/_app/community")({
+export const Route = createFileRoute("/_app/community/")({
   head: () => ({
     meta: [
       { title: "Community Groups | Banyamulenge Hub" },
