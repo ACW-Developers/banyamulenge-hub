@@ -23,6 +23,7 @@ import { Route as AppAdminRouteImport } from './routes/_app/admin'
 import { Route as AppAdminIndexRouteImport } from './routes/_app/admin/index'
 import { Route as AppProfileUsernameRouteImport } from './routes/_app/profile.$username'
 import { Route as AppCommunitySlugRouteImport } from './routes/_app/community.$slug'
+import { Route as AppCommunityIdRouteImport } from './routes/_app/community.$id'
 import { Route as AppAdminUsersRouteImport } from './routes/_app/admin/users'
 import { Route as AppAdminSettingsRouteImport } from './routes/_app/admin/settings'
 import { Route as AppAdminLogsRouteImport } from './routes/_app/admin/logs'
@@ -96,6 +97,11 @@ const AppCommunitySlugRoute = AppCommunitySlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => AppCommunityRoute,
 } as any)
+const AppCommunityIdRoute = AppCommunityIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AppCommunityRoute,
+} as any)
 const AppAdminUsersRoute = AppAdminUsersRouteImport.update({
   id: '/users',
   path: '/users',
@@ -126,6 +132,7 @@ export interface FileRoutesByFullPath {
   '/admin/logs': typeof AppAdminLogsRoute
   '/admin/settings': typeof AppAdminSettingsRoute
   '/admin/users': typeof AppAdminUsersRoute
+  '/community/$id': typeof AppCommunityIdRoute
   '/community/$slug': typeof AppCommunitySlugRoute
   '/profile/$username': typeof AppProfileUsernameRoute
   '/admin/': typeof AppAdminIndexRoute
@@ -143,6 +150,7 @@ export interface FileRoutesByTo {
   '/admin/logs': typeof AppAdminLogsRoute
   '/admin/settings': typeof AppAdminSettingsRoute
   '/admin/users': typeof AppAdminUsersRoute
+  '/community/$id': typeof AppCommunityIdRoute
   '/community/$slug': typeof AppCommunitySlugRoute
   '/profile/$username': typeof AppProfileUsernameRoute
   '/admin': typeof AppAdminIndexRoute
@@ -163,6 +171,7 @@ export interface FileRoutesById {
   '/_app/admin/logs': typeof AppAdminLogsRoute
   '/_app/admin/settings': typeof AppAdminSettingsRoute
   '/_app/admin/users': typeof AppAdminUsersRoute
+  '/_app/community/$id': typeof AppCommunityIdRoute
   '/_app/community/$slug': typeof AppCommunitySlugRoute
   '/_app/profile/$username': typeof AppProfileUsernameRoute
   '/_app/admin/': typeof AppAdminIndexRoute
@@ -183,6 +192,7 @@ export interface FileRouteTypes {
     | '/admin/logs'
     | '/admin/settings'
     | '/admin/users'
+    | '/community/$id'
     | '/community/$slug'
     | '/profile/$username'
     | '/admin/'
@@ -200,6 +210,7 @@ export interface FileRouteTypes {
     | '/admin/logs'
     | '/admin/settings'
     | '/admin/users'
+    | '/community/$id'
     | '/community/$slug'
     | '/profile/$username'
     | '/admin'
@@ -219,6 +230,7 @@ export interface FileRouteTypes {
     | '/_app/admin/logs'
     | '/_app/admin/settings'
     | '/_app/admin/users'
+    | '/_app/community/$id'
     | '/_app/community/$slug'
     | '/_app/profile/$username'
     | '/_app/admin/'
@@ -329,6 +341,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppCommunitySlugRouteImport
       parentRoute: typeof AppCommunityRoute
     }
+    '/_app/community/$id': {
+      id: '/_app/community/$id'
+      path: '/$id'
+      fullPath: '/community/$id'
+      preLoaderRoute: typeof AppCommunityIdRouteImport
+      parentRoute: typeof AppCommunityRoute
+    }
     '/_app/admin/users': {
       id: '/_app/admin/users'
       path: '/users'
@@ -372,10 +391,12 @@ const AppAdminRouteWithChildren = AppAdminRoute._addFileChildren(
 )
 
 interface AppCommunityRouteChildren {
+  AppCommunityIdRoute: typeof AppCommunityIdRoute
   AppCommunitySlugRoute: typeof AppCommunitySlugRoute
 }
 
 const AppCommunityRouteChildren: AppCommunityRouteChildren = {
+  AppCommunityIdRoute: AppCommunityIdRoute,
   AppCommunitySlugRoute: AppCommunitySlugRoute,
 }
 
