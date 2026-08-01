@@ -98,7 +98,7 @@ function MessagesPage() {
       const { data } = await supabase
         .from("conversations")
         .select(
-          `id, last_message_at, title, is_group, created_by,
+          `id, last_message_at, title, is_group, created_by, avatar_url,
            conversation_participants(user_id, profiles!cp_user_profile_fkey(username, display_name, avatar_url)),
            messages(id, sender_id, content, created_at, delivered_at, read_at, attachment_url, attachment_type, attachment_name)`,
         )
