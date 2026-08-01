@@ -66,6 +66,7 @@ type ConversationRow = {
   last_message_at: string;
   title: string | null;
   is_group: boolean;
+  avatar_url?: string | null;
   created_by: string | null;
   conversation_participants: {
     user_id: string;
@@ -98,13 +99,17 @@ function MessagesPage() {
       const { data } = await supabase
         .from("conversations")
         .select(
-          `id, last_message_at, title, is_group, created_by,
+          `id, last_message_at, title, is_group, created_by, avatar_url,
            conversation_participants(user_id, profiles!cp_user_profile_fkey(username, display_name, avatar_url)),
            messages(id, sender_id, content, created_at, delivered_at, read_at, attachment_url, attachment_type, attachment_name)`,
         )
         .order("last_message_at", { ascending: false });
 
-      return (data ?? []) as unknown as ConversationRow[];
+      // Group conversations are publicly discoverable (Community), so keep only
+      // the ones this user actually belongs to in the Messages sidebar.
+      return ((data ?? []) as unknown as ConversationRow[]).filter((c) =>
+        c.conversation_participants.some((p) => p.user_id === user?.id),
+      );
     },
   });
 
@@ -248,7 +253,7 @@ function MessagesPage() {
                   ? {
                       username: c.title ?? "Group",
                       display_name: c.title ?? "Group",
-                      avatar_url: null as string | null,
+                      avatar_url: c.avatar_url ?? null,
                     }
                   : other?.profiles;
                 if (!p) return null;

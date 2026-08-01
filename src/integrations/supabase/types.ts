@@ -164,24 +164,30 @@ export type Database = {
       }
       conversations: {
         Row: {
+          avatar_url: string | null
           created_at: string
           created_by: string | null
+          description: string | null
           id: string
           is_group: boolean
           last_message_at: string
           title: string | null
         }
         Insert: {
+          avatar_url?: string | null
           created_at?: string
           created_by?: string | null
+          description?: string | null
           id?: string
           is_group?: boolean
           last_message_at?: string
           title?: string | null
         }
         Update: {
+          avatar_url?: string | null
           created_at?: string
           created_by?: string | null
+          description?: string | null
           id?: string
           is_group?: boolean
           last_message_at?: string
