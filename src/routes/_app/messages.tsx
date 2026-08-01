@@ -104,7 +104,11 @@ function MessagesPage() {
         )
         .order("last_message_at", { ascending: false });
 
-      return (data ?? []) as unknown as ConversationRow[];
+      // Group conversations are publicly discoverable (Community), so keep only
+      // the ones this user actually belongs to in the Messages sidebar.
+      return ((data ?? []) as unknown as ConversationRow[]).filter((c) =>
+        c.conversation_participants.some((p) => p.user_id === user?.id),
+      );
     },
   });
 
