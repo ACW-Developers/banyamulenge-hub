@@ -253,7 +253,7 @@ function MessagesPage() {
                   ? {
                       username: c.title ?? "Group",
                       display_name: c.title ?? "Group",
-                      avatar_url: null as string | null,
+                      avatar_url: c.avatar_url ?? null,
                     }
                   : other?.profiles;
                 if (!p) return null;
