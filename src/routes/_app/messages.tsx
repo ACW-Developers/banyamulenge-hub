@@ -66,6 +66,7 @@ type ConversationRow = {
   last_message_at: string;
   title: string | null;
   is_group: boolean;
+  avatar_url?: string | null;
   created_by: string | null;
   conversation_participants: {
     user_id: string;
