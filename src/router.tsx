@@ -12,7 +12,7 @@ export const getRouter = () => {
         refetchOnWindowFocus: false,
         refetchOnReconnect: true,
         retry: 1,
-integrationPlaceholder: undefined as never,
+
       },
     },
   });
