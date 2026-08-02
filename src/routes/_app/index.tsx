@@ -34,6 +34,8 @@ export const Route = createFileRoute("/_app/")({
 
 const feedKey = ["feed"] as const;
 
+const FEED_LIMIT = 40;
+
 async function fetchFeed(): Promise<FeedPost[]> {
   const { data, error } = await supabase
     .from("posts")
@@ -45,7 +47,8 @@ async function fetchFeed(): Promise<FeedPost[]> {
     )
     .is("group_id", null)
     .order("is_announcement", { ascending: false })
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .limit(FEED_LIMIT);
   if (error) throw error;
   return (data as unknown as FeedPost[]) ?? [];
 }
@@ -55,6 +58,8 @@ function FeedPage() {
   const { data: posts, isLoading } = useQuery({
     queryKey: feedKey,
     queryFn: fetchFeed,
+    staleTime: 30_000,
+    placeholderData: (prev) => prev,
   });
 
   // Mark feed as seen once loaded
@@ -62,9 +67,13 @@ function FeedPage() {
     if (posts) markFeedSeen();
   }, [posts]);
 
-  // Realtime updates for posts, likes, comments
+  // Realtime updates for posts, likes, comments (coalesced to avoid refetch storms)
   useEffect(() => {
-    const invalidate = () => qc.invalidateQueries({ queryKey: feedKey });
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const invalidate = () => {
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(() => qc.invalidateQueries({ queryKey: feedKey }), 600);
+    };
     const channel = supabase
       .channel("feed-realtime")
       .on("postgres_changes", { event: "*", schema: "public", table: "posts" }, invalidate)
@@ -72,9 +81,11 @@ function FeedPage() {
       .on("postgres_changes", { event: "*", schema: "public", table: "comments" }, invalidate)
       .subscribe();
     return () => {
+      if (timer) clearTimeout(timer);
       supabase.removeChannel(channel);
     };
   }, [qc]);
+
 
   return (
     <div className="max-w-7xl mx-auto space-y-6">
