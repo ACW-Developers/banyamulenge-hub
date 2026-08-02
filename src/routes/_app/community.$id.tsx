@@ -337,7 +337,7 @@ function GroupChatPage() {
                                 src={m.attachment_url}
                                 alt={m.attachment_name ?? "Shared image"}
                                 className="rounded-lg max-h-64 object-cover"
-                                loading="lazy"
+                                
                               />
                             </a>
                           ) : (
