@@ -285,6 +285,8 @@ function MarketplacePage() {
                 <div className="relative aspect-[16/10] bg-gradient-to-br from-gray-100 to-gray-50 overflow-hidden">
                   {l.image_url ? (
                     <img
+                      loading="lazy"
+                      decoding="async"
                       src={l.image_url}
                       alt={l.title}
                       className="w-full h-full object-cover group-hover:scale-[1.03] transition duration-500"
@@ -600,6 +602,8 @@ function ListingDialog({
             </label>
             {preview && (
               <img
+                loading="lazy"
+                decoding="async"
                 src={preview}
                 alt="preview"
                 className="mt-2 w-full max-h-40 object-cover rounded-lg border"

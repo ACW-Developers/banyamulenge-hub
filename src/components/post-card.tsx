@@ -229,7 +229,7 @@ export function PostCard({ post, queryKey }: { post: FeedPost; queryKey: readonl
       <p className="text-[15px] leading-relaxed whitespace-pre-wrap">{post.content}</p>
       {post.image_url && (
         <div className="mt-3 rounded-xl overflow-hidden border">
-          <img src={post.image_url} alt="" className="w-full max-h-[520px] object-cover" />
+          <img src={post.image_url} alt="" loading="lazy" decoding="async" className="w-full max-h-[520px] object-cover" />
         </div>
       )}
       {post.video_url && (

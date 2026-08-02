@@ -118,7 +118,7 @@ function AdminDashboard() {
                 >
                   <div className="h-10 w-10 rounded-full bg-primary/10 text-primary font-bold flex items-center justify-center overflow-hidden">
                     {u.avatar_url ? (
-                      <img src={u.avatar_url} alt="" className="h-full w-full object-cover" />
+                      <img src={u.avatar_url} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover" />
                     ) : (
                       initial
                     )}

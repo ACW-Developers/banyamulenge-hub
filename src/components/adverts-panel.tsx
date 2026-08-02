@@ -238,6 +238,8 @@ function NewAdvertDialog() {
             </label>
             {preview && (
               <img
+                loading="lazy"
+                decoding="async"
                 src={preview}
                 alt="preview"
                 className="mt-2 w-full max-h-40 object-cover rounded-lg border"

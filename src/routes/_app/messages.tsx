@@ -694,6 +694,8 @@ function AttachmentBubble({
       <>
         <button onClick={() => setOpen(true)} className="block mb-1">
           <img
+            loading="lazy"
+            decoding="async"
             src={url}
             alt={name ?? "attachment"}
             className="max-w-[240px] max-h-[240px] rounded-lg object-cover"
@@ -712,6 +714,8 @@ function AttachmentBubble({
               <X className="h-5 w-5" />
             </button>
             <img
+              loading="lazy"
+              decoding="async"
               src={url}
               alt={name ?? "attachment"}
               className="max-h-full max-w-full rounded-lg"
