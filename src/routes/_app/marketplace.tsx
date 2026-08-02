@@ -290,7 +290,7 @@ function MarketplacePage() {
                       src={l.image_url}
                       alt={l.title}
                       className="w-full h-full object-cover group-hover:scale-[1.03] transition duration-500"
-                      loading="lazy"
+                      
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">

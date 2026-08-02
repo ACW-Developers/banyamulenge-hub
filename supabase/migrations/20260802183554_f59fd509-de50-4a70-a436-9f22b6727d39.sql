@@ -1,0 +1,16 @@
+CREATE INDEX IF NOT EXISTS likes_post_id_idx ON public.likes (post_id);
+CREATE INDEX IF NOT EXISTS follows_following_created_idx ON public.follows (following_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS follows_follower_idx ON public.follows (follower_id);
+CREATE INDEX IF NOT EXISTS cp_user_idx ON public.conversation_participants (user_id);
+CREATE INDEX IF NOT EXISTS conversations_last_message_idx ON public.conversations (last_message_at DESC);
+CREATE INDEX IF NOT EXISTS conversations_is_group_idx ON public.conversations (is_group, last_message_at DESC);
+CREATE INDEX IF NOT EXISTS adverts_created_idx ON public.adverts (created_at DESC);
+CREATE INDEX IF NOT EXISTS activity_logs_created_idx ON public.activity_logs (created_at DESC);
+CREATE INDEX IF NOT EXISTS posts_feed_idx ON public.posts (group_id, is_announcement DESC, created_at DESC);
+CREATE INDEX IF NOT EXISTS profiles_created_idx ON public.profiles (created_at DESC);
+ANALYZE public.posts;
+ANALYZE public.likes;
+ANALYZE public.comments;
+ANALYZE public.messages;
+ANALYZE public.conversations;
+ANALYZE public.conversation_participants;
