@@ -95,6 +95,8 @@ function MessagesPage() {
   const { data: convos, isLoading } = useQuery({
     queryKey: ["conversations", user?.id],
     enabled: !!user,
+    staleTime: 15_000,
+    placeholderData: (prev) => prev,
     queryFn: async () => {
       const { data } = await supabase
         .from("conversations")
@@ -103,7 +105,10 @@ function MessagesPage() {
            conversation_participants(user_id, profiles!cp_user_profile_fkey(username, display_name, avatar_url)),
            messages(id, sender_id, content, created_at, delivered_at, read_at, attachment_url, attachment_type, attachment_name)`,
         )
-        .order("last_message_at", { ascending: false });
+        .order("last_message_at", { ascending: false })
+        // Only the recent slice per conversation is needed for the preview + unread badge.
+        .order("created_at", { referencedTable: "messages", ascending: false })
+        .limit(30, { referencedTable: "messages" });
 
       // Group conversations are publicly discoverable (Community), so keep only
       // the ones this user actually belongs to in the Messages sidebar.
@@ -119,6 +124,8 @@ function MessagesPage() {
   const { data: messages } = useQuery({
     queryKey: ["messages", activeId],
     enabled: !!activeId,
+    staleTime: 10_000,
+    placeholderData: (prev) => prev,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("messages")
@@ -126,11 +133,13 @@ function MessagesPage() {
           "id, sender_id, content, created_at, delivered_at, read_at, attachment_url, attachment_type, attachment_name",
         )
         .eq("conversation_id", activeId!)
-        .order("created_at", { ascending: true });
+        .order("created_at", { ascending: false })
+        .limit(200);
       if (error) throw error;
-      return (data ?? []) as MessageRow[];
+      return ((data ?? []) as MessageRow[]).slice().reverse();
     },
   });
+
 
   // Mark incoming messages as delivered/read as soon as they're on-screen.
   useEffect(() => {
