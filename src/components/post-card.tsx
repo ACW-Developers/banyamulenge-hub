@@ -73,9 +73,31 @@ export function PostCard({ post, queryKey }: { post: FeedPost; queryKey: readonl
         logActivity(user.id, "post.like", "post", post.id);
       }
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey }),
-    onError: (e: Error) => toast.error(e.message),
+    // Optimistic like: update the cached list instantly, no refetch round-trip.
+    onMutate: async () => {
+      if (!user) return;
+      await qc.cancelQueries({ queryKey });
+      const previous = qc.getQueryData<FeedPost[]>(queryKey);
+      qc.setQueryData<FeedPost[]>(queryKey, (old) =>
+        (old ?? []).map((p) =>
+          p.id === post.id
+            ? {
+                ...p,
+                likes: liked
+                  ? p.likes.filter((l) => l.user_id !== user.id)
+                  : [...p.likes, { user_id: user.id }],
+              }
+            : p,
+        ),
+      );
+      return { previous };
+    },
+    onError: (e: Error, _v, ctx) => {
+      if (ctx?.previous) qc.setQueryData(queryKey, ctx.previous);
+      toast.error(e.message);
+    },
   });
+
 
   const del = useMutation({
     mutationFn: async () => {
