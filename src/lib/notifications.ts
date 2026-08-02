@@ -32,7 +32,9 @@ export function useNotifications() {
   const { data } = useQuery({
     queryKey: ["notifications", user?.id],
     enabled: !!user,
-    refetchInterval: 30000,
+    staleTime: 30_000,
+    refetchInterval: 90_000,
+
     queryFn: async (): Promise<NotificationCounts> => {
       if (!user) return { unreadMessages: 0, newPosts: 0, newFollowers: 0 };
 
