@@ -332,6 +332,8 @@ function GroupChatPage() {
                           m.attachment_type?.startsWith("image/") ? (
                             <a href={m.attachment_url} target="_blank" rel="noreferrer">
                               <img
+                                loading="lazy"
+                                decoding="async"
                                 src={m.attachment_url}
                                 alt={m.attachment_name ?? "Shared image"}
                                 className="rounded-lg max-h-64 object-cover"

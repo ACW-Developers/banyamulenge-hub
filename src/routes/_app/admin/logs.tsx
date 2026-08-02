@@ -72,7 +72,7 @@ function LogsAdmin() {
                 <li key={l.id} className="p-4 flex items-start gap-3">
                   <div className="h-9 w-9 rounded-full bg-primary/10 text-primary font-bold flex items-center justify-center overflow-hidden shrink-0">
                     {l.actor?.avatar_url ? (
-                      <img src={l.actor.avatar_url} alt="" className="h-full w-full object-cover" />
+                      <img src={l.actor.avatar_url} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover" />
                     ) : (
                       initial
                     )}

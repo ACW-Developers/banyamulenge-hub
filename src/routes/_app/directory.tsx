@@ -255,6 +255,8 @@ function DirectoryPage() {
 
                   {e.image_url ? (
                     <img
+                      loading="lazy"
+                      decoding="async"
                       src={e.image_url}
                       alt=""
                       className="w-full h-full object-cover opacity-90"
@@ -535,6 +537,8 @@ function EntryDialog({
             </label>
             {preview && (
               <img
+                loading="lazy"
+                decoding="async"
                 src={preview}
                 alt="preview"
                 className="mt-2 w-full max-h-40 object-cover rounded-lg border"
