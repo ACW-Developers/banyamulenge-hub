@@ -21,6 +21,7 @@ import {
   Store,
   BookUser,
   RefreshCw,
+  Gem,
 } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -121,7 +122,7 @@ function AppLayout() {
     { to: "/directory", label: "Directory", icon: BookUser, badge: 0 },
     { to: "/messages", label: "Messages", icon: MessageCircle, badge: notif.unreadMessages },
     { to: "/heritage", label: "Our Heritage", icon: Landmark, badge: 0 },
-    { to: "/museum", label: "Virtual Museum", icon: Landmark, badge: 0 },
+    { to: "/museum", label: "Virtual Museum", icon: Gem, badge: 0 },
     { to: "/family-tree", label: "Family Tree", icon: Trees, badge: 0 },
     {
       to: profile?.username ? `/profile/${profile.username}` : "/",
