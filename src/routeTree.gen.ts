@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as AppIndexRouteImport } from './routes/_app/index'
+import { Route as AppMuseumRouteImport } from './routes/_app/museum'
 import { Route as AppMessagesRouteImport } from './routes/_app/messages'
 import { Route as AppMarketplaceRouteImport } from './routes/_app/marketplace'
 import { Route as AppHeritageRouteImport } from './routes/_app/heritage'
@@ -39,6 +40,11 @@ const AppRoute = AppRouteImport.update({
 const AppIndexRoute = AppIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppMuseumRoute = AppMuseumRouteImport.update({
+  id: '/museum',
+  path: '/museum',
   getParentRoute: () => AppRoute,
 } as any)
 const AppMessagesRoute = AppMessagesRouteImport.update({
@@ -122,6 +128,7 @@ export interface FileRoutesByFullPath {
   '/heritage': typeof AppHeritageRoute
   '/marketplace': typeof AppMarketplaceRoute
   '/messages': typeof AppMessagesRoute
+  '/museum': typeof AppMuseumRoute
   '/admin/logs': typeof AppAdminLogsRoute
   '/admin/settings': typeof AppAdminSettingsRoute
   '/admin/users': typeof AppAdminUsersRoute
@@ -138,6 +145,7 @@ export interface FileRoutesByTo {
   '/heritage': typeof AppHeritageRoute
   '/marketplace': typeof AppMarketplaceRoute
   '/messages': typeof AppMessagesRoute
+  '/museum': typeof AppMuseumRoute
   '/': typeof AppIndexRoute
   '/admin/logs': typeof AppAdminLogsRoute
   '/admin/settings': typeof AppAdminSettingsRoute
@@ -158,6 +166,7 @@ export interface FileRoutesById {
   '/_app/heritage': typeof AppHeritageRoute
   '/_app/marketplace': typeof AppMarketplaceRoute
   '/_app/messages': typeof AppMessagesRoute
+  '/_app/museum': typeof AppMuseumRoute
   '/_app/': typeof AppIndexRoute
   '/_app/admin/logs': typeof AppAdminLogsRoute
   '/_app/admin/settings': typeof AppAdminSettingsRoute
@@ -179,6 +188,7 @@ export interface FileRouteTypes {
     | '/heritage'
     | '/marketplace'
     | '/messages'
+    | '/museum'
     | '/admin/logs'
     | '/admin/settings'
     | '/admin/users'
@@ -195,6 +205,7 @@ export interface FileRouteTypes {
     | '/heritage'
     | '/marketplace'
     | '/messages'
+    | '/museum'
     | '/'
     | '/admin/logs'
     | '/admin/settings'
@@ -214,6 +225,7 @@ export interface FileRouteTypes {
     | '/_app/heritage'
     | '/_app/marketplace'
     | '/_app/messages'
+    | '/_app/museum'
     | '/_app/'
     | '/_app/admin/logs'
     | '/_app/admin/settings'
@@ -250,6 +262,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof AppIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/museum': {
+      id: '/_app/museum'
+      path: '/museum'
+      fullPath: '/museum'
+      preLoaderRoute: typeof AppMuseumRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/messages': {
@@ -379,6 +398,7 @@ interface AppRouteChildren {
   AppHeritageRoute: typeof AppHeritageRoute
   AppMarketplaceRoute: typeof AppMarketplaceRoute
   AppMessagesRoute: typeof AppMessagesRoute
+  AppMuseumRoute: typeof AppMuseumRoute
   AppIndexRoute: typeof AppIndexRoute
   AppCommunityIdRoute: typeof AppCommunityIdRoute
   AppProfileUsernameRoute: typeof AppProfileUsernameRoute
@@ -393,6 +413,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppHeritageRoute: AppHeritageRoute,
   AppMarketplaceRoute: AppMarketplaceRoute,
   AppMessagesRoute: AppMessagesRoute,
+  AppMuseumRoute: AppMuseumRoute,
   AppIndexRoute: AppIndexRoute,
   AppCommunityIdRoute: AppCommunityIdRoute,
   AppProfileUsernameRoute: AppProfileUsernameRoute,
@@ -408,13 +429,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
