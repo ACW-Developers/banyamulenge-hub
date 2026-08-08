@@ -12,7 +12,7 @@ import {
 const LANGS = [
   { code: "en", label: "English", flag: "🇬🇧" },
   { code: "sw", label: "Swahili", flag: "🇰🇪" },
-  { code: "rw", label: "Kinyarwanda", flag: "🇷🇼" },
+  { code: "rw", label: "Kinyamulenge", flag: "🇨🇩" },
 ];
 
 export function LanguageSelector() {
