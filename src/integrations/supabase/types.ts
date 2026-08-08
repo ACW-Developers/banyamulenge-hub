@@ -580,6 +580,57 @@ export type Database = {
           },
         ]
       }
+      museum_artifacts: {
+        Row: {
+          category: string
+          created_at: string
+          created_by: string | null
+          era: string | null
+          id: string
+          image_url: string | null
+          materials: string | null
+          name: string
+          origin: string | null
+          sort_order: number
+          source_url: string | null
+          story: string
+          updated_at: string
+          use_description: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          era?: string | null
+          id?: string
+          image_url?: string | null
+          materials?: string | null
+          name: string
+          origin?: string | null
+          sort_order?: number
+          source_url?: string | null
+          story: string
+          updated_at?: string
+          use_description: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          era?: string | null
+          id?: string
+          image_url?: string | null
+          materials?: string | null
+          name?: string
+          origin?: string | null
+          sort_order?: number
+          source_url?: string | null
+          story?: string
+          updated_at?: string
+          use_description?: string
+        }
+        Relationships: []
+      }
       page_visits: {
         Row: {
           browser: string | null
