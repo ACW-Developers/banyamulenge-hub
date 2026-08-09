@@ -138,8 +138,10 @@ function AppLayout() {
     { to: "/admin", label: "Admin", icon: Shield, badge: 0 },
     { to: "/admin/users", label: "User Management", icon: Users, badge: 0 },
     { to: "/admin/logs", label: "Activity Logs", icon: Activity, badge: 0 },
+    { to: "/admin/payments", label: "Payments", icon: DollarSign, badge: 0 },
     { to: "/admin/settings", label: "Settings", icon: Settings, badge: 0 },
   ];
+
 
   const initial = (profile?.display_name || profile?.username || "U").slice(0, 1).toUpperCase();
 
