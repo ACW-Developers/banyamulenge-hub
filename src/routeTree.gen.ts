@@ -26,6 +26,7 @@ import { Route as AppProfileUsernameRouteImport } from './routes/_app/profile.$u
 import { Route as AppCommunityIdRouteImport } from './routes/_app/community.$id'
 import { Route as AppAdminUsersRouteImport } from './routes/_app/admin/users'
 import { Route as AppAdminSettingsRouteImport } from './routes/_app/admin/settings'
+import { Route as AppAdminPaymentsRouteImport } from './routes/_app/admin/payments'
 import { Route as AppAdminLogsRouteImport } from './routes/_app/admin/logs'
 
 const AuthRoute = AuthRouteImport.update({
@@ -112,6 +113,11 @@ const AppAdminSettingsRoute = AppAdminSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => AppAdminRoute,
 } as any)
+const AppAdminPaymentsRoute = AppAdminPaymentsRouteImport.update({
+  id: '/payments',
+  path: '/payments',
+  getParentRoute: () => AppAdminRoute,
+} as any)
 const AppAdminLogsRoute = AppAdminLogsRouteImport.update({
   id: '/logs',
   path: '/logs',
@@ -130,6 +136,7 @@ export interface FileRoutesByFullPath {
   '/messages': typeof AppMessagesRoute
   '/museum': typeof AppMuseumRoute
   '/admin/logs': typeof AppAdminLogsRoute
+  '/admin/payments': typeof AppAdminPaymentsRoute
   '/admin/settings': typeof AppAdminSettingsRoute
   '/admin/users': typeof AppAdminUsersRoute
   '/community/$id': typeof AppCommunityIdRoute
@@ -148,6 +155,7 @@ export interface FileRoutesByTo {
   '/museum': typeof AppMuseumRoute
   '/': typeof AppIndexRoute
   '/admin/logs': typeof AppAdminLogsRoute
+  '/admin/payments': typeof AppAdminPaymentsRoute
   '/admin/settings': typeof AppAdminSettingsRoute
   '/admin/users': typeof AppAdminUsersRoute
   '/community/$id': typeof AppCommunityIdRoute
@@ -169,6 +177,7 @@ export interface FileRoutesById {
   '/_app/museum': typeof AppMuseumRoute
   '/_app/': typeof AppIndexRoute
   '/_app/admin/logs': typeof AppAdminLogsRoute
+  '/_app/admin/payments': typeof AppAdminPaymentsRoute
   '/_app/admin/settings': typeof AppAdminSettingsRoute
   '/_app/admin/users': typeof AppAdminUsersRoute
   '/_app/community/$id': typeof AppCommunityIdRoute
@@ -190,6 +199,7 @@ export interface FileRouteTypes {
     | '/messages'
     | '/museum'
     | '/admin/logs'
+    | '/admin/payments'
     | '/admin/settings'
     | '/admin/users'
     | '/community/$id'
@@ -208,6 +218,7 @@ export interface FileRouteTypes {
     | '/museum'
     | '/'
     | '/admin/logs'
+    | '/admin/payments'
     | '/admin/settings'
     | '/admin/users'
     | '/community/$id'
@@ -228,6 +239,7 @@ export interface FileRouteTypes {
     | '/_app/museum'
     | '/_app/'
     | '/_app/admin/logs'
+    | '/_app/admin/payments'
     | '/_app/admin/settings'
     | '/_app/admin/users'
     | '/_app/community/$id'
@@ -362,6 +374,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAdminSettingsRouteImport
       parentRoute: typeof AppAdminRoute
     }
+    '/_app/admin/payments': {
+      id: '/_app/admin/payments'
+      path: '/payments'
+      fullPath: '/admin/payments'
+      preLoaderRoute: typeof AppAdminPaymentsRouteImport
+      parentRoute: typeof AppAdminRoute
+    }
     '/_app/admin/logs': {
       id: '/_app/admin/logs'
       path: '/logs'
@@ -374,6 +393,7 @@ declare module '@tanstack/react-router' {
 
 interface AppAdminRouteChildren {
   AppAdminLogsRoute: typeof AppAdminLogsRoute
+  AppAdminPaymentsRoute: typeof AppAdminPaymentsRoute
   AppAdminSettingsRoute: typeof AppAdminSettingsRoute
   AppAdminUsersRoute: typeof AppAdminUsersRoute
   AppAdminIndexRoute: typeof AppAdminIndexRoute
@@ -381,6 +401,7 @@ interface AppAdminRouteChildren {
 
 const AppAdminRouteChildren: AppAdminRouteChildren = {
   AppAdminLogsRoute: AppAdminLogsRoute,
+  AppAdminPaymentsRoute: AppAdminPaymentsRoute,
   AppAdminSettingsRoute: AppAdminSettingsRoute,
   AppAdminUsersRoute: AppAdminUsersRoute,
   AppAdminIndexRoute: AppAdminIndexRoute,
@@ -429,13 +450,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

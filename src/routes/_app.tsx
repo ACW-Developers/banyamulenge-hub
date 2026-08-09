@@ -44,6 +44,8 @@ import {
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { trackVisit, logActivity } from "@/lib/tracking";
 import { useNotifications } from "@/lib/notifications";
+import { DonateButton } from "@/components/donate-button";
+
 
 export const Route = createFileRoute("/_app")({
   component: AppLayout,
