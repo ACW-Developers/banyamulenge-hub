@@ -22,6 +22,8 @@ import {
   BookUser,
   RefreshCw,
   Gem,
+  DollarSign,
+
 } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -44,6 +46,8 @@ import {
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { trackVisit, logActivity } from "@/lib/tracking";
 import { useNotifications } from "@/lib/notifications";
+import { DonateButton } from "@/components/donate-button";
+
 
 export const Route = createFileRoute("/_app")({
   component: AppLayout,
@@ -136,8 +140,10 @@ function AppLayout() {
     { to: "/admin", label: "Admin", icon: Shield, badge: 0 },
     { to: "/admin/users", label: "User Management", icon: Users, badge: 0 },
     { to: "/admin/logs", label: "Activity Logs", icon: Activity, badge: 0 },
+    { to: "/admin/payments", label: "Payments", icon: DollarSign, badge: 0 },
     { to: "/admin/settings", label: "Settings", icon: Settings, badge: 0 },
   ];
+
 
   const initial = (profile?.display_name || profile?.username || "U").slice(0, 1).toUpperCase();
 
@@ -340,7 +346,9 @@ function AppLayout() {
               <Input placeholder="Search..." className="pl-9 h-10 bg-gray-50 border-gray-200" />
             </div>
             <div className="ml-auto flex items-center gap-2">
+              <DonateButton />
               <LanguageSelector />
+
               <Tooltip>
                 <TooltipTrigger asChild>
                   <button
