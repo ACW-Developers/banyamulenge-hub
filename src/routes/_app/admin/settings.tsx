@@ -13,6 +13,9 @@ import {
   Smartphone,
   Globe,
   BarChart3,
+  Activity,
+  Users,
+  RefreshCw,
 } from "lucide-react";
 import {
   BarChart,
@@ -29,13 +32,13 @@ import {
   CartesianGrid,
   Legend,
 } from "recharts";
-import { toast } from "sonner";
 import { format } from "date-fns";
 
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { notifyError, notifySuccess } from "@/lib/notify";
 
 export const Route = createFileRoute("/_app/admin/settings")({
   component: SettingsAdmin,
@@ -69,25 +72,25 @@ function PasswordSection() {
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (next.length < 6) return toast.error("Password must be at least 6 characters");
-    if (next !== confirm) return toast.error("Passwords do not match");
+    if (next.length < 6) return notifyError("Password must be at least 6 characters");
+    if (next !== confirm) return notifyError("Passwords do not match");
     setBusy(true);
     // Re-authenticate with current password
     const { data: sess } = await supabase.auth.getUser();
     const email = sess.user?.email;
     if (!email) {
       setBusy(false);
-      return toast.error("Not signed in");
+      return notifyError("Not signed in");
     }
     const { error: signErr } = await supabase.auth.signInWithPassword({ email, password: current });
     if (signErr) {
       setBusy(false);
-      return toast.error("Current password is wrong");
+      return notifyError("Current password is wrong");
     }
     const { error } = await supabase.auth.updateUser({ password: next });
     setBusy(false);
-    if (error) return toast.error(error.message);
-    toast.success("Password updated");
+    if (error) return notifyError(error.message);
+    notifySuccess("Password updated");
     setCurrent("");
     setNext("");
     setConfirm("");
@@ -150,87 +153,137 @@ function PasswordSection() {
   );
 }
 
+type Slice = { name: string; value: number };
+type TrafficStats = {
+  total: number;
+  total_all_time: number;
+  unique_visitors: number;
+  today: number;
+  devices: Slice[];
+  browsers: Slice[];
+  os: Slice[];
+  countries: Slice[];
+  pages: Slice[];
+  timeline: { day: string; visits: number }[];
+};
+
+const EMPTY_STATS: TrafficStats = {
+  total: 0,
+  total_all_time: 0,
+  unique_visitors: 0,
+  today: 0,
+  devices: [],
+  browsers: [],
+  os: [],
+  countries: [],
+  pages: [],
+  timeline: [],
+};
+
 function TrafficSection() {
-  const { data, isLoading } = useQuery({
-    queryKey: ["admin-traffic"],
-    queryFn: async () => {
-      const since = new Date(Date.now() - 30 * 86400 * 1000).toISOString();
-      const { data } = await supabase
-        .from("page_visits")
-        .select("device, browser, country, os, path, created_at")
-        .gte("created_at", since)
-        .order("created_at", { ascending: false })
-        .limit(5000);
-      return data ?? [];
+  const [days, setDays] = useState(30);
+
+  const { data, isLoading, isFetching, refetch, error } = useQuery({
+    queryKey: ["admin-traffic", days],
+    // Analytics must always be current: no stale cache, refresh in the background.
+    staleTime: 0,
+    gcTime: 0,
+    refetchOnMount: "always",
+    refetchOnWindowFocus: true,
+    refetchInterval: 60_000,
+    queryFn: async (): Promise<TrafficStats> => {
+      const { data, error } = await supabase.rpc("admin_traffic_stats", { days });
+      if (error) throw error;
+      return { ...EMPTY_STATS, ...(data as unknown as TrafficStats) };
     },
   });
 
   const stats = useMemo(() => {
-    const rows = data ?? [];
-    const byField = (field: "device" | "browser" | "country" | "os" | "path") => {
-      const map = new Map<string, number>();
-      rows.forEach((r) => {
-        const v = (r[field] as string | null) || "Unknown";
-        map.set(v, (map.get(v) ?? 0) + 1);
-      });
-      return Array.from(map.entries())
-        .map(([name, value]) => ({ name, value }))
-        .sort((a, b) => b.value - a.value);
-    };
-    const byDay = new Map<string, number>();
-    rows.forEach((r) => {
-      const d = format(new Date(r.created_at), "MMM d");
-      byDay.set(d, (byDay.get(d) ?? 0) + 1);
-    });
-    const timeline = Array.from(byDay.entries())
-      .reverse()
-      .map(([day, visits]) => ({ day, visits }));
+    const s = data ?? EMPTY_STATS;
     return {
-      total: rows.length,
-      devices: byField("device"),
-      browsers: byField("browser"),
-      countries: byField("country").slice(0, 8),
-      pages: byField("path").slice(0, 6),
-      timeline,
+      ...s,
+      timeline: (s.timeline ?? []).map((r) => ({
+        day: format(new Date(`${r.day}T00:00:00`), "MMM d"),
+        visits: r.visits,
+      })),
     };
   }, [data]);
 
   const kpis = [
     {
-      label: "Total visits (30d)",
+      label: `Total visits (${days}d)`,
       value: stats.total,
       icon: BarChart3,
       accent: "text-primary bg-primary/10",
     },
     {
-      label: "Desktop",
-      value: stats.devices.find((d) => d.name === "Desktop")?.value ?? 0,
-      icon: Monitor,
-      accent: "text-sky-600 bg-sky-100",
+      label: "Visits today",
+      value: stats.today,
+      icon: Activity,
+      accent: "text-amber-600 bg-amber-100",
     },
     {
-      label: "Mobile",
-      value: stats.devices.find((d) => d.name === "Mobile")?.value ?? 0,
-      icon: Smartphone,
+      label: "Signed-in visitors",
+      value: stats.unique_visitors,
+      icon: Users,
       accent: "text-emerald-600 bg-emerald-100",
     },
     {
-      label: "Countries/regions",
-      value: stats.countries.length,
+      label: "All-time visits",
+      value: stats.total_all_time,
       icon: Globe,
       accent: "text-violet-600 bg-violet-100",
     },
   ];
 
+  const deviceKpis = [
+    {
+      label: "Desktop",
+      value: stats.devices.find((d) => d.name === "Desktop")?.value ?? 0,
+      icon: Monitor,
+    },
+    {
+      label: "Mobile",
+      value: stats.devices.find((d) => d.name === "Mobile")?.value ?? 0,
+      icon: Smartphone,
+    },
+  ];
+
   return (
     <section className="rounded-2xl border bg-white shadow-sm">
-      <div className="px-6 py-4 border-b flex items-center gap-2">
+      <div className="px-6 py-4 border-b flex flex-wrap items-center gap-2">
         <BarChart3 className="h-5 w-5 text-primary" />
-        <h2 className="font-bold">Traffic & analytics</h2>
-        <span className="ml-auto text-xs text-gray-500">Last 30 days</span>
+        <h2 className="font-bold">Traffic &amp; analytics</h2>
+        <div className="ml-auto flex items-center gap-2">
+          <select
+            value={days}
+            onChange={(e) => setDays(Number(e.target.value))}
+            className="h-8 rounded-md border border-gray-200 bg-white px-2 text-xs text-gray-600"
+          >
+            <option value={1}>Today</option>
+            <option value={7}>Last 7 days</option>
+            <option value={30}>Last 30 days</option>
+            <option value={90}>Last 90 days</option>
+            <option value={365}>Last 12 months</option>
+          </select>
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-8 gap-1.5 text-xs"
+            onClick={() => refetch()}
+            disabled={isFetching}
+          >
+            <RefreshCw className={`h-3.5 w-3.5 ${isFetching ? "animate-spin" : ""}`} />
+            Refresh
+          </Button>
+        </div>
       </div>
       <div className="p-6 space-y-6">
-        {isLoading ? (
+        {error ? (
+          <p className="text-sm text-red-600">
+            Could not load analytics: {(error as Error).message}
+          </p>
+        ) : isLoading ? (
           <div className="flex justify-center py-12">
             <Loader2 className="h-6 w-6 animate-spin text-primary" />
           </div>
@@ -246,12 +299,34 @@ function TrafficSection() {
                     >
                       <Icon className="h-5 w-5" />
                     </div>
-                    <div className="mt-3 text-2xl font-bold">{k.value}</div>
+                    <div className="mt-3 text-2xl font-bold">{k.value.toLocaleString()}</div>
                     <div className="text-xs text-gray-500 mt-0.5">{k.label}</div>
                   </div>
                 );
               })}
             </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              {deviceKpis.map((d) => {
+                const Icon = d.icon;
+                const pct = stats.total ? Math.round((d.value / stats.total) * 100) : 0;
+                return (
+                  <div
+                    key={d.label}
+                    className="rounded-xl border p-4 flex items-center gap-3 bg-white"
+                  >
+                    <Icon className="h-5 w-5 text-gray-400" />
+                    <div>
+                      <div className="text-lg font-bold">{d.value.toLocaleString()}</div>
+                      <div className="text-xs text-gray-500">
+                        {d.label} · {pct}%
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
 
             <div className="grid lg:grid-cols-2 gap-6">
               <div className="rounded-xl border p-4">

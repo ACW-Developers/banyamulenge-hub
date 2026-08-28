@@ -7,30 +7,49 @@ import { supabase } from "@/integrations/supabase/client";
 import { PostCard, PostComposer, type FeedPost } from "@/components/post-card";
 import { AdvertsPanel } from "@/components/adverts-panel";
 import { markFeedSeen } from "@/lib/notifications";
-import { getRequestOrigin } from "@/lib/origin.functions";
+import { useI18n } from "@/lib/i18n";
+
+const OG_IMAGE = "https://project--b0b87b03-ed7f-478e-8e23-548029db89f9.lovable.app/favicon.png";
 
 export const Route = createFileRoute("/_app/")({
-  loader: async () => {
-    const origin = await getRequestOrigin();
-    return { origin };
-  },
-  head: ({ loaderData }) => {
-    const origin = loaderData?.origin ?? "";
-    const imageUrl = origin ? `${origin}/favicon.png` : "/favicon.png";
-    return {
-      meta: [
-        { property: "og:url", content: "/" },
-        { property: "og:image", content: imageUrl },
-        { property: "og:image:type", content: "image/png" },
-        { property: "og:image:width", content: "457" },
-        { property: "og:image:height", content: "426" },
-        { name: "twitter:image", content: imageUrl },
-      ],
-      links: [{ rel: "canonical", href: "/" }],
-    };
-  },
+  head: () => ({
+    meta: [
+      { title: "Community Feed | Banyamulenge Community Heritage" },
+      {
+        name: "description",
+        content:
+          "Share stories, photos and announcements with the Banyamulenge community around the world.",
+      },
+      { property: "og:title", content: "Community Feed | Banyamulenge Community Heritage" },
+      {
+        property: "og:description",
+        content: "Share stories, photos and announcements with the Banyamulenge community.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { property: "og:image", content: OG_IMAGE },
+      { name: "twitter:image", content: OG_IMAGE },
+    ],
+    links: [{ rel: "canonical", href: "/" }],
+  }),
   component: FeedPage,
+  errorComponent: FeedError,
 });
+
+function FeedError({ reset }: { reset: () => void }) {
+  return (
+    <div className="max-w-md mx-auto text-center py-16">
+      <h2 className="text-lg font-bold">The feed didn't load</h2>
+      <p className="text-sm text-gray-500 mt-1">Check your connection and try again.</p>
+      <button
+        onClick={reset}
+        className="mt-4 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
+      >
+        Try again
+      </button>
+    </div>
+  );
+}
 
 const feedKey = ["feed"] as const;
 
@@ -40,7 +59,7 @@ async function fetchFeed(): Promise<FeedPost[]> {
   const { data, error } = await supabase
     .from("posts")
     .select(
-      `id, user_id, content, image_url, video_url, created_at, is_announcement,
+      `id, user_id, content, image_url, image_urls, video_url, created_at, is_announcement,
        author:profiles!posts_author_profile_fkey(username, display_name, avatar_url),
        likes(user_id),
        comments(id)`,
@@ -55,6 +74,7 @@ async function fetchFeed(): Promise<FeedPost[]> {
 
 function FeedPage() {
   const qc = useQueryClient();
+  const { t } = useI18n();
   const { data: posts, isLoading } = useQuery({
     queryKey: feedKey,
     queryFn: fetchFeed,
@@ -90,11 +110,10 @@ function FeedPage() {
   return (
     <div className="max-w-7xl mx-auto space-y-6">
       <div className="text-center max-w-2xl mx-auto">
-        <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight">Community</h1>
-        <p className="mt-2 text-sm sm:text-base text-gray-500">
-          Share your stories, celebrate our heritage, and interact with fellow Banyamulenge across
-          the globe.
-        </p>
+        <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight">
+          {t("title.community")}
+        </h1>
+        <p className="mt-2 text-sm sm:text-base text-gray-500">{t("title.communitySub")}</p>
       </div>
       <div className="grid lg:grid-cols-[minmax(0,1fr)_340px] gap-6">
         <div className="min-w-0 space-y-6">
@@ -112,10 +131,8 @@ function FeedPage() {
             </div>
           ) : (
             <div className="rounded-2xl border bg-white p-12 text-center shadow-sm">
-              <h3 className="text-lg font-bold">The feed is quiet</h3>
-              <p className="text-sm text-gray-500 mt-1">
-                Be the first to share something with the community.
-              </p>
+              <h3 className="text-lg font-bold">{t("feed.empty")}</h3>
+              <p className="text-sm text-gray-500 mt-1">{t("feed.emptySub")}</p>
             </div>
           )}
         </div>

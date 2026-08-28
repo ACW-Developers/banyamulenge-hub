@@ -24,6 +24,7 @@ import {
 
 import { formatDistanceToNow } from "date-fns";
 import { toast } from "sonner";
+import { notifySuccess, notifyInfo } from "@/lib/notify";
 
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
@@ -165,10 +166,27 @@ function MessagesPage() {
     const ch = supabase
       .channel(`msg-rt-${user.id}`)
       .on("postgres_changes", { event: "*", schema: "public", table: "messages" }, (payload) => {
-        const row = (payload.new ?? payload.old) as { conversation_id?: string } | null;
+        const row = (payload.new ?? payload.old) as {
+          conversation_id?: string;
+          sender_id?: string;
+          content?: string | null;
+          attachment_name?: string | null;
+        } | null;
         qc.invalidateQueries({ queryKey: ["conversations", user.id] });
         if (row?.conversation_id) {
           qc.invalidateQueries({ queryKey: ["messages", row.conversation_id] });
+        }
+        // WhatsApp-style banner for messages arriving in another conversation.
+        if (
+          payload.eventType === "INSERT" &&
+          row?.sender_id &&
+          row.sender_id !== user.id &&
+          row.conversation_id !== activeId
+        ) {
+          notifyInfo("New message", {
+            description: (row.content || row.attachment_name || "Attachment")?.slice(0, 80),
+            push: true,
+          });
         }
       })
       .on("postgres_changes", { event: "*", schema: "public", table: "conversations" }, () =>
@@ -178,7 +196,7 @@ function MessagesPage() {
     return () => {
       supabase.removeChannel(ch);
     };
-  }, [user, qc]);
+  }, [user, qc, activeId]);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight });
@@ -200,6 +218,7 @@ function MessagesPage() {
       setText(body);
       return;
     }
+    notifySuccess("Message sent");
     qc.invalidateQueries({ queryKey: ["messages", activeId] });
     qc.invalidateQueries({ queryKey: ["conversations", user.id] });
   }
@@ -218,6 +237,7 @@ function MessagesPage() {
         attachment_name: att.name,
       });
       if (error) throw error;
+      notifySuccess("Attachment sent");
       qc.invalidateQueries({ queryKey: ["messages", activeId] });
       qc.invalidateQueries({ queryKey: ["conversations", user.id] });
     } catch (e) {

@@ -12,7 +12,6 @@ import {
   MoreHorizontal,
   Trash2,
 } from "lucide-react";
-import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
@@ -26,12 +25,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { logActivity } from "@/lib/tracking";
+import { notifyError, notifySuccess } from "@/lib/notify";
 
 export type FeedPost = {
   id: string;
   user_id: string;
   content: string;
   image_url: string | null;
+  image_urls?: string[] | null;
   video_url: string | null;
   created_at: string;
   is_announcement?: boolean;
@@ -44,11 +45,20 @@ export type FeedPost = {
   comments: { id: string }[];
 };
 
+/** All photos on a post: the legacy single column plus the multi-photo list. */
+export function postImages(post: FeedPost): string[] {
+  const many = post.image_urls ?? [];
+  const all = many.length ? many : post.image_url ? [post.image_url] : [];
+  return Array.from(new Set(all.filter(Boolean)));
+}
+
 export function PostCard({ post, queryKey }: { post: FeedPost; queryKey: readonly unknown[] }) {
   const { user, isAdmin } = useAuth();
   const qc = useQueryClient();
   const [showComments, setShowComments] = useState(false);
   const [commentText, setCommentText] = useState("");
+  const [lightbox, setLightbox] = useState<string | null>(null);
+  const images = postImages(post);
 
   const liked = user ? post.likes.some((l) => l.user_id === user.id) : false;
   const authorInitial = (post.author?.display_name || post.author?.username || "?")
@@ -94,7 +104,7 @@ export function PostCard({ post, queryKey }: { post: FeedPost; queryKey: readonl
     },
     onError: (e: Error, _v, ctx) => {
       if (ctx?.previous) qc.setQueryData(queryKey, ctx.previous);
-      toast.error(e.message);
+      notifyError(e.message);
     },
   });
 
@@ -105,10 +115,10 @@ export function PostCard({ post, queryKey }: { post: FeedPost; queryKey: readonl
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("Post deleted");
+      notifySuccess("Post deleted");
       qc.invalidateQueries({ queryKey });
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => notifyError(e.message),
   });
 
   const toggleAnnouncement = useMutation({
@@ -120,10 +130,10 @@ export function PostCard({ post, queryKey }: { post: FeedPost; queryKey: readonl
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success(post.is_announcement ? "Unmarked as announcement" : "Marked as announcement");
+      notifySuccess(post.is_announcement ? "Unmarked as announcement" : "Marked as announcement");
       qc.invalidateQueries({ queryKey });
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => notifyError(e.message),
   });
 
   const { data: comments, refetch: refetchComments } = useQuery({
@@ -146,7 +156,7 @@ export function PostCard({ post, queryKey }: { post: FeedPost; queryKey: readonl
     const { error } = await supabase
       .from("comments")
       .insert({ post_id: post.id, user_id: user.id, content: commentText.trim() });
-    if (error) return toast.error(error.message);
+    if (error) return notifyError(error.message);
     setCommentText("");
     logActivity(user.id, "post.comment", "post", post.id);
     refetchComments();
@@ -160,7 +170,7 @@ export function PostCard({ post, queryKey }: { post: FeedPost; queryKey: readonl
         await navigator.share({ title: "Community post", text: post.content.slice(0, 80), url });
       } else {
         await navigator.clipboard.writeText(url);
-        toast.success("Link copied");
+        notifySuccess("Link copied");
       }
       if (user) logActivity(user.id, "post.share", "post", post.id);
     } catch {
@@ -227,9 +237,43 @@ export function PostCard({ post, queryKey }: { post: FeedPost; queryKey: readonl
         )}
       </header>
       <p className="text-[15px] leading-relaxed whitespace-pre-wrap">{post.content}</p>
-      {post.image_url && (
-        <div className="mt-3 rounded-xl overflow-hidden border">
-          <img src={post.image_url} alt="" loading="lazy" decoding="async" className="w-full max-h-[520px] object-cover" />
+      {images.length > 0 && (
+        <div
+          className={`mt-3 grid gap-2 ${
+            images.length === 1 ? "grid-cols-1" : images.length === 2 ? "grid-cols-2" : "grid-cols-2 sm:grid-cols-3"
+          }`}
+        >
+          {images.map((src, i) => (
+            <button
+              key={src + i}
+              type="button"
+              onClick={() => setLightbox(src)}
+              className={`group relative rounded-xl overflow-hidden border bg-gray-50 ${
+                images.length === 1 ? "" : "aspect-square"
+              }`}
+            >
+              <img
+                src={src}
+                alt=""
+                loading="lazy"
+                decoding="async"
+                className={
+                  images.length === 1
+                    ? "w-full max-h-[560px] object-contain bg-gray-50"
+                    : "absolute inset-0 h-full w-full object-contain bg-gray-50"
+                }
+              />
+            </button>
+          ))}
+        </div>
+      )}
+      {lightbox && (
+        <div
+          className="fixed inset-0 z-50 bg-black/85 flex items-center justify-center p-4"
+          onClick={() => setLightbox(null)}
+          role="dialog"
+        >
+          <img src={lightbox} alt="" className="max-h-full max-w-full object-contain rounded-lg" />
         </div>
       )}
       {post.video_url && (
@@ -335,24 +379,40 @@ export function PostComposer({
   const { user, profile, isAdmin } = useAuth();
   const qc = useQueryClient();
   const [content, setContent] = useState("");
-  const [file, setFile] = useState<File | null>(null);
-  const [preview, setPreview] = useState<string | null>(null);
+  const [files, setFiles] = useState<File[]>([]);
+  const [previews, setPreviews] = useState<string[]>([]);
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [videoPreview, setVideoPreview] = useState<string | null>(null);
   const [isAnnouncement, setIsAnnouncement] = useState(false);
   const [busy, setBusy] = useState(false);
 
+  const MAX_PHOTOS = 6;
   const initial = (profile?.display_name || profile?.username || "U").slice(0, 1).toUpperCase();
 
-  function pickImage(e: React.ChangeEvent<HTMLInputElement>) {
-    const f = e.target.files?.[0];
-    if (!f) return;
-    if (f.size > 5 * 1024 * 1024) {
-      toast.error("Image must be under 5 MB");
+  function pickImages(e: React.ChangeEvent<HTMLInputElement>) {
+    const picked = Array.from(e.target.files ?? []);
+    e.target.value = "";
+    if (!picked.length) return;
+    const room = MAX_PHOTOS - files.length;
+    if (room <= 0) {
+      notifyError(`You can attach up to ${MAX_PHOTOS} photos`);
       return;
     }
-    setFile(f);
-    setPreview(URL.createObjectURL(f));
+    const tooBig = picked.filter((f) => f.size > 5 * 1024 * 1024);
+    if (tooBig.length) notifyError("Each image must be under 5 MB");
+    const accepted = picked.filter((f) => f.size <= 5 * 1024 * 1024).slice(0, room);
+    if (!accepted.length) return;
+    setFiles((prev) => [...prev, ...accepted]);
+    setPreviews((prev) => [...prev, ...accepted.map((f) => URL.createObjectURL(f))]);
+  }
+
+  function removeImage(index: number) {
+    setFiles((prev) => prev.filter((_, i) => i !== index));
+    setPreviews((prev) => {
+      const url = prev[index];
+      if (url) URL.revokeObjectURL(url);
+      return prev.filter((_, i) => i !== index);
+    });
   }
 
   async function pickVideo(e: React.ChangeEvent<HTMLInputElement>) {
@@ -360,7 +420,7 @@ export function PostComposer({
     e.target.value = "";
     if (!f) return;
     if (f.size > 15 * 1024 * 1024) {
-      toast.error("Video must be under 15 MB");
+      notifyError("Video must be under 15 MB");
       return;
     }
     // Validate duration
@@ -370,7 +430,7 @@ export function PostComposer({
     v.onloadedmetadata = () => {
       if (v.duration > 120.5) {
         URL.revokeObjectURL(url);
-        toast.error("Video must be 2 minutes or shorter");
+        notifyError("Video must be 2 minutes or shorter");
         return;
       }
       setVideoFile(f);
@@ -378,7 +438,7 @@ export function PostComposer({
     };
     v.onerror = () => {
       URL.revokeObjectURL(url);
-      toast.error("Could not read that video file");
+      notifyError("Could not read that video file");
     };
     v.src = url;
   }
@@ -388,30 +448,38 @@ export function PostComposer({
     setBusy(true);
     try {
       const uploadMod = await import("@/lib/upload");
-      let image_url: string | null = null;
+      const image_urls: string[] = [];
       let video_url: string | null = null;
-      if (file) image_url = await uploadMod.uploadPostImage(file, user.id);
+      for (const f of files) {
+        image_urls.push(await uploadMod.uploadPostImage(f, user.id));
+      }
       if (videoFile) video_url = await uploadMod.uploadPostVideo(videoFile, user.id);
       const { error } = await supabase.from("posts").insert({
         user_id: user.id,
         content: content.trim(),
-        image_url,
+        image_url: image_urls[0] ?? null,
+        image_urls,
         video_url,
         is_announcement: isAnnouncement && isAdmin,
         group_id: groupId ?? null,
       });
       if (error) throw error;
       setContent("");
-      setFile(null);
-      setPreview(null);
+      previews.forEach((u) => URL.revokeObjectURL(u));
+      setFiles([]);
+      setPreviews([]);
       setVideoFile(null);
       setVideoPreview(null);
       setIsAnnouncement(false);
-      toast.success("Posted");
+      notifySuccess("Post shared", {
+        description: image_urls.length
+          ? `${image_urls.length} photo${image_urls.length > 1 ? "s" : ""} attached`
+          : undefined,
+      });
       logActivity(user.id, "post.create", "post");
       qc.invalidateQueries({ queryKey });
     } catch (e) {
-      toast.error((e as Error).message);
+      notifyError((e as Error).message);
     } finally {
       setBusy(false);
     }
@@ -433,20 +501,28 @@ export function PostComposer({
             placeholder={`Share something with the community, ${profile?.display_name || "friend"}...`}
             className="min-h-[80px] resize-none border-0 bg-gray-50 focus-visible:ring-1"
           />
-          {preview && (
-            <div className="relative rounded-xl overflow-hidden border">
-              <img src={preview} alt="preview" className="w-full max-h-72 object-cover" />
-              <button
-                onClick={() => {
-                  setFile(null);
-                  setPreview(null);
-                }}
-                className="absolute top-2 right-2 rounded-full bg-black/60 text-white p-1 hover:bg-black"
-                aria-label="Remove image"
-                type="button"
-              >
-                <TrashIcon />
-              </button>
+          {previews.length > 0 && (
+            <div className="grid grid-cols-3 gap-2">
+              {previews.map((src, i) => (
+                <div
+                  key={src}
+                  className="relative aspect-square rounded-xl overflow-hidden border bg-gray-50"
+                >
+                  <img
+                    src={src}
+                    alt={`preview ${i + 1}`}
+                    className="absolute inset-0 h-full w-full object-contain"
+                  />
+                  <button
+                    onClick={() => removeImage(i)}
+                    className="absolute top-1.5 right-1.5 rounded-full bg-black/60 text-white p-1 hover:bg-black"
+                    aria-label="Remove image"
+                    type="button"
+                  >
+                    <TrashIcon />
+                  </button>
+                </div>
+              ))}
             </div>
           )}
           {videoPreview && (
@@ -468,8 +544,17 @@ export function PostComposer({
           <div className="flex flex-wrap items-center gap-2">
             <label className="cursor-pointer inline-flex items-center gap-2 px-3 py-2 rounded-lg border text-sm text-gray-600 hover:bg-gray-50">
               <ImageIcon />
-              Photo
-              <input type="file" accept="image/*" className="hidden" onChange={pickImage} />
+              Photos
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                className="hidden"
+                onChange={pickImages}
+              />
+              {files.length > 0 && (
+                <span className="text-xs font-semibold text-primary">{files.length}</span>
+              )}
             </label>
             <label className="cursor-pointer inline-flex items-center gap-2 px-3 py-2 rounded-lg border text-sm text-gray-600 hover:bg-gray-50">
               <VideoIcon />
