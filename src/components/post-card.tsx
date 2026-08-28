@@ -379,24 +379,40 @@ export function PostComposer({
   const { user, profile, isAdmin } = useAuth();
   const qc = useQueryClient();
   const [content, setContent] = useState("");
-  const [file, setFile] = useState<File | null>(null);
-  const [preview, setPreview] = useState<string | null>(null);
+  const [files, setFiles] = useState<File[]>([]);
+  const [previews, setPreviews] = useState<string[]>([]);
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [videoPreview, setVideoPreview] = useState<string | null>(null);
   const [isAnnouncement, setIsAnnouncement] = useState(false);
   const [busy, setBusy] = useState(false);
 
+  const MAX_PHOTOS = 6;
   const initial = (profile?.display_name || profile?.username || "U").slice(0, 1).toUpperCase();
 
-  function pickImage(e: React.ChangeEvent<HTMLInputElement>) {
-    const f = e.target.files?.[0];
-    if (!f) return;
-    if (f.size > 5 * 1024 * 1024) {
-      toast.error("Image must be under 5 MB");
+  function pickImages(e: React.ChangeEvent<HTMLInputElement>) {
+    const picked = Array.from(e.target.files ?? []);
+    e.target.value = "";
+    if (!picked.length) return;
+    const room = MAX_PHOTOS - files.length;
+    if (room <= 0) {
+      notifyError(`You can attach up to ${MAX_PHOTOS} photos`);
       return;
     }
-    setFile(f);
-    setPreview(URL.createObjectURL(f));
+    const tooBig = picked.filter((f) => f.size > 5 * 1024 * 1024);
+    if (tooBig.length) notifyError("Each image must be under 5 MB");
+    const accepted = picked.filter((f) => f.size <= 5 * 1024 * 1024).slice(0, room);
+    if (!accepted.length) return;
+    setFiles((prev) => [...prev, ...accepted]);
+    setPreviews((prev) => [...prev, ...accepted.map((f) => URL.createObjectURL(f))]);
+  }
+
+  function removeImage(index: number) {
+    setFiles((prev) => prev.filter((_, i) => i !== index));
+    setPreviews((prev) => {
+      const url = prev[index];
+      if (url) URL.revokeObjectURL(url);
+      return prev.filter((_, i) => i !== index);
+    });
   }
 
   async function pickVideo(e: React.ChangeEvent<HTMLInputElement>) {
