@@ -166,10 +166,27 @@ function MessagesPage() {
     const ch = supabase
       .channel(`msg-rt-${user.id}`)
       .on("postgres_changes", { event: "*", schema: "public", table: "messages" }, (payload) => {
-        const row = (payload.new ?? payload.old) as { conversation_id?: string } | null;
+        const row = (payload.new ?? payload.old) as {
+          conversation_id?: string;
+          sender_id?: string;
+          content?: string | null;
+          attachment_name?: string | null;
+        } | null;
         qc.invalidateQueries({ queryKey: ["conversations", user.id] });
         if (row?.conversation_id) {
           qc.invalidateQueries({ queryKey: ["messages", row.conversation_id] });
+        }
+        // WhatsApp-style banner for messages arriving in another conversation.
+        if (
+          payload.eventType === "INSERT" &&
+          row?.sender_id &&
+          row.sender_id !== user.id &&
+          row.conversation_id !== activeId
+        ) {
+          notifyInfo("New message", {
+            description: (row.content || row.attachment_name || "Attachment")?.slice(0, 80),
+            push: true,
+          });
         }
       })
       .on("postgres_changes", { event: "*", schema: "public", table: "conversations" }, () =>
