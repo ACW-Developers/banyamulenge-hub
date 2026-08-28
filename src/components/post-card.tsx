@@ -544,8 +544,17 @@ export function PostComposer({
           <div className="flex flex-wrap items-center gap-2">
             <label className="cursor-pointer inline-flex items-center gap-2 px-3 py-2 rounded-lg border text-sm text-gray-600 hover:bg-gray-50">
               <ImageIcon />
-              Photo
-              <input type="file" accept="image/*" className="hidden" onChange={pickImage} />
+              Photos
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                className="hidden"
+                onChange={pickImages}
+              />
+              {files.length > 0 && (
+                <span className="text-xs font-semibold text-primary">{files.length}</span>
+              )}
             </label>
             <label className="cursor-pointer inline-flex items-center gap-2 px-3 py-2 rounded-lg border text-sm text-gray-600 hover:bg-gray-50">
               <VideoIcon />
