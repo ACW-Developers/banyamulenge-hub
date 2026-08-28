@@ -13,6 +13,9 @@ import {
   Smartphone,
   Globe,
   BarChart3,
+  Activity,
+  Users,
+  RefreshCw,
 } from "lucide-react";
 import {
   BarChart,
@@ -29,13 +32,13 @@ import {
   CartesianGrid,
   Legend,
 } from "recharts";
-import { toast } from "sonner";
 import { format } from "date-fns";
 
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { notifyError, notifySuccess } from "@/lib/notify";
 
 export const Route = createFileRoute("/_app/admin/settings")({
   component: SettingsAdmin,
@@ -69,25 +72,25 @@ function PasswordSection() {
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (next.length < 6) return toast.error("Password must be at least 6 characters");
-    if (next !== confirm) return toast.error("Passwords do not match");
+    if (next.length < 6) return notifyError("Password must be at least 6 characters");
+    if (next !== confirm) return notifyError("Passwords do not match");
     setBusy(true);
     // Re-authenticate with current password
     const { data: sess } = await supabase.auth.getUser();
     const email = sess.user?.email;
     if (!email) {
       setBusy(false);
-      return toast.error("Not signed in");
+      return notifyError("Not signed in");
     }
     const { error: signErr } = await supabase.auth.signInWithPassword({ email, password: current });
     if (signErr) {
       setBusy(false);
-      return toast.error("Current password is wrong");
+      return notifyError("Current password is wrong");
     }
     const { error } = await supabase.auth.updateUser({ password: next });
     setBusy(false);
-    if (error) return toast.error(error.message);
-    toast.success("Password updated");
+    if (error) return notifyError(error.message);
+    notifySuccess("Password updated");
     setCurrent("");
     setNext("");
     setConfirm("");
