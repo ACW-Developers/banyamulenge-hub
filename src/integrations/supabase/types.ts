@@ -719,6 +719,7 @@ export type Database = {
           group_id: string | null
           id: string
           image_url: string | null
+          image_urls: string[]
           is_announcement: boolean
           updated_at: string
           user_id: string
@@ -730,6 +731,7 @@ export type Database = {
           group_id?: string | null
           id?: string
           image_url?: string | null
+          image_urls?: string[]
           is_announcement?: boolean
           updated_at?: string
           user_id: string
@@ -741,6 +743,7 @@ export type Database = {
           group_id?: string | null
           id?: string
           image_url?: string | null
+          image_urls?: string[]
           is_announcement?: boolean
           updated_at?: string
           user_id?: string
@@ -825,6 +828,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_traffic_stats: { Args: { days?: number }; Returns: Json }
       create_direct_conversation: {
         Args: { other_user: string }
         Returns: string
