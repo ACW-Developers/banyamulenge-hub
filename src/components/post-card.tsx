@@ -57,6 +57,8 @@ export function PostCard({ post, queryKey }: { post: FeedPost; queryKey: readonl
   const qc = useQueryClient();
   const [showComments, setShowComments] = useState(false);
   const [commentText, setCommentText] = useState("");
+  const [lightbox, setLightbox] = useState<string | null>(null);
+  const images = postImages(post);
 
   const liked = user ? post.likes.some((l) => l.user_id === user.id) : false;
   const authorInitial = (post.author?.display_name || post.author?.username || "?")
