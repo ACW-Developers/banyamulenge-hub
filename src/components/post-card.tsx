@@ -12,7 +12,6 @@ import {
   MoreHorizontal,
   Trash2,
 } from "lucide-react";
-import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
@@ -26,6 +25,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { logActivity } from "@/lib/tracking";
+import { notifyError, notifySuccess } from "@/lib/notify";
 
 export type FeedPost = {
   id: string;
@@ -104,7 +104,7 @@ export function PostCard({ post, queryKey }: { post: FeedPost; queryKey: readonl
     },
     onError: (e: Error, _v, ctx) => {
       if (ctx?.previous) qc.setQueryData(queryKey, ctx.previous);
-      toast.error(e.message);
+      notifyError(e.message);
     },
   });
 
@@ -115,10 +115,10 @@ export function PostCard({ post, queryKey }: { post: FeedPost; queryKey: readonl
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("Post deleted");
+      notifySuccess("Post deleted");
       qc.invalidateQueries({ queryKey });
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => notifyError(e.message),
   });
 
   const toggleAnnouncement = useMutation({
@@ -130,10 +130,10 @@ export function PostCard({ post, queryKey }: { post: FeedPost; queryKey: readonl
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success(post.is_announcement ? "Unmarked as announcement" : "Marked as announcement");
+      notifySuccess(post.is_announcement ? "Unmarked as announcement" : "Marked as announcement");
       qc.invalidateQueries({ queryKey });
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => notifyError(e.message),
   });
 
   const { data: comments, refetch: refetchComments } = useQuery({
@@ -156,7 +156,7 @@ export function PostCard({ post, queryKey }: { post: FeedPost; queryKey: readonl
     const { error } = await supabase
       .from("comments")
       .insert({ post_id: post.id, user_id: user.id, content: commentText.trim() });
-    if (error) return toast.error(error.message);
+    if (error) return notifyError(error.message);
     setCommentText("");
     logActivity(user.id, "post.comment", "post", post.id);
     refetchComments();
@@ -170,7 +170,7 @@ export function PostCard({ post, queryKey }: { post: FeedPost; queryKey: readonl
         await navigator.share({ title: "Community post", text: post.content.slice(0, 80), url });
       } else {
         await navigator.clipboard.writeText(url);
-        toast.success("Link copied");
+        notifySuccess("Link copied");
       }
       if (user) logActivity(user.id, "post.share", "post", post.id);
     } catch {
@@ -420,7 +420,7 @@ export function PostComposer({
     e.target.value = "";
     if (!f) return;
     if (f.size > 15 * 1024 * 1024) {
-      toast.error("Video must be under 15 MB");
+      notifyError("Video must be under 15 MB");
       return;
     }
     // Validate duration
@@ -430,7 +430,7 @@ export function PostComposer({
     v.onloadedmetadata = () => {
       if (v.duration > 120.5) {
         URL.revokeObjectURL(url);
-        toast.error("Video must be 2 minutes or shorter");
+        notifyError("Video must be 2 minutes or shorter");
         return;
       }
       setVideoFile(f);
@@ -438,7 +438,7 @@ export function PostComposer({
     };
     v.onerror = () => {
       URL.revokeObjectURL(url);
-      toast.error("Could not read that video file");
+      notifyError("Could not read that video file");
     };
     v.src = url;
   }
