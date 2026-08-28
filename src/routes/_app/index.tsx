@@ -131,10 +131,8 @@ function FeedPage() {
             </div>
           ) : (
             <div className="rounded-2xl border bg-white p-12 text-center shadow-sm">
-              <h3 className="text-lg font-bold">The feed is quiet</h3>
-              <p className="text-sm text-gray-500 mt-1">
-                Be the first to share something with the community.
-              </p>
+              <h3 className="text-lg font-bold">{t("feed.empty")}</h3>
+              <p className="text-sm text-gray-500 mt-1">{t("feed.emptySub")}</p>
             </div>
           )}
         </div>
