@@ -448,30 +448,38 @@ export function PostComposer({
     setBusy(true);
     try {
       const uploadMod = await import("@/lib/upload");
-      let image_url: string | null = null;
+      const image_urls: string[] = [];
       let video_url: string | null = null;
-      if (file) image_url = await uploadMod.uploadPostImage(file, user.id);
+      for (const f of files) {
+        image_urls.push(await uploadMod.uploadPostImage(f, user.id));
+      }
       if (videoFile) video_url = await uploadMod.uploadPostVideo(videoFile, user.id);
       const { error } = await supabase.from("posts").insert({
         user_id: user.id,
         content: content.trim(),
-        image_url,
+        image_url: image_urls[0] ?? null,
+        image_urls,
         video_url,
         is_announcement: isAnnouncement && isAdmin,
         group_id: groupId ?? null,
       });
       if (error) throw error;
       setContent("");
-      setFile(null);
-      setPreview(null);
+      previews.forEach((u) => URL.revokeObjectURL(u));
+      setFiles([]);
+      setPreviews([]);
       setVideoFile(null);
       setVideoPreview(null);
       setIsAnnouncement(false);
-      toast.success("Posted");
+      notifySuccess("Post shared", {
+        description: image_urls.length
+          ? `${image_urls.length} photo${image_urls.length > 1 ? "s" : ""} attached`
+          : undefined,
+      });
       logActivity(user.id, "post.create", "post");
       qc.invalidateQueries({ queryKey });
     } catch (e) {
-      toast.error((e as Error).message);
+      notifyError((e as Error).message);
     } finally {
       setBusy(false);
     }
