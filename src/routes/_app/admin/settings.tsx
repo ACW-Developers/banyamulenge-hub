@@ -150,75 +150,99 @@ function PasswordSection() {
   );
 }
 
+type Slice = { name: string; value: number };
+type TrafficStats = {
+  total: number;
+  total_all_time: number;
+  unique_visitors: number;
+  today: number;
+  devices: Slice[];
+  browsers: Slice[];
+  os: Slice[];
+  countries: Slice[];
+  pages: Slice[];
+  timeline: { day: string; visits: number }[];
+};
+
+const EMPTY_STATS: TrafficStats = {
+  total: 0,
+  total_all_time: 0,
+  unique_visitors: 0,
+  today: 0,
+  devices: [],
+  browsers: [],
+  os: [],
+  countries: [],
+  pages: [],
+  timeline: [],
+};
+
 function TrafficSection() {
-  const { data, isLoading } = useQuery({
-    queryKey: ["admin-traffic"],
-    queryFn: async () => {
-      const since = new Date(Date.now() - 30 * 86400 * 1000).toISOString();
-      const { data } = await supabase
-        .from("page_visits")
-        .select("device, browser, country, os, path, created_at")
-        .gte("created_at", since)
-        .order("created_at", { ascending: false })
-        .limit(5000);
-      return data ?? [];
+  const [days, setDays] = useState(30);
+
+  const { data, isLoading, isFetching, refetch, error } = useQuery({
+    queryKey: ["admin-traffic", days],
+    // Analytics must always be current: no stale cache, refresh in the background.
+    staleTime: 0,
+    gcTime: 0,
+    refetchOnMount: "always",
+    refetchOnWindowFocus: true,
+    refetchInterval: 60_000,
+    queryFn: async (): Promise<TrafficStats> => {
+      const { data, error } = await supabase.rpc("admin_traffic_stats", { days });
+      if (error) throw error;
+      return { ...EMPTY_STATS, ...(data as unknown as TrafficStats) };
     },
   });
 
   const stats = useMemo(() => {
-    const rows = data ?? [];
-    const byField = (field: "device" | "browser" | "country" | "os" | "path") => {
-      const map = new Map<string, number>();
-      rows.forEach((r) => {
-        const v = (r[field] as string | null) || "Unknown";
-        map.set(v, (map.get(v) ?? 0) + 1);
-      });
-      return Array.from(map.entries())
-        .map(([name, value]) => ({ name, value }))
-        .sort((a, b) => b.value - a.value);
-    };
-    const byDay = new Map<string, number>();
-    rows.forEach((r) => {
-      const d = format(new Date(r.created_at), "MMM d");
-      byDay.set(d, (byDay.get(d) ?? 0) + 1);
-    });
-    const timeline = Array.from(byDay.entries())
-      .reverse()
-      .map(([day, visits]) => ({ day, visits }));
+    const s = data ?? EMPTY_STATS;
     return {
-      total: rows.length,
-      devices: byField("device"),
-      browsers: byField("browser"),
-      countries: byField("country").slice(0, 8),
-      pages: byField("path").slice(0, 6),
-      timeline,
+      ...s,
+      timeline: (s.timeline ?? []).map((r) => ({
+        day: format(new Date(`${r.day}T00:00:00`), "MMM d"),
+        visits: r.visits,
+      })),
     };
   }, [data]);
 
   const kpis = [
     {
-      label: "Total visits (30d)",
+      label: `Total visits (${days}d)`,
       value: stats.total,
       icon: BarChart3,
       accent: "text-primary bg-primary/10",
     },
     {
+      label: "Visits today",
+      value: stats.today,
+      icon: Activity,
+      accent: "text-amber-600 bg-amber-100",
+    },
+    {
+      label: "Signed-in visitors",
+      value: stats.unique_visitors,
+      icon: Users,
+      accent: "text-emerald-600 bg-emerald-100",
+    },
+    {
+      label: "All-time visits",
+      value: stats.total_all_time,
+      icon: Globe,
+      accent: "text-violet-600 bg-violet-100",
+    },
+  ];
+
+  const deviceKpis = [
+    {
       label: "Desktop",
       value: stats.devices.find((d) => d.name === "Desktop")?.value ?? 0,
       icon: Monitor,
-      accent: "text-sky-600 bg-sky-100",
     },
     {
       label: "Mobile",
       value: stats.devices.find((d) => d.name === "Mobile")?.value ?? 0,
       icon: Smartphone,
-      accent: "text-emerald-600 bg-emerald-100",
-    },
-    {
-      label: "Countries/regions",
-      value: stats.countries.length,
-      icon: Globe,
-      accent: "text-violet-600 bg-violet-100",
     },
   ];
 
