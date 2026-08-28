@@ -235,9 +235,43 @@ export function PostCard({ post, queryKey }: { post: FeedPost; queryKey: readonl
         )}
       </header>
       <p className="text-[15px] leading-relaxed whitespace-pre-wrap">{post.content}</p>
-      {post.image_url && (
-        <div className="mt-3 rounded-xl overflow-hidden border">
-          <img src={post.image_url} alt="" loading="lazy" decoding="async" className="w-full max-h-[520px] object-cover" />
+      {images.length > 0 && (
+        <div
+          className={`mt-3 grid gap-2 ${
+            images.length === 1 ? "grid-cols-1" : images.length === 2 ? "grid-cols-2" : "grid-cols-2 sm:grid-cols-3"
+          }`}
+        >
+          {images.map((src, i) => (
+            <button
+              key={src + i}
+              type="button"
+              onClick={() => setLightbox(src)}
+              className={`group relative rounded-xl overflow-hidden border bg-gray-50 ${
+                images.length === 1 ? "" : "aspect-square"
+              }`}
+            >
+              <img
+                src={src}
+                alt=""
+                loading="lazy"
+                decoding="async"
+                className={
+                  images.length === 1
+                    ? "w-full max-h-[560px] object-contain bg-gray-50"
+                    : "absolute inset-0 h-full w-full object-contain bg-gray-50"
+                }
+              />
+            </button>
+          ))}
+        </div>
+      )}
+      {lightbox && (
+        <div
+          className="fixed inset-0 z-50 bg-black/85 flex items-center justify-center p-4"
+          onClick={() => setLightbox(null)}
+          role="dialog"
+        >
+          <img src={lightbox} alt="" className="max-h-full max-w-full object-contain rounded-lg" />
         </div>
       )}
       {post.video_url && (
