@@ -32,6 +32,7 @@ export type FeedPost = {
   user_id: string;
   content: string;
   image_url: string | null;
+  image_urls?: string[] | null;
   video_url: string | null;
   created_at: string;
   is_announcement?: boolean;
@@ -43,6 +44,13 @@ export type FeedPost = {
   likes: { user_id: string }[];
   comments: { id: string }[];
 };
+
+/** All photos on a post: the legacy single column plus the multi-photo list. */
+export function postImages(post: FeedPost): string[] {
+  const many = post.image_urls ?? [];
+  const all = many.length ? many : post.image_url ? [post.image_url] : [];
+  return Array.from(new Set(all.filter(Boolean)));
+}
 
 export function PostCard({ post, queryKey }: { post: FeedPost; queryKey: readonly unknown[] }) {
   const { user, isAdmin } = useAuth();
