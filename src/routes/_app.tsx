@@ -31,6 +31,8 @@ import { toast } from "sonner";
 import { LanguageSelector } from "@/components/language-selector";
 
 import { useAuth } from "@/lib/auth-context";
+import { useI18n } from "@/lib/i18n";
+import { ensurePushPermission } from "@/lib/notify";
 import { Logo } from "@/components/logo";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -61,6 +63,7 @@ function AppLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(true); // desktop: expanded vs. collapsed to icons
   const [mobileOpen, setMobileOpen] = useState(false);
   const notif = useNotifications();
+  const { t } = useI18n();
   const qc = useQueryClient();
   const [refreshing, setRefreshing] = useState(false);
 
@@ -102,6 +105,11 @@ function AppLayout() {
 
   useEffect(() => {
     if (!user) return;
+    void ensurePushPermission();
+  }, [user]);
+
+  useEffect(() => {
+    if (!user) return;
     trackVisit(pathname, user.id);
     logActivity(user.id, "page.view", "route", pathname);
     if (pathname === "/") notif.markSeen("feed");
@@ -119,29 +127,29 @@ function AppLayout() {
   const totalNotif = notif.unreadMessages + notif.newPosts + notif.newFollowers;
 
   const nav = [
-    { to: "/", label: "Home", icon: Home, badge: notif.newPosts },
-    { to: "/explore", label: "Explore", icon: Compass, badge: notif.newFollowers },
-    { to: "/community", label: "Community", icon: Users, badge: 0 },
-    { to: "/marketplace", label: "Marketplace", icon: Store, badge: 0 },
-    { to: "/directory", label: "Directory", icon: BookUser, badge: 0 },
-    { to: "/messages", label: "Messages", icon: MessageCircle, badge: notif.unreadMessages },
-    { to: "/heritage", label: "Our Heritage", icon: Landmark, badge: 0 },
-    { to: "/museum", label: "Virtual Museum", icon: Gem, badge: 0 },
-    { to: "/family-tree", label: "Family Tree", icon: Trees, badge: 0 },
+    { to: "/", label: t("nav.home"), icon: Home, badge: notif.newPosts },
+    { to: "/explore", label: t("nav.explore"), icon: Compass, badge: notif.newFollowers },
+    { to: "/community", label: t("nav.community"), icon: Users, badge: 0 },
+    { to: "/marketplace", label: t("nav.marketplace"), icon: Store, badge: 0 },
+    { to: "/directory", label: t("nav.directory"), icon: BookUser, badge: 0 },
+    { to: "/messages", label: t("nav.messages"), icon: MessageCircle, badge: notif.unreadMessages },
+    { to: "/heritage", label: t("nav.heritage"), icon: Landmark, badge: 0 },
+    { to: "/museum", label: t("nav.museum"), icon: Gem, badge: 0 },
+    { to: "/family-tree", label: t("nav.familyTree"), icon: Trees, badge: 0 },
     {
       to: profile?.username ? `/profile/${profile.username}` : "/",
-      label: "Profile",
+      label: t("nav.profile"),
       icon: UserIcon,
       badge: notif.newFollowers,
     },
   ];
 
   const adminNav = [
-    { to: "/admin", label: "Admin", icon: Shield, badge: 0 },
-    { to: "/admin/users", label: "User Management", icon: Users, badge: 0 },
-    { to: "/admin/logs", label: "Activity Logs", icon: Activity, badge: 0 },
-    { to: "/admin/payments", label: "Payments", icon: DollarSign, badge: 0 },
-    { to: "/admin/settings", label: "Settings", icon: Settings, badge: 0 },
+    { to: "/admin", label: t("nav.admin"), icon: Shield, badge: 0 },
+    { to: "/admin/users", label: t("nav.users"), icon: Users, badge: 0 },
+    { to: "/admin/logs", label: t("nav.logs"), icon: Activity, badge: 0 },
+    { to: "/admin/payments", label: t("nav.payments"), icon: DollarSign, badge: 0 },
+    { to: "/admin/settings", label: t("nav.settings"), icon: Settings, badge: 0 },
   ];
 
 
@@ -225,7 +233,7 @@ function AppLayout() {
           <nav className={`flex-1 overflow-y-auto py-3 space-y-1 ${sidebarOpen ? "px-3" : "px-2"}`}>
             {sidebarOpen && (
               <div className="px-3 pt-2 pb-1 text-[10px] uppercase tracking-wider text-gray-400 font-semibold">
-                Main
+                {t("nav.main")}
               </div>
             )}
             {nav.map((item) => (
@@ -235,7 +243,7 @@ function AppLayout() {
               <>
                 {sidebarOpen && (
                   <div className="px-3 pt-5 pb-1 text-[10px] uppercase tracking-wider text-gray-400 font-semibold">
-                    Administration
+                    {t("nav.administration")}
                   </div>
                 )}
                 {!sidebarOpen && <div className="my-3 border-t" />}
@@ -252,7 +260,7 @@ function AppLayout() {
                 className="w-full flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-100"
               >
                 <LogOut className="h-4 w-4" />
-                Sign out
+                {t("nav.signOut")}
               </button>
             ) : (
               <Tooltip delayDuration={100}>
@@ -264,7 +272,7 @@ function AppLayout() {
                     <LogOut className="h-4 w-4" />
                   </button>
                 </TooltipTrigger>
-                <TooltipContent side="right">Sign out</TooltipContent>
+                <TooltipContent side="right">{t("nav.signOut")}</TooltipContent>
               </Tooltip>
             )}
           </div>
@@ -343,7 +351,7 @@ function AppLayout() {
 
             <div className="hidden md:flex flex-1 max-w-md relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <Input placeholder="Search..." className="pl-9 h-10 bg-gray-50 border-gray-200" />
+              <Input placeholder={t("nav.search")} className="pl-9 h-10 bg-gray-50 border-gray-200" />
             </div>
             <div className="ml-auto flex items-center gap-2">
               <DonateButton />
@@ -360,7 +368,7 @@ function AppLayout() {
                     <RefreshCw className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`} />
                   </button>
                 </TooltipTrigger>
-                <TooltipContent side="bottom">Clear cache & refresh</TooltipContent>
+                <TooltipContent side="bottom">{t("nav.refresh")}</TooltipContent>
               </Tooltip>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -368,7 +376,7 @@ function AppLayout() {
                     to="/messages"
                     onClick={() => notif.markSeen("all")}
                     className="relative inline-flex items-center justify-center h-10 w-10 rounded-md border border-gray-200 hover:border-primary/40 hover:bg-primary/5 text-gray-600 transition"
-                    aria-label="Notifications"
+                    aria-label={t("nav.notifications")}
                   >
                     <Bell className="h-5 w-5" />
                     {totalNotif > 0 && (
@@ -398,7 +406,7 @@ function AppLayout() {
                         {profile?.display_name || profile?.username}
                       </span>
                       <span className="text-[11px] text-gray-500">
-                        {isAdmin ? "Administrator" : "Member"}
+                        {isAdmin ? t("nav.administrator") : t("nav.member")}
                       </span>
                     </div>
                     <ChevronDown className="h-4 w-4 text-gray-400 hidden sm:block" />
@@ -431,7 +439,7 @@ function AppLayout() {
                     onClick={() => signOut().then(() => navigate({ to: "/auth" }))}
                     className="text-red-600"
                   >
-                    <LogOut className="h-4 w-4 mr-2" /> Sign out
+                    <LogOut className="h-4 w-4 mr-2" /> {t("nav.signOut")}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
