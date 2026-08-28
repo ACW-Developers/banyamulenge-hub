@@ -24,6 +24,7 @@ import {
 
 import { formatDistanceToNow } from "date-fns";
 import { toast } from "sonner";
+import { notifySuccess, notifyInfo } from "@/lib/notify";
 
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
@@ -200,6 +201,7 @@ function MessagesPage() {
       setText(body);
       return;
     }
+    notifySuccess("Message sent");
     qc.invalidateQueries({ queryKey: ["messages", activeId] });
     qc.invalidateQueries({ queryKey: ["conversations", user.id] });
   }
@@ -218,6 +220,7 @@ function MessagesPage() {
         attachment_name: att.name,
       });
       if (error) throw error;
+      notifySuccess("Attachment sent");
       qc.invalidateQueries({ queryKey: ["messages", activeId] });
       qc.invalidateQueries({ queryKey: ["conversations", user.id] });
     } catch (e) {
