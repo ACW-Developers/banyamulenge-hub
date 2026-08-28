@@ -74,6 +74,7 @@ async function fetchFeed(): Promise<FeedPost[]> {
 
 function FeedPage() {
   const qc = useQueryClient();
+  const { t } = useI18n();
   const { data: posts, isLoading } = useQuery({
     queryKey: feedKey,
     queryFn: fetchFeed,
