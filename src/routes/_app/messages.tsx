@@ -196,7 +196,7 @@ function MessagesPage() {
     return () => {
       supabase.removeChannel(ch);
     };
-  }, [user, qc]);
+  }, [user, qc, activeId]);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight });
