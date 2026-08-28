@@ -248,13 +248,39 @@ function TrafficSection() {
 
   return (
     <section className="rounded-2xl border bg-white shadow-sm">
-      <div className="px-6 py-4 border-b flex items-center gap-2">
+      <div className="px-6 py-4 border-b flex flex-wrap items-center gap-2">
         <BarChart3 className="h-5 w-5 text-primary" />
-        <h2 className="font-bold">Traffic & analytics</h2>
-        <span className="ml-auto text-xs text-gray-500">Last 30 days</span>
+        <h2 className="font-bold">Traffic &amp; analytics</h2>
+        <div className="ml-auto flex items-center gap-2">
+          <select
+            value={days}
+            onChange={(e) => setDays(Number(e.target.value))}
+            className="h-8 rounded-md border border-gray-200 bg-white px-2 text-xs text-gray-600"
+          >
+            <option value={1}>Today</option>
+            <option value={7}>Last 7 days</option>
+            <option value={30}>Last 30 days</option>
+            <option value={90}>Last 90 days</option>
+            <option value={365}>Last 12 months</option>
+          </select>
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-8 gap-1.5 text-xs"
+            onClick={() => refetch()}
+            disabled={isFetching}
+          >
+            <RefreshCw className={`h-3.5 w-3.5 ${isFetching ? "animate-spin" : ""}`} />
+            Refresh
+          </Button>
+        </div>
       </div>
       <div className="p-6 space-y-6">
-        {isLoading ? (
+        {error ? (
+          <p className="text-sm text-red-600">
+            Could not load analytics: {(error as Error).message}
+          </p>
+        ) : isLoading ? (
           <div className="flex justify-center py-12">
             <Loader2 className="h-6 w-6 animate-spin text-primary" />
           </div>
@@ -270,12 +296,34 @@ function TrafficSection() {
                     >
                       <Icon className="h-5 w-5" />
                     </div>
-                    <div className="mt-3 text-2xl font-bold">{k.value}</div>
+                    <div className="mt-3 text-2xl font-bold">{k.value.toLocaleString()}</div>
                     <div className="text-xs text-gray-500 mt-0.5">{k.label}</div>
                   </div>
                 );
               })}
             </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              {deviceKpis.map((d) => {
+                const Icon = d.icon;
+                const pct = stats.total ? Math.round((d.value / stats.total) * 100) : 0;
+                return (
+                  <div
+                    key={d.label}
+                    className="rounded-xl border p-4 flex items-center gap-3 bg-white"
+                  >
+                    <Icon className="h-5 w-5 text-gray-400" />
+                    <div>
+                      <div className="text-lg font-bold">{d.value.toLocaleString()}</div>
+                      <div className="text-xs text-gray-500">
+                        {d.label} · {pct}%
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
 
             <div className="grid lg:grid-cols-2 gap-6">
               <div className="rounded-xl border p-4">
