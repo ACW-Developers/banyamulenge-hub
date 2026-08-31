@@ -489,6 +489,66 @@ function ChatPane({
   const sessionRef = useRef<CallSession | null>(null);
   const remoteAudioRef = useRef<HTMLAudioElement>(null);
   const [membersOpen, setMembersOpen] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editText, setEditText] = useState("");
+  const [busyId, setBusyId] = useState<string | null>(null);
+  const chatQc = useQueryClient();
+
+  function refreshChat() {
+    chatQc.invalidateQueries({ queryKey: ["messages", convoId] });
+    chatQc.invalidateQueries({ queryKey: ["conversations", userId] });
+  }
+
+  // Editing / unsending is only allowed while the message is still unread —
+  // a database trigger enforces the same rule server-side.
+  async function saveEdit(id: string) {
+    const next = editText.trim();
+    if (!next) return;
+    setBusyId(id);
+    const { data, error } = await supabase
+      .from("messages")
+      .update({ content: next })
+      .eq("id", id)
+      .is("read_at", null)
+      .select("id");
+    setBusyId(null);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    if (!data?.length) {
+      toast.error("Message was already read — it can no longer be edited.");
+      refreshChat();
+      return;
+    }
+    setEditingId(null);
+    notifySuccess("Message edited");
+    refreshChat();
+  }
+
+  async function unsend(id: string) {
+    setBusyId(id);
+    const { data, error } = await supabase
+      .from("messages")
+      .delete()
+      .eq("id", id)
+      .is("read_at", null)
+      .select("id");
+    setBusyId(null);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    if (!data?.length) {
+      toast.error("Message was already read — it can no longer be unsent.");
+      refreshChat();
+      return;
+    }
+    notifySuccess("Message unsent");
+    refreshChat();
+  }
+
+
 
 
   useEffect(() => {
