@@ -115,12 +115,13 @@ export function DonateButton() {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <button
-          className="group inline-flex items-center gap-2 rounded-full border border-primary/30 bg-gradient-to-r from-primary to-primary/80 px-3 sm:px-4 h-10 text-sm font-semibold text-primary-foreground shadow-sm hover:shadow-md hover:brightness-105 transition"
+          className="group inline-flex items-center gap-2 rounded-full border border-emerald-700/40 bg-emerald-600 px-3 sm:px-4 h-10 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 hover:shadow-md transition"
           aria-label="Donate"
         >
           <Heart className="h-4 w-4 fill-current group-hover:scale-110 transition-transform" />
           <span className="hidden sm:inline">Donate</span>
         </button>
+
       </DialogTrigger>
       <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
