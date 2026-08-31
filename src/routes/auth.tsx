@@ -1,39 +1,45 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Mail, Lock, User, Loader2, ArrowLeft, Eye, EyeOff } from "lucide-react";
+import { Mail, Lock, User, Loader2, ArrowLeft, Eye, EyeOff, MailCheck } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable/index";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import authHero from "@/assets/auth-bg.jpg";
 import logoStacked from "@/assets/logo-stacked.png";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Sign in - Banyamulenge Community Heritage" },
+      { title: "Login - Banyamulenge Community Heritage" },
       {
         name: "description",
-        content: "Sign in or join the Banyamulenge Community Heritage platform.",
+        content: "Log in or join the Banyamulenge Community Heritage platform.",
       },
     ],
   }),
   component: AuthPage,
 });
 
+const inputClass = "pl-9 h-11 border-2 border-input focus-visible:border-primary rounded-lg";
+
+type Mode = "signin" | "signup" | "forgot";
+
 function AuthPage() {
   const navigate = useNavigate();
   const { session, loading } = useAuth();
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
+  const [mode, setMode] = useState<Mode>("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPw, setShowPw] = useState(false);
   const [displayName, setDisplayName] = useState("");
+  const [agreed, setAgreed] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [resetSent, setResetSent] = useState(false);
 
   useEffect(() => {
     if (!loading && session) navigate({ to: "/" });
@@ -44,11 +50,22 @@ function AuthPage() {
     if (busy) return;
     setBusy(true);
     try {
-      if (mode === "signin") {
+      if (mode === "forgot") {
+        const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+          redirectTo: `${window.location.origin}/reset-password`,
+        });
+        if (error) throw error;
+        setResetSent(true);
+        toast.success("Reset link sent - check your inbox (and spam folder).");
+      } else if (mode === "signin") {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         toast.success("Welcome back");
       } else {
+        if (!agreed) {
+          toast.error("Please accept the Terms and Privacy Policy to continue.");
+          return;
+        }
         const { error } = await supabase.auth.signUp({
           email,
           password,
@@ -67,19 +84,7 @@ function AuthPage() {
     }
   }
 
-  async function handleGoogle() {
-    setBusy(true);
-    try {
-      const result = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: window.location.origin,
-      });
-      if (result.error) throw result.error;
-    } catch (err) {
-      toast.error((err as Error).message);
-    } finally {
-      setBusy(false);
-    }
-  }
+  const isForgot = mode === "forgot";
 
   return (
     <div className="min-h-screen grid lg:grid-cols-2 bg-background">
@@ -106,7 +111,7 @@ function AuthPage() {
       {/* Right form */}
       <div className="flex items-center justify-center p-6 sm:p-10">
         <div className="w-full max-w-md">
-          <div className="rounded-2xl border bg-card shadow-soft p-6 sm:p-8 pt-6">
+          <div className="rounded-2xl border-2 bg-card shadow-soft p-6 sm:p-8 pt-6">
             <div className="flex flex-col items-center mb-5">
               <img
                 src={logoStacked}
@@ -116,30 +121,41 @@ function AuthPage() {
               <p className="text-xs text-muted-foreground mt-2">Community Heritage Platform</p>
             </div>
 
-            <div className="grid grid-cols-2 gap-1 rounded-lg bg-muted p-1 mb-6">
-              <button
-                type="button"
-                onClick={() => setMode("signin")}
-                className={`py-2 text-sm font-semibold rounded-md transition ${
-                  mode === "signin"
-                    ? "bg-background text-foreground shadow-sm"
-                    : "text-muted-foreground"
-                }`}
-              >
-                Sign In
-              </button>
-              <button
-                type="button"
-                onClick={() => setMode("signup")}
-                className={`py-2 text-sm font-semibold rounded-md transition ${
-                  mode === "signup"
-                    ? "bg-background text-foreground shadow-sm"
-                    : "text-muted-foreground"
-                }`}
-              >
-                Sign Up
-              </button>
-            </div>
+            {!isForgot && (
+              <div className="grid grid-cols-2 gap-1 rounded-lg bg-muted p-1 mb-6">
+                <button
+                  type="button"
+                  onClick={() => setMode("signin")}
+                  className={`py-2 text-sm font-semibold rounded-md transition ${
+                    mode === "signin"
+                      ? "bg-background text-foreground shadow-sm"
+                      : "text-muted-foreground"
+                  }`}
+                >
+                  Login
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setMode("signup")}
+                  className={`py-2 text-sm font-semibold rounded-md transition ${
+                    mode === "signup"
+                      ? "bg-background text-foreground shadow-sm"
+                      : "text-muted-foreground"
+                  }`}
+                >
+                  Sign Up
+                </button>
+              </div>
+            )}
+
+            {isForgot && (
+              <div className="mb-6 text-center">
+                <h2 className="text-lg font-bold">Forgot your password?</h2>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Enter your email and we'll send you a link to set a new password.
+                </p>
+              </div>
+            )}
 
             <form onSubmit={handleSubmit} className="space-y-4">
               {mode === "signup" && (
@@ -152,12 +168,13 @@ function AuthPage() {
                       value={displayName}
                       onChange={(e) => setDisplayName(e.target.value)}
                       placeholder="Your name"
-                      className="pl-9"
+                      className={inputClass}
                       required
                     />
                   </div>
                 </div>
               )}
+
               <div className="space-y-1.5">
                 <Label htmlFor="email">Email</Label>
                 <div className="relative">
@@ -168,68 +185,122 @@ function AuthPage() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="you@example.com"
-                    className="pl-9"
+                    className={inputClass}
+                    disabled={isForgot && resetSent}
                     required
                   />
-                </div>
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="password">Password</Label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="password"
-                    type={showPw ? "text" : "password"}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••••"
-                    className="pl-9 pr-10"
-                    minLength={6}
-                    required
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPw((v) => !v)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                    tabIndex={-1}
-                  >
-                    {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </button>
                 </div>
               </div>
 
-              <Button type="submit" disabled={busy} className="w-full h-11 text-base font-semibold">
+              {!isForgot && (
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="password">Password</Label>
+                    {mode === "signin" && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setMode("forgot");
+                          setResetSent(false);
+                        }}
+                        className="text-xs font-medium text-primary hover:underline"
+                      >
+                        Forgot password?
+                      </button>
+                    )}
+                  </div>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="password"
+                      type={showPw ? "text" : "password"}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="••••••••"
+                      className={`${inputClass} pr-10`}
+                      minLength={6}
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPw((v) => !v)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                      aria-label={showPw ? "Hide password" : "Show password"}
+                      tabIndex={-1}
+                    >
+                      {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {mode === "signup" && (
+                <div className="flex items-start gap-2.5 rounded-lg border-2 border-dashed p-3">
+                  <Checkbox
+                    id="terms"
+                    checked={agreed}
+                    onCheckedChange={(v) => setAgreed(v === true)}
+                    className="mt-0.5"
+                  />
+                  <Label
+                    htmlFor="terms"
+                    className="text-xs font-normal leading-relaxed text-muted-foreground"
+                  >
+                    I agree to the{" "}
+                    <span className="font-semibold text-primary">Terms and Conditions</span> and the{" "}
+                    <span className="font-semibold text-primary">Privacy Policy</span> of
+                    Banyamulenge Heritage Hub.
+                  </Label>
+                </div>
+              )}
+
+              {isForgot && resetSent && (
+                <div className="flex items-start gap-2 rounded-lg border-2 border-emerald-600/30 bg-emerald-50 p-3 text-xs text-emerald-800">
+                  <MailCheck className="h-4 w-4 shrink-0 mt-0.5" />
+                  <span>
+                    Email sent. Open the link in your inbox to set a new password, then log in
+                    again.
+                  </span>
+                </div>
+              )}
+
+              <Button
+                type="submit"
+                disabled={
+                  busy ||
+                  (mode === "signup" && !agreed) ||
+                  (isForgot && (resetSent || !email.trim()))
+                }
+                className="w-full h-11 text-base font-semibold"
+              >
                 {busy ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
+                ) : isForgot ? (
+                  resetSent ? (
+                    "Reset link sent"
+                  ) : (
+                    "Send reset link"
+                  )
                 ) : mode === "signin" ? (
-                  "Sign In"
+                  "Login"
                 ) : (
                   "Create Account"
                 )}
               </Button>
             </form>
 
-            <div className="relative my-6">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t" />
-              </div>
-              <div className="relative flex justify-center">
-                <span className="bg-card px-3 text-xs uppercase tracking-wider text-muted-foreground">
-                  or continue with
-                </span>
-              </div>
-            </div>
-
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleGoogle}
-              disabled={busy}
-              className="w-full h-11 gap-2"
-            >
-              <GoogleIcon />
-              Google
-            </Button>
+            {isForgot && (
+              <button
+                type="button"
+                onClick={() => {
+                  setMode("signin");
+                  setResetSent(false);
+                }}
+                className="mt-4 w-full text-center text-xs font-medium text-primary hover:underline"
+              >
+                Back to login
+              </button>
+            )}
 
             <div className="mt-6 text-center text-xs text-muted-foreground">
               <Link to="/" className="inline-flex items-center gap-1 hover:text-primary">
@@ -243,13 +314,3 @@ function AuthPage() {
   );
 }
 
-function GoogleIcon() {
-  return (
-    <svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden>
-      <path
-        fill="#EA4335"
-        d="M12 10.2v3.9h5.5c-.24 1.4-1.68 4.1-5.5 4.1-3.3 0-6-2.74-6-6.1s2.7-6.1 6-6.1c1.88 0 3.14.8 3.86 1.5l2.64-2.54C16.9 3.4 14.7 2.5 12 2.5 6.8 2.5 2.5 6.8 2.5 12S6.8 21.5 12 21.5c6.9 0 9.5-4.85 9.5-8.3 0-.56-.06-.99-.14-1.4H12z"
-      />
-    </svg>
-  );
-}
