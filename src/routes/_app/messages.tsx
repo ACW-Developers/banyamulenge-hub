@@ -20,6 +20,8 @@ import {
   UserMinus,
   Trash2,
   Crown,
+  Pencil,
+  Undo2,
 } from "lucide-react";
 
 import { formatDistanceToNow } from "date-fns";
@@ -57,6 +59,7 @@ type MessageRow = {
   created_at: string;
   delivered_at: string | null;
   read_at: string | null;
+  edited_at: string | null;
   attachment_url: string | null;
   attachment_type: string | null;
   attachment_name: string | null;
@@ -104,7 +107,7 @@ function MessagesPage() {
         .select(
           `id, last_message_at, title, is_group, created_by, avatar_url,
            conversation_participants(user_id, profiles!cp_user_profile_fkey(username, display_name, avatar_url)),
-           messages(id, sender_id, content, created_at, delivered_at, read_at, attachment_url, attachment_type, attachment_name)`,
+           messages(id, sender_id, content, created_at, delivered_at, read_at, edited_at, attachment_url, attachment_type, attachment_name)`,
         )
         .order("last_message_at", { ascending: false })
         // Only the recent slice per conversation is needed for the preview + unread badge.
@@ -131,7 +134,7 @@ function MessagesPage() {
       const { data, error } = await supabase
         .from("messages")
         .select(
-          "id, sender_id, content, created_at, delivered_at, read_at, attachment_url, attachment_type, attachment_name",
+          "id, sender_id, content, created_at, delivered_at, read_at, edited_at, attachment_url, attachment_type, attachment_name",
         )
         .eq("conversation_id", activeId!)
         .order("created_at", { ascending: false })
