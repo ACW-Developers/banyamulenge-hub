@@ -1,0 +1,1 @@
+REVOKE ALL ON FUNCTION public.messages_guard_edit() FROM PUBLIC, anon, authenticated;

@@ -20,6 +20,8 @@ import {
   UserMinus,
   Trash2,
   Crown,
+  Pencil,
+  Undo2,
 } from "lucide-react";
 
 import { formatDistanceToNow } from "date-fns";
@@ -57,6 +59,7 @@ type MessageRow = {
   created_at: string;
   delivered_at: string | null;
   read_at: string | null;
+  edited_at: string | null;
   attachment_url: string | null;
   attachment_type: string | null;
   attachment_name: string | null;
@@ -104,7 +107,7 @@ function MessagesPage() {
         .select(
           `id, last_message_at, title, is_group, created_by, avatar_url,
            conversation_participants(user_id, profiles!cp_user_profile_fkey(username, display_name, avatar_url)),
-           messages(id, sender_id, content, created_at, delivered_at, read_at, attachment_url, attachment_type, attachment_name)`,
+           messages(id, sender_id, content, created_at, delivered_at, read_at, edited_at, attachment_url, attachment_type, attachment_name)`,
         )
         .order("last_message_at", { ascending: false })
         // Only the recent slice per conversation is needed for the preview + unread badge.
@@ -131,7 +134,7 @@ function MessagesPage() {
       const { data, error } = await supabase
         .from("messages")
         .select(
-          "id, sender_id, content, created_at, delivered_at, read_at, attachment_url, attachment_type, attachment_name",
+          "id, sender_id, content, created_at, delivered_at, read_at, edited_at, attachment_url, attachment_type, attachment_name",
         )
         .eq("conversation_id", activeId!)
         .order("created_at", { ascending: false })
@@ -486,6 +489,66 @@ function ChatPane({
   const sessionRef = useRef<CallSession | null>(null);
   const remoteAudioRef = useRef<HTMLAudioElement>(null);
   const [membersOpen, setMembersOpen] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editText, setEditText] = useState("");
+  const [busyId, setBusyId] = useState<string | null>(null);
+  const chatQc = useQueryClient();
+
+  function refreshChat() {
+    chatQc.invalidateQueries({ queryKey: ["messages", convoId] });
+    chatQc.invalidateQueries({ queryKey: ["conversations", userId] });
+  }
+
+  // Editing / unsending is only allowed while the message is still unread —
+  // a database trigger enforces the same rule server-side.
+  async function saveEdit(id: string) {
+    const next = editText.trim();
+    if (!next) return;
+    setBusyId(id);
+    const { data, error } = await supabase
+      .from("messages")
+      .update({ content: next })
+      .eq("id", id)
+      .is("read_at", null)
+      .select("id");
+    setBusyId(null);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    if (!data?.length) {
+      toast.error("Message was already read — it can no longer be edited.");
+      refreshChat();
+      return;
+    }
+    setEditingId(null);
+    notifySuccess("Message edited");
+    refreshChat();
+  }
+
+  async function unsend(id: string) {
+    setBusyId(id);
+    const { data, error } = await supabase
+      .from("messages")
+      .delete()
+      .eq("id", id)
+      .is("read_at", null)
+      .select("id");
+    setBusyId(null);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    if (!data?.length) {
+      toast.error("Message was already read — it can no longer be unsent.");
+      refreshChat();
+      return;
+    }
+    notifySuccess("Message unsent");
+    refreshChat();
+  }
+
+
 
 
   useEffect(() => {
@@ -593,8 +656,38 @@ function ChatPane({
         {messages.map((m) => {
           const mine = m.sender_id === userId;
           const senderProfile = isGroup && !mine ? (profilesById.get(m.sender_id) ?? null) : null;
+          const canModify = mine && !m.read_at;
+          const isEditing = editingId === m.id;
           return (
-            <div key={m.id} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
+            <div key={m.id} className={`group flex items-end gap-1 ${mine ? "justify-end" : "justify-start"}`}>
+              {canModify && !isEditing && (
+                <div className="flex gap-0.5 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition">
+                  {m.content !== null && !m.attachment_url && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setEditingId(m.id);
+                        setEditText(m.content ?? "");
+                      }}
+                      className="h-7 w-7 rounded-full border bg-white text-gray-500 hover:text-primary flex items-center justify-center"
+                      aria-label="Edit message"
+                      title="Edit message"
+                    >
+                      <Pencil className="h-3.5 w-3.5" />
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => unsend(m.id)}
+                    disabled={busyId === m.id}
+                    className="h-7 w-7 rounded-full border bg-white text-gray-500 hover:text-destructive flex items-center justify-center"
+                    aria-label="Unsend message"
+                    title="Unsend message"
+                  >
+                    <Undo2 className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              )}
               <div
                 className={`max-w-[70%] rounded-2xl px-3 py-2 text-sm ${
                   mine
@@ -615,10 +708,47 @@ function ChatPane({
                     mine={mine}
                   />
                 )}
-                {m.content && <div className="whitespace-pre-wrap break-words">{m.content}</div>}
+                {isEditing ? (
+                  <div className="space-y-2 min-w-[220px]">
+                    <Input
+                      value={editText}
+                      onChange={(e) => setEditText(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          void saveEdit(m.id);
+                        }
+                        if (e.key === "Escape") setEditingId(null);
+                      }}
+                      autoFocus
+                      className="h-9 bg-white text-foreground"
+                    />
+                    <div className="flex gap-2 justify-end">
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        className="h-7 text-xs"
+                        onClick={() => setEditingId(null)}
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        size="sm"
+                        className="h-7 text-xs"
+                        disabled={busyId === m.id || !editText.trim()}
+                        onClick={() => void saveEdit(m.id)}
+                      >
+                        Save
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  m.content && <div className="whitespace-pre-wrap break-words">{m.content}</div>
+                )}
                 <div
                   className={`text-[10px] mt-1 flex items-center gap-1 ${mine ? "opacity-90 justify-end" : "text-gray-400"}`}
                 >
+                  {m.edited_at && <span className="italic">edited</span>}
                   <span>{formatDistanceToNow(new Date(m.created_at), { addSuffix: true })}</span>
                   {mine &&
                     (m.read_at ? (
@@ -633,6 +763,7 @@ function ChatPane({
             </div>
           );
         })}
+
         {messages.length === 0 && (
           <div className="text-center text-xs text-gray-400 py-8">Send the first message.</div>
         )}
