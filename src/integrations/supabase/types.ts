@@ -831,8 +831,6 @@ export type Database = {
       directory_public: {
         Row: {
           category: string | null
-          contact_email: string | null
-          contact_phone: string | null
           created_at: string | null
           description: string | null
           id: string | null
@@ -846,8 +844,6 @@ export type Database = {
         }
         Insert: {
           category?: string | null
-          contact_email?: never
-          contact_phone?: never
           created_at?: string | null
           description?: string | null
           id?: string | null
@@ -861,8 +857,6 @@ export type Database = {
         }
         Update: {
           category?: string | null
-          contact_email?: never
-          contact_phone?: never
           created_at?: string | null
           description?: string | null
           id?: string | null
@@ -879,13 +873,13 @@ export type Database = {
       marketplace_public: {
         Row: {
           category: string | null
-          contact_email: string | null
-          contact_phone: string | null
           created_at: string | null
+          currency: string | null
           description: string | null
           id: string | null
           image_url: string | null
           kind: string | null
+          link_url: string | null
           location: string | null
           price: number | null
           title: string | null
@@ -894,13 +888,13 @@ export type Database = {
         }
         Insert: {
           category?: string | null
-          contact_email?: never
-          contact_phone?: never
           created_at?: string | null
+          currency?: string | null
           description?: string | null
           id?: string | null
           image_url?: string | null
           kind?: string | null
+          link_url?: string | null
           location?: string | null
           price?: number | null
           title?: string | null
@@ -909,13 +903,13 @@ export type Database = {
         }
         Update: {
           category?: string | null
-          contact_email?: never
-          contact_phone?: never
           created_at?: string | null
+          currency?: string | null
           description?: string | null
           id?: string | null
           image_url?: string | null
           kind?: string | null
+          link_url?: string | null
           location?: string | null
           price?: number | null
           title?: string | null
