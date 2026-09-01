@@ -131,16 +131,19 @@ function MarketplacePage() {
   const [open, setOpen] = useState(false);
 
   const { data, isLoading } = useQuery({
-    queryKey: key,
+    queryKey: [...key, user ? "auth" : "public"],
+    staleTime: 60_000,
+    placeholderData: (prev) => prev,
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("marketplace_listings")
-        .select("*")
-        .order("created_at", { ascending: false });
+      // Signed-out visitors read a public view that never exposes contact details.
+      const { data, error } = user
+        ? await supabase.from("marketplace_listings").select("*").order("created_at", { ascending: false })
+        : await supabase.from("marketplace_public").select("*").order("created_at", { ascending: false });
       if (error) throw error;
       return (data ?? []) as Listing[];
     },
   });
+
 
   const filtered = useMemo(() => {
     const list = data ?? [];
