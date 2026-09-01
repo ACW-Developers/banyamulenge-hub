@@ -828,7 +828,102 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      directory_public: {
+        Row: {
+          category: string | null
+          contact_email: string | null
+          contact_phone: string | null
+          created_at: string | null
+          description: string | null
+          id: string | null
+          image_url: string | null
+          kind: string | null
+          location: string | null
+          name: string | null
+          updated_at: string | null
+          user_id: string | null
+          website: string | null
+        }
+        Insert: {
+          category?: string | null
+          contact_email?: never
+          contact_phone?: never
+          created_at?: string | null
+          description?: string | null
+          id?: string | null
+          image_url?: string | null
+          kind?: string | null
+          location?: string | null
+          name?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          website?: string | null
+        }
+        Update: {
+          category?: string | null
+          contact_email?: never
+          contact_phone?: never
+          created_at?: string | null
+          description?: string | null
+          id?: string | null
+          image_url?: string | null
+          kind?: string | null
+          location?: string | null
+          name?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          website?: string | null
+        }
+        Relationships: []
+      }
+      marketplace_public: {
+        Row: {
+          category: string | null
+          contact_email: string | null
+          contact_phone: string | null
+          created_at: string | null
+          description: string | null
+          id: string | null
+          image_url: string | null
+          kind: string | null
+          location: string | null
+          price: number | null
+          title: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          category?: string | null
+          contact_email?: never
+          contact_phone?: never
+          created_at?: string | null
+          description?: string | null
+          id?: string | null
+          image_url?: string | null
+          kind?: string | null
+          location?: string | null
+          price?: number | null
+          title?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          category?: string | null
+          contact_email?: never
+          contact_phone?: never
+          created_at?: string | null
+          description?: string | null
+          id?: string | null
+          image_url?: string | null
+          kind?: string | null
+          location?: string | null
+          price?: number | null
+          title?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       admin_traffic_stats: { Args: { days?: number }; Returns: Json }
