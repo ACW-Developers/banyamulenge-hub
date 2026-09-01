@@ -419,8 +419,8 @@ export function PostComposer({
     const f = e.target.files?.[0];
     e.target.value = "";
     if (!f) return;
-    if (f.size > 15 * 1024 * 1024) {
-      notifyError("Video must be under 15 MB");
+    if (f.size > 40 * 1024 * 1024) {
+      notifyError("Video must be under 40 MB");
       return;
     }
     // Validate duration

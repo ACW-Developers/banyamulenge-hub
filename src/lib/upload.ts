@@ -20,11 +20,11 @@ export async function uploadPostImage(file: File, userId: string): Promise<strin
 }
 
 /**
- * Upload a short video (max 15 MB, max 2 minutes). Duration is validated
+ * Upload a short video (max 40 MB, max 2 minutes). Duration is validated
  * client-side by loading metadata before upload.
  */
 export async function uploadPostVideo(file: File, userId: string): Promise<string> {
-  if (file.size > 15 * 1024 * 1024) throw new Error("Video must be under 15 MB");
+  if (file.size > 40 * 1024 * 1024) throw new Error("Video must be under 40 MB");
   const duration = await getVideoDuration(file);
   if (duration > 120.5) throw new Error("Video must be 2 minutes or shorter");
   const ext = (file.name.split(".").pop() || "mp4").toLowerCase();
