@@ -149,10 +149,10 @@ function RootComponent() {
             duration={2800}
             toastOptions={{
               classNames: {
-                toast:
-                  "rounded-xl border shadow-lg backdrop-blur bg-white/95 text-gray-900 text-sm py-3",
-                title: "font-semibold",
-                description: "text-xs text-gray-500",
+            toast:
+              "rounded-xl border shadow-lg backdrop-blur bg-white/95 text-gray-900 text-sm py-3 mx-2 sm:mx-0",
+            title: "font-semibold",
+            description: "text-xs text-gray-500",
               },
             }}
           />
