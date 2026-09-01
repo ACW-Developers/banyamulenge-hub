@@ -140,7 +140,7 @@ function MarketplacePage() {
         ? await supabase.from("marketplace_listings").select("*").order("created_at", { ascending: false })
         : await supabase.from("marketplace_public").select("*").order("created_at", { ascending: false });
       if (error) throw error;
-      return (data ?? []) as Listing[];
+      return (data ?? []) as unknown as Listing[];
     },
   });
 

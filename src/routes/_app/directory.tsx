@@ -112,7 +112,7 @@ function DirectoryPage() {
         ? await supabase.from("directory_entries").select("*").order("created_at", { ascending: false })
         : await supabase.from("directory_public").select("*").order("created_at", { ascending: false });
       if (error) throw error;
-      return (data ?? []) as Entry[];
+      return (data ?? []) as unknown as Entry[];
     },
   });
 
