@@ -158,16 +158,15 @@ export async function verifyDonationSession(sessionId: string) {
       ? session.payment_intent
       : (session.payment_intent?.id ?? null);
 
-  const { error } = await supabaseAdmin
-    .from("donations")
-    .update({
-      status: paid ? "paid" : (session.payment_status ?? "pending"),
-      amount_cents: session.amount_total ?? undefined,
-      donor_email: session.customer_details?.email ?? undefined,
-      donor_name: session.metadata?.["donor_name"] || session.customer_details?.name || undefined,
-      stripe_payment_intent_id: pi,
-    })
-    .eq("stripe_session_id", sessionId);
+  const { error } = await supabasePublic.rpc("mark_donation_result", {
+    p_session_id: sessionId,
+    p_status: paid ? "paid" : (session.payment_status ?? "pending"),
+    p_amount_cents: session.amount_total ?? null,
+    p_donor_email: session.customer_details?.email ?? null,
+    p_donor_name:
+      session.metadata?.["donor_name"] || session.customer_details?.name || null,
+    p_payment_intent_id: pi,
+  } as never);
   if (error) throw new Error(error.message);
 
   return { paid, amountCents: session.amount_total ?? 0 };

@@ -224,7 +224,7 @@ function AppLayout() {
           >
             <Link to="/" className="flex items-center gap-2 min-w-0">
               {sidebarOpen ? (
-                <Logo variant="horizontal" className="h-9 w-auto object-contain" />
+                <Logo variant="horizontal" className="h-12 w-auto max-w-[220px] object-contain" />
               ) : (
                 <Logo variant="stacked" className="h-9 w-9 object-contain" />
               )}
