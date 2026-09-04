@@ -52,6 +52,42 @@ async function stripeRequest(
   return json;
 }
 
+/**
+ * Public (publishable-key) Supabase client for donation inserts/updates.
+ * Works on any host (Lovable, Netlify) using only public env vars — no
+ * service-role key required. RLS allows pending donation inserts and the
+ * mark_donation_result function handles verified status updates.
+ */
+async function getPublicClient() {
+  const { createClient } = await import("@supabase/supabase-js");
+  const env = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process
+    ?.env;
+  const url = env?.["SUPABASE_URL"] || env?.["VITE_SUPABASE_URL"] || "";
+  const key =
+    env?.["SUPABASE_PUBLISHABLE_KEY"] ||
+    env?.["VITE_SUPABASE_PUBLISHABLE_KEY"] ||
+    env?.["SUPABASE_ANON_KEY"] ||
+    env?.["VITE_SUPABASE_ANON_KEY"] ||
+    "";
+  if (!url || !key) {
+    throw new Error(
+      "Supabase public env vars are missing. Set VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY in your hosting environment.",
+    );
+  }
+  return createClient(url, key, {
+    auth: { persistSession: false, autoRefreshToken: false },
+    global: {
+      fetch: (input, init) => {
+        const h = new Headers(init?.headers);
+        if (key.startsWith("sb_") && h.get("Authorization") === `Bearer ${key}`)
+          h.delete("Authorization");
+        h.set("apikey", key);
+        return fetch(input, { ...init, headers: h });
+      },
+    },
+  });
+}
+
 export type CheckoutInput = {
   amountCents: number;
   name?: string;
@@ -63,7 +99,7 @@ export type CheckoutInput = {
 };
 
 export async function createDonationSession(input: CheckoutInput) {
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const supabasePublic = await getPublicClient();
 
   const sep = input.returnPath.includes("?") ? "&" : "?";
   const successUrl = `${input.origin}${input.returnPath}${sep}donation={CHECKOUT_SESSION_ID}`;
