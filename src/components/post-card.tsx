@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
@@ -11,6 +11,9 @@ import {
   Megaphone,
   MoreHorizontal,
   Trash2,
+  ChevronLeft,
+  ChevronRight,
+  Images,
 } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -238,34 +241,7 @@ export function PostCard({ post, queryKey }: { post: FeedPost; queryKey: readonl
       </header>
       <p className="text-[15px] leading-relaxed whitespace-pre-wrap">{post.content}</p>
       {images.length > 0 && (
-        <div
-          className={`mt-3 grid gap-2 ${
-            images.length === 1 ? "grid-cols-1" : images.length === 2 ? "grid-cols-2" : "grid-cols-2 sm:grid-cols-3"
-          }`}
-        >
-          {images.map((src, i) => (
-            <button
-              key={src + i}
-              type="button"
-              onClick={() => setLightbox(src)}
-              className={`group relative rounded-xl overflow-hidden border bg-gray-50 ${
-                images.length === 1 ? "" : "aspect-square"
-              }`}
-            >
-              <img
-                src={src}
-                alt=""
-                loading="lazy"
-                decoding="async"
-                className={
-                  images.length === 1
-                    ? "w-full max-h-[560px] object-contain bg-gray-50"
-                    : "absolute inset-0 h-full w-full object-contain bg-gray-50"
-                }
-              />
-            </button>
-          ))}
-        </div>
+        <PostGallery images={images} onOpen={(src) => setLightbox(src)} />
       )}
       {lightbox && (
         <div
@@ -606,5 +582,91 @@ function VideoIcon() {
       <rect x="2" y="6" width="14" height="12" rx="2" />
       <path d="m22 8-6 4 6 4V8Z" />
     </svg>
+  );
+}
+
+/** Horizontally swipeable photo gallery with counter and dot progress. */
+function PostGallery({ images, onOpen }: { images: string[]; onOpen: (src: string) => void }) {
+  const trackRef = useRef<HTMLDivElement | null>(null);
+  const [index, setIndex] = useState(0);
+  const multi = images.length > 1;
+
+  function onScroll() {
+    const el = trackRef.current;
+    if (!el) return;
+    const i = Math.round(el.scrollLeft / el.clientWidth);
+    setIndex(Math.max(0, Math.min(images.length - 1, i)));
+  }
+
+  function go(dir: -1 | 1) {
+    const el = trackRef.current;
+    if (!el) return;
+    el.scrollTo({ left: (index + dir) * el.clientWidth, behavior: "smooth" });
+  }
+
+  return (
+    <div className="mt-3 relative rounded-xl overflow-hidden border bg-gray-50">
+      <div
+        ref={trackRef}
+        onScroll={onScroll}
+        className="flex overflow-x-auto snap-x snap-mandatory scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      >
+        {images.map((src, i) => (
+          <button
+            key={src + i}
+            type="button"
+            onClick={() => onOpen(src)}
+            className="relative shrink-0 w-full snap-center"
+          >
+            <img
+              src={src}
+              alt=""
+              loading="lazy"
+              decoding="async"
+              className="w-full h-[300px] sm:h-[420px] object-contain bg-gray-50"
+            />
+          </button>
+        ))}
+      </div>
+
+      {multi && (
+        <>
+          <div className="absolute top-2 right-2 flex items-center gap-1 rounded-full bg-black/60 px-2.5 py-1 text-[11px] font-semibold text-white">
+            <Images className="h-3 w-3" />
+            {index + 1}/{images.length}
+          </div>
+          {index > 0 && (
+            <button
+              type="button"
+              onClick={() => go(-1)}
+              aria-label="Previous photo"
+              className="absolute left-2 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </button>
+          )}
+          {index < images.length - 1 && (
+            <button
+              type="button"
+              onClick={() => go(1)}
+              aria-label="Next photo"
+              className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          )}
+          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-1.5 rounded-full bg-black/45 px-2 py-1">
+            {images.map((src, i) => (
+              <span
+                key={"dot" + src + i}
+                className={`h-1.5 rounded-full transition-all ${
+                  i === index ? "w-4 bg-white" : "w-1.5 bg-white/50"
+                }`}
+              />
+            ))}
+          </div>
+        </>
+      )}
+    </div>
   );
 }

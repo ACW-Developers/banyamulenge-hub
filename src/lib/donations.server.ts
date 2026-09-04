@@ -6,9 +6,20 @@
 const STRIPE_API = "https://api.stripe.com/v1";
 
 function stripeKey(): string {
-  const key = process.env["STRIPE_SECRET_KEY"];
-  if (!key) throw new Error("Stripe is not configured (missing secret key).");
-  return key;
+  // Different hosts expose env differently, so check the common aliases.
+  const env = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process
+    ?.env;
+  const key =
+    env?.["STRIPE_SECRET_KEY"] ||
+    env?.["STRIPE_API_KEY"] ||
+    env?.["VITE_STRIPE_SECRET_KEY"] ||
+    "";
+  if (!key.trim()) {
+    throw new Error(
+      "Stripe is not configured on the server: STRIPE_SECRET_KEY is missing in this deployment's environment. Add it to the hosting environment variables and redeploy.",
+    );
+  }
+  return key.trim();
 }
 
 function encodeForm(obj: Record<string, string | number | undefined | null>): string {
