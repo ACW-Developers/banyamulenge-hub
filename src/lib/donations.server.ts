@@ -124,7 +124,7 @@ export async function createDonationSession(input: CheckoutInput) {
     },
   })) as { id: string; url: string };
 
-  const { error } = await supabaseAdmin.from("donations").insert({
+  const { error } = await supabasePublic.from("donations").insert({
     user_id: input.userId,
     donor_name: input.name ?? null,
     donor_email: input.email ?? null,
@@ -140,7 +140,7 @@ export async function createDonationSession(input: CheckoutInput) {
 }
 
 export async function verifyDonationSession(sessionId: string) {
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const supabasePublic = await getPublicClient();
 
   const session = (await stripeRequest(
     `/checkout/sessions/${encodeURIComponent(sessionId)}?expand[]=payment_intent`,
