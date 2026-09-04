@@ -1,12 +1,10 @@
 [build]
   command = "npm run build"
+  # Nitro's Netlify preset emits the static site here and the SSR/server-function
+  # handler into .netlify/ — do NOT add a SPA catch-all redirect, it would swallow
+  # the /_serverFn/* requests that Stripe checkout depends on.
   publish = "dist"
 
 [build.environment]
   NODE_VERSION = "20"
   NPM_FLAGS = "--legacy-peer-deps"
-
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
