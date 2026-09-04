@@ -186,9 +186,10 @@ export async function assertAdmin(
   if (!data) throw new Error("Admin access required");
 }
 
-export async function fetchAllDonations() {
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const { data, error } = await supabaseAdmin
+// Uses the caller's authenticated client — the admin RLS policy grants
+// visibility of all rows, so no service-role key is needed on any host.
+export async function fetchAllDonations(supabase: { from: (t: string) => any }) {
+  const { data, error } = await supabase
     .from("donations")
     .select(
       "id, donor_name, donor_email, message, amount_cents, currency, status, stripe_session_id, stripe_payment_intent_id, created_at, user_id",
