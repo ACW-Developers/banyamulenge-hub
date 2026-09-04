@@ -292,7 +292,7 @@ function AppLayout() {
         >
           <div className="h-16 flex items-center justify-between px-5 border-b">
             <Link to="/" className="flex items-center gap-2" onClick={() => setMobileOpen(false)}>
-              <Logo variant="horizontal" className="h-9 w-auto object-contain" />
+              <Logo variant="horizontal" className="h-12 w-auto max-w-[220px] object-contain" />
             </Link>
             <button onClick={() => setMobileOpen(false)} className="text-gray-500">
               <X className="h-5 w-5" />
