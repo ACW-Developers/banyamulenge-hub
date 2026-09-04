@@ -22,6 +22,8 @@ import {
   Crown,
   Pencil,
   Undo2,
+  MoreVertical,
+  ArrowLeft,
 } from "lucide-react";
 
 import { formatDistanceToNow } from "date-fns";
@@ -43,6 +45,12 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { z } from "zod";
 
 const searchSchema = z.object({ c: z.string().optional() });
@@ -381,8 +389,24 @@ function MessagesPage() {
           </div>
         </div>
 
+        {/* Mobile backdrop for the floating chat */}
+        {active && user && (
+          <button
+            type="button"
+            aria-label="Close conversation"
+            onClick={() => setActiveId(null)}
+            className="md:hidden fixed inset-0 z-40 bg-black/50 backdrop-blur-[2px]"
+          />
+        )}
+
         {/* Message pane */}
-        <div className="rounded-2xl border bg-white flex flex-col overflow-hidden">
+        <div
+          className={
+            active && user
+              ? "max-md:fixed max-md:inset-x-2 max-md:bottom-2 max-md:top-[18vh] max-md:z-50 max-md:shadow-2xl rounded-2xl border bg-white flex flex-col overflow-hidden"
+              : "rounded-2xl border bg-white flex flex-col overflow-hidden max-md:min-h-[240px]"
+          }
+        >
           {active && user ? (
             <ChatPane
               key={active.id}
@@ -406,6 +430,7 @@ function MessagesPage() {
               uploading={uploading}
               scrollRef={scrollRef}
               onGroupDeleted={() => setActiveId(null)}
+              onClose={() => setActiveId(null)}
             />
 
           ) : (
@@ -466,6 +491,7 @@ function ChatPane({
   uploading,
   scrollRef,
   onGroupDeleted,
+  onClose,
 }: {
   convoId: string;
   userId: string;
@@ -484,6 +510,7 @@ function ChatPane({
   uploading: boolean;
   scrollRef: React.RefObject<HTMLDivElement | null>;
   onGroupDeleted: () => void;
+  onClose: () => void;
 }) {
   const [callStatus, setCallStatus] = useState<CallStatus>("idle");
   const sessionRef = useRef<CallSession | null>(null);
@@ -590,6 +617,14 @@ function ChatPane({
   return (
     <>
       <div className="p-4 border-b flex items-center gap-3">
+        <button
+          type="button"
+          onClick={onClose}
+          className="md:hidden -ml-1 h-9 w-9 rounded-full border flex items-center justify-center text-gray-600 shrink-0"
+          aria-label="Back to conversations"
+        >
+          <ArrowLeft className="h-4 w-4" />
+        </button>
         <Avatar className="h-10 w-10">
           <AvatarImage src={other?.avatar_url ?? undefined} />
           <AvatarFallback
@@ -661,7 +696,35 @@ function ChatPane({
           return (
             <div key={m.id} className={`group flex items-end gap-1 ${mine ? "justify-end" : "justify-start"}`}>
               {canModify && !isEditing && (
-                <div className="flex gap-0.5 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button
+                      type="button"
+                      className="md:hidden h-7 w-7 rounded-full border bg-white text-gray-500 flex items-center justify-center shrink-0"
+                      aria-label="Message options"
+                    >
+                      <MoreVertical className="h-3.5 w-3.5" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align={mine ? "end" : "start"} className="w-40">
+                    {m.content !== null && !m.attachment_url && (
+                      <DropdownMenuItem
+                        onClick={() => {
+                          setEditingId(m.id);
+                          setEditText(m.content ?? "");
+                        }}
+                      >
+                        <Pencil className="h-4 w-4 mr-2" /> Edit
+                      </DropdownMenuItem>
+                    )}
+                    <DropdownMenuItem className="text-red-600" onClick={() => unsend(m.id)}>
+                      <Undo2 className="h-4 w-4 mr-2" /> Delete
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
+              {canModify && !isEditing && (
+                <div className="hidden md:flex gap-0.5 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition">
                   {m.content !== null && !m.attachment_url && (
                     <button
                       type="button"
