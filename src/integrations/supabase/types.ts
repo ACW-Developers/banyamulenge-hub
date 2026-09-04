@@ -940,6 +940,17 @@ export type Database = {
         Args: { _convo: string; _user: string }
         Returns: boolean
       }
+      mark_donation_result: {
+        Args: {
+          p_amount_cents: number
+          p_donor_email: string
+          p_donor_name: string
+          p_payment_intent_id: string
+          p_session_id: string
+          p_status: string
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
