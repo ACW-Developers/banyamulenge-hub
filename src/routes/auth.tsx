@@ -116,7 +116,7 @@ function AuthPage() {
               <img
                 src={logoStacked}
                 alt="Banyamulenge Heritage Hub"
-                className="h-24 w-auto object-contain"
+                className="h-36 w-auto object-contain"
               />
               <p className="text-xs text-muted-foreground mt-2">Community Heritage Platform</p>
             </div>

@@ -52,6 +52,42 @@ async function stripeRequest(
   return json;
 }
 
+/**
+ * Public (publishable-key) Supabase client for donation inserts/updates.
+ * Works on any host (Lovable, Netlify) using only public env vars — no
+ * service-role key required. RLS allows pending donation inserts and the
+ * mark_donation_result function handles verified status updates.
+ */
+async function getPublicClient() {
+  const { createClient } = await import("@supabase/supabase-js");
+  const env = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process
+    ?.env;
+  const url = env?.["SUPABASE_URL"] || env?.["VITE_SUPABASE_URL"] || "";
+  const key =
+    env?.["SUPABASE_PUBLISHABLE_KEY"] ||
+    env?.["VITE_SUPABASE_PUBLISHABLE_KEY"] ||
+    env?.["SUPABASE_ANON_KEY"] ||
+    env?.["VITE_SUPABASE_ANON_KEY"] ||
+    "";
+  if (!url || !key) {
+    throw new Error(
+      "Supabase public env vars are missing. Set VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY in your hosting environment.",
+    );
+  }
+  return createClient(url, key, {
+    auth: { persistSession: false, autoRefreshToken: false },
+    global: {
+      fetch: (input, init) => {
+        const h = new Headers(init?.headers);
+        if (key.startsWith("sb_") && h.get("Authorization") === `Bearer ${key}`)
+          h.delete("Authorization");
+        h.set("apikey", key);
+        return fetch(input, { ...init, headers: h });
+      },
+    },
+  });
+}
+
 export type CheckoutInput = {
   amountCents: number;
   name?: string;
@@ -63,7 +99,7 @@ export type CheckoutInput = {
 };
 
 export async function createDonationSession(input: CheckoutInput) {
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const supabasePublic = await getPublicClient();
 
   const sep = input.returnPath.includes("?") ? "&" : "?";
   const successUrl = `${input.origin}${input.returnPath}${sep}donation={CHECKOUT_SESSION_ID}`;
@@ -88,7 +124,7 @@ export async function createDonationSession(input: CheckoutInput) {
     },
   })) as { id: string; url: string };
 
-  const { error } = await supabaseAdmin.from("donations").insert({
+  const { error } = await supabasePublic.from("donations").insert({
     user_id: input.userId,
     donor_name: input.name ?? null,
     donor_email: input.email ?? null,
@@ -104,7 +140,7 @@ export async function createDonationSession(input: CheckoutInput) {
 }
 
 export async function verifyDonationSession(sessionId: string) {
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const supabasePublic = await getPublicClient();
 
   const session = (await stripeRequest(
     `/checkout/sessions/${encodeURIComponent(sessionId)}?expand[]=payment_intent`,
@@ -122,16 +158,15 @@ export async function verifyDonationSession(sessionId: string) {
       ? session.payment_intent
       : (session.payment_intent?.id ?? null);
 
-  const { error } = await supabaseAdmin
-    .from("donations")
-    .update({
-      status: paid ? "paid" : (session.payment_status ?? "pending"),
-      amount_cents: session.amount_total ?? undefined,
-      donor_email: session.customer_details?.email ?? undefined,
-      donor_name: session.metadata?.["donor_name"] || session.customer_details?.name || undefined,
-      stripe_payment_intent_id: pi,
-    })
-    .eq("stripe_session_id", sessionId);
+  const { error } = await supabasePublic.rpc("mark_donation_result", {
+    p_session_id: sessionId,
+    p_status: paid ? "paid" : (session.payment_status ?? "pending"),
+    p_amount_cents: session.amount_total ?? null,
+    p_donor_email: session.customer_details?.email ?? null,
+    p_donor_name:
+      session.metadata?.["donor_name"] || session.customer_details?.name || null,
+    p_payment_intent_id: pi,
+  } as never);
   if (error) throw new Error(error.message);
 
   return { paid, amountCents: session.amount_total ?? 0 };
@@ -151,9 +186,26 @@ export async function assertAdmin(
   if (!data) throw new Error("Admin access required");
 }
 
-export async function fetchAllDonations() {
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const { data, error } = await supabaseAdmin
+export type DonationRow = {
+  id: string;
+  donor_name: string | null;
+  donor_email: string | null;
+  message: string | null;
+  amount_cents: number | null;
+  currency: string | null;
+  status: string | null;
+  stripe_session_id: string | null;
+  stripe_payment_intent_id: string | null;
+  created_at: string;
+  user_id: string | null;
+};
+
+// Uses the caller's authenticated client — the admin RLS policy grants
+// visibility of all rows, so no service-role key is needed on any host.
+export async function fetchAllDonations(supabase: {
+  from: (t: string) => any;
+}): Promise<DonationRow[]> {
+  const { data, error } = await supabase
     .from("donations")
     .select(
       "id, donor_name, donor_email, message, amount_cents, currency, status, stripe_session_id, stripe_payment_intent_id, created_at, user_id",

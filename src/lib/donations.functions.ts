@@ -31,5 +31,5 @@ export const listDonations = createServerFn({ method: "POST" })
   .handler(async ({ context }) => {
     const { assertAdmin, fetchAllDonations } = await import("./donations.server");
     await assertAdmin(context.supabase as never, context.userId);
-    return fetchAllDonations();
+    return fetchAllDonations(context.supabase as never);
   });
