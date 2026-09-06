@@ -22,6 +22,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { logActivity } from "@/lib/tracking";
+import { useI18n } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_app/admin/users")({
   component: UsersAdmin,
@@ -39,6 +40,7 @@ type Row = {
 };
 
 function UsersAdmin() {
+  const { t } = useI18n();
   const { user } = useAuth();
   const qc = useQueryClient();
   const [q, setQ] = useState("");
@@ -89,7 +91,7 @@ function UsersAdmin() {
       );
     },
     onSuccess: () => {
-      toast.success("Updated");
+      toast.success(t("admin.users.toast.updated"));
       qc.invalidateQueries({ queryKey: ["admin-users"] });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -110,7 +112,7 @@ function UsersAdmin() {
       logActivity(user?.id ?? null, "user.update", "user", row.id);
     },
     onSuccess: () => {
-      toast.success("Profile updated");
+      toast.success(t("admin.users.toast.profileUpdated"));
       setEditing(null);
       qc.invalidateQueries({ queryKey: ["admin-users"] });
     },
@@ -125,7 +127,7 @@ function UsersAdmin() {
       logActivity(user?.id ?? null, "user.delete", "user", row.id);
     },
     onSuccess: () => {
-      toast.success("User profile removed");
+      toast.success(t("admin.users.toast.profileRemoved"));
       setConfirmDel(null);
       qc.invalidateQueries({ queryKey: ["admin-users"] });
     },
@@ -148,9 +150,9 @@ function UsersAdmin() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">User Management</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{t("admin.users.title")}</h1>
           <p className="text-sm text-gray-500 mt-1">
-            View all members. Edit profiles, remove accounts, grant or revoke admin.
+            {t("admin.users.subtitle")}
           </p>
         </div>
         <Button
@@ -164,7 +166,7 @@ function UsersAdmin() {
           ) : (
             <RefreshCw className="h-4 w-4" />
           )}
-          Sync accounts
+          {t("admin.users.syncAccounts")}
         </Button>
       </div>
 
@@ -173,7 +175,7 @@ function UsersAdmin() {
         <Input
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder="Search users..."
+          placeholder={t("admin.users.searchPlaceholder")}
           className="pl-9 bg-white"
         />
       </div>
@@ -182,10 +184,10 @@ function UsersAdmin() {
         <table className="w-full text-sm">
           <thead className="bg-gray-50 text-xs uppercase tracking-wide text-gray-500">
             <tr>
-              <th className="px-4 py-3 text-left">User</th>
-              <th className="px-4 py-3 text-left hidden md:table-cell">Location</th>
-              <th className="px-4 py-3 text-left">Role</th>
-              <th className="px-4 py-3 text-right">Actions</th>
+              <th className="px-4 py-3 text-left">{t("admin.users.table.user")}</th>
+              <th className="px-4 py-3 text-left hidden md:table-cell">{t("admin.users.table.location")}</th>
+              <th className="px-4 py-3 text-left">{t("admin.users.table.role")}</th>
+              <th className="px-4 py-3 text-right">{t("admin.users.table.actions")}</th>
             </tr>
           </thead>
           <tbody>
@@ -223,10 +225,10 @@ function UsersAdmin() {
                   <td className="px-4 py-3">
                     {isAdminUser ? (
                       <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-100">
-                        <Shield className="h-3 w-3 mr-1" /> Admin
+                        <Shield className="h-3 w-3 mr-1" /> {t("admin.users.role.admin")}
                       </Badge>
                     ) : (
-                      <Badge variant="secondary">Member</Badge>
+                      <Badge variant="secondary">{t("admin.users.role.member")}</Badge>
                     )}
                   </td>
                   <td className="px-4 py-3 text-right">
@@ -248,11 +250,11 @@ function UsersAdmin() {
                       >
                         {isAdminUser ? (
                           <>
-                            <ShieldOff className="h-3 w-3" /> Revoke
+                            <ShieldOff className="h-3 w-3" /> {t("admin.users.action.revoke")}
                           </>
                         ) : (
                           <>
-                            <Shield className="h-3 w-3" /> Admin
+                            <Shield className="h-3 w-3" /> {t("admin.users.action.admin")}
                           </>
                         )}
                       </Button>
@@ -279,34 +281,34 @@ function UsersAdmin() {
       <Dialog open={!!editing} onOpenChange={(o) => !o && setEditing(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Edit user</DialogTitle>
-            <DialogDescription>Update profile details.</DialogDescription>
+            <DialogTitle>{t("admin.users.edit.title")}</DialogTitle>
+            <DialogDescription>{t("admin.users.edit.description")}</DialogDescription>
           </DialogHeader>
           {editing && (
             <div className="space-y-3">
               <div className="space-y-1.5">
-                <Label>Display name</Label>
+                <Label>{t("admin.users.edit.displayName")}</Label>
                 <Input
                   value={editing.display_name ?? ""}
                   onChange={(e) => setEditing({ ...editing, display_name: e.target.value })}
                 />
               </div>
               <div className="space-y-1.5">
-                <Label>Username</Label>
+                <Label>{t("admin.users.edit.username")}</Label>
                 <Input
                   value={editing.username}
                   onChange={(e) => setEditing({ ...editing, username: e.target.value })}
                 />
               </div>
               <div className="space-y-1.5">
-                <Label>Location</Label>
+                <Label>{t("admin.users.edit.location")}</Label>
                 <Input
                   value={editing.location ?? ""}
                   onChange={(e) => setEditing({ ...editing, location: e.target.value })}
                 />
               </div>
               <div className="space-y-1.5">
-                <Label>Bio</Label>
+                <Label>{t("admin.users.edit.bio")}</Label>
                 <Textarea
                   value={editing.bio ?? ""}
                   onChange={(e) => setEditing({ ...editing, bio: e.target.value })}
@@ -317,13 +319,13 @@ function UsersAdmin() {
           )}
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditing(null)}>
-              Cancel
+              {t("admin.users.edit.cancel")}
             </Button>
             <Button
               onClick={() => editing && saveEdit.mutate(editing)}
               disabled={saveEdit.isPending}
             >
-              {saveEdit.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save"}
+              {saveEdit.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : t("admin.users.edit.save")}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -333,21 +335,21 @@ function UsersAdmin() {
       <Dialog open={!!confirmDel} onOpenChange={(o) => !o && setConfirmDel(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Delete user profile</DialogTitle>
+            <DialogTitle>{t("admin.users.delete.title")}</DialogTitle>
             <DialogDescription>
-              This removes the profile, posts, and related content. This action cannot be undone.
+              {t("admin.users.delete.description")}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setConfirmDel(null)}>
-              Cancel
+              {t("admin.users.delete.cancel")}
             </Button>
             <Button
               variant="destructive"
               onClick={() => confirmDel && deleteUser.mutate(confirmDel)}
               disabled={deleteUser.isPending}
             >
-              {deleteUser.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Delete"}
+              {deleteUser.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : t("admin.users.delete.confirm")}
             </Button>
           </DialogFooter>
         </DialogContent>
