@@ -6,6 +6,7 @@ import { formatDistanceToNow, format } from "date-fns";
 
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { useI18n } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_app/admin/logs")({
   component: LogsAdmin,
@@ -14,6 +15,7 @@ export const Route = createFileRoute("/_app/admin/logs")({
 const PAGE_SIZE = 25;
 
 function LogsAdmin() {
+  const { t } = useI18n();
   const [page, setPage] = useState(0);
 
   const { data, isLoading } = useQuery({
@@ -51,9 +53,9 @@ function LogsAdmin() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Activity Logs</h1>
+        <h1 className="text-2xl font-bold text-gray-900">{t("admin.logs.title")}</h1>
         <p className="text-sm text-gray-500 mt-1">
-          Every action, page view, and admin change with timestamps.
+          {t("admin.logs.subtitle")}
         </p>
       </div>
 
@@ -80,12 +82,12 @@ function LogsAdmin() {
                   <div className="flex-1 min-w-0">
                     <div className="text-sm">
                       <span className="font-semibold">
-                        {l.actor?.display_name || l.actor?.username || "System"}
+                        {l.actor?.display_name || l.actor?.username || t("admin.logs.system")}
                       </span>{" "}
                       <span className="font-mono text-primary">{l.action}</span>
                       {l.target_type && (
                         <span className="text-gray-500">
-                          {" on "}
+                          {" "}{t("admin.logs.on")}{" "}
                           {l.target_type}{" "}
                           <span className="font-mono text-xs">
                             {typeof l.target_id === "string" ? l.target_id.slice(0, 40) : ""}
@@ -105,12 +107,12 @@ function LogsAdmin() {
         ) : (
           <div className="p-12 text-center">
             <Activity className="h-10 w-10 mx-auto text-primary mb-3" />
-            <p className="text-sm text-gray-500">No activity logged yet.</p>
+            <p className="text-sm text-gray-500">{t("admin.logs.empty")}</p>
           </div>
         )}
         <div className="flex items-center justify-between p-3 border-t bg-gray-50/50">
           <div className="text-xs text-gray-500">
-            Page {page + 1} of {pages} · {total} entries
+            {t("admin.logs.page")} {page + 1} {t("admin.logs.of")} {pages} · {total} {t("admin.logs.entries")}
           </div>
           <div className="flex gap-1">
             <Button
