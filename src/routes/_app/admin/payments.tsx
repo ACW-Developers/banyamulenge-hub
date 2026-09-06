@@ -28,6 +28,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { listDonations } from "@/lib/donations.functions";
+import { useI18n } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_app/admin/payments")({
   component: PaymentsDashboard,
@@ -53,6 +54,7 @@ const money = (cents: number) =>
   `$${(cents / 100).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
 function PaymentsDashboard() {
+  const { t } = useI18n();
   const fetchDonations = useServerFn(listDonations);
   const [q, setQ] = useState("");
 
@@ -123,18 +125,18 @@ function PaymentsDashboard() {
   }
 
   const cards = [
-    { label: "Total raised", value: money(stats.total), icon: DollarSign, tint: "from-emerald-500 to-emerald-600" },
-    { label: "Donations", value: String(stats.count), icon: Receipt, tint: "from-blue-500 to-blue-600" },
-    { label: "Unique donors", value: String(stats.donors), icon: Users, tint: "from-violet-500 to-violet-600" },
-    { label: "Average gift", value: money(stats.avg), icon: TrendingUp, tint: "from-amber-500 to-orange-600" },
+    { label: t("admin.payments.card.totalRaised"), value: money(stats.total), icon: DollarSign, tint: "from-emerald-500 to-emerald-600" },
+    { label: t("admin.payments.card.donations"), value: String(stats.count), icon: Receipt, tint: "from-blue-500 to-blue-600" },
+    { label: t("admin.payments.card.uniqueDonors"), value: String(stats.donors), icon: Users, tint: "from-violet-500 to-violet-600" },
+    { label: t("admin.payments.card.averageGift"), value: money(stats.avg), icon: TrendingUp, tint: "from-amber-500 to-orange-600" },
   ];
 
   return (
     <div className="max-w-7xl mx-auto space-y-6">
       <div>
-        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Payments</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">{t("admin.payments.title")}</h1>
         <p className="text-muted-foreground text-sm">
-          Donations received through Stripe, with donors and transaction codes.
+          {t("admin.payments.subtitle")}
         </p>
       </div>
 
@@ -161,7 +163,7 @@ function PaymentsDashboard() {
       <div className="grid gap-4 lg:grid-cols-3">
         <Card className="lg:col-span-2">
           <CardHeader className="pb-2">
-            <CardTitle className="text-base">Last 30 days</CardTitle>
+            <CardTitle className="text-base">{t("admin.payments.chart.last30Days")}</CardTitle>
           </CardHeader>
           <CardContent className="h-64">
             <ResponsiveContainer width="100%" height="100%">
@@ -175,7 +177,7 @@ function PaymentsDashboard() {
                 <CartesianGrid strokeDasharray="3 3" vertical={false} opacity={0.3} />
                 <XAxis dataKey="date" tick={{ fontSize: 11 }} interval={4} />
                 <YAxis tick={{ fontSize: 11 }} />
-                <RTooltip formatter={(v: number) => [`$${v}`, "Raised"]} />
+                <RTooltip formatter={(v: number) => [`$${v}`, t("admin.payments.chart.raised")]} />
                 <Area
                   type="monotone"
                   dataKey="amount"
@@ -190,7 +192,7 @@ function PaymentsDashboard() {
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-base">Gift sizes</CardTitle>
+            <CardTitle className="text-base">{t("admin.payments.chart.giftSizes")}</CardTitle>
           </CardHeader>
           <CardContent className="h-64">
             <ResponsiveContainer width="100%" height="100%">
@@ -209,7 +211,7 @@ function PaymentsDashboard() {
       <Card>
         <CardHeader className="flex-row items-center justify-between gap-3 space-y-0">
           <CardTitle className="text-base">
-            Transactions{" "}
+            {t("admin.payments.table.transactions")}{" "}
             <span className="text-muted-foreground font-normal">({filtered.length})</span>
           </CardTitle>
           <div className="relative w-full max-w-xs">
@@ -217,7 +219,7 @@ function PaymentsDashboard() {
             <Input
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder="Search donor, email or code"
+              placeholder={t("admin.payments.searchPlaceholder")}
               className="pl-9 h-9"
             />
           </div>
@@ -227,25 +229,25 @@ function PaymentsDashboard() {
             <table className="w-full text-sm">
               <thead className="bg-muted/50 text-xs uppercase tracking-wide text-muted-foreground">
                 <tr>
-                  <th className="text-left font-semibold px-4 py-3">Donor</th>
-                  <th className="text-left font-semibold px-4 py-3">Email</th>
-                  <th className="text-right font-semibold px-4 py-3">Amount</th>
-                  <th className="text-left font-semibold px-4 py-3">Status</th>
-                  <th className="text-left font-semibold px-4 py-3">Transaction code</th>
-                  <th className="text-left font-semibold px-4 py-3">Date</th>
+                  <th className="text-left font-semibold px-4 py-3">{t("admin.payments.table.donor")}</th>
+                  <th className="text-left font-semibold px-4 py-3">{t("admin.payments.table.email")}</th>
+                  <th className="text-right font-semibold px-4 py-3">{t("admin.payments.table.amount")}</th>
+                  <th className="text-left font-semibold px-4 py-3">{t("admin.payments.table.status")}</th>
+                  <th className="text-left font-semibold px-4 py-3">{t("admin.payments.table.transactionCode")}</th>
+                  <th className="text-left font-semibold px-4 py-3">{t("admin.payments.table.date")}</th>
                 </tr>
               </thead>
               <tbody>
                 {filtered.length === 0 && (
                   <tr>
                     <td colSpan={6} className="px-4 py-10 text-center text-muted-foreground">
-                      No donations recorded yet.
+                      {t("admin.payments.empty")}
                     </td>
                   </tr>
                 )}
                 {filtered.map((r) => (
                   <tr key={r.id} className="border-t hover:bg-muted/30">
-                    <td className="px-4 py-3 font-medium">{r.donor_name || "Anonymous"}</td>
+                    <td className="px-4 py-3 font-medium">{r.donor_name || t("admin.payments.anonymous")}</td>
                     <td className="px-4 py-3 text-muted-foreground">{r.donor_email || "—"}</td>
                     <td className="px-4 py-3 text-right font-semibold tabular-nums">
                       {money(r.amount_cents ?? 0)}
@@ -253,7 +255,7 @@ function PaymentsDashboard() {
                     <td className="px-4 py-3">
                       {r.status === "paid" ? (
                         <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100 gap-1">
-                          <CheckCircle2 className="h-3 w-3" /> Paid
+                          <CheckCircle2 className="h-3 w-3" /> {t("admin.payments.paid")}
                         </Badge>
                       ) : (
                         <Badge variant="secondary" className="gap-1">
@@ -277,7 +279,7 @@ function PaymentsDashboard() {
 
       {stats.pending > 0 && (
         <p className="text-xs text-muted-foreground">
-          {stats.pending} incomplete checkout{stats.pending > 1 ? "s" : ""} are excluded from totals.
+          {stats.pending} {stats.pending > 1 ? t("admin.payments.pendingNote") : t("admin.payments.pendingNoteSingular")}
         </p>
       )}
     </div>

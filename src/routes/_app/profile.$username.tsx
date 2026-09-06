@@ -12,7 +12,7 @@ import {
   MessageCircle,
 } from "lucide-react";
 import { format } from "date-fns";
-import { toast } from "sonner";
+import { toast } from "@/lib/notify";
 
 import { supabase } from "@/integrations/supabase/client";
 import { uploadPostImage } from "@/lib/upload";
@@ -33,6 +33,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { openConversationWith } from "@/lib/messaging";
 import { useNavigate } from "@tanstack/react-router";
+import { useI18n } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_app/profile/$username")({
   component: ProfilePage,
@@ -82,6 +83,7 @@ function ProfilePage() {
   const { user, refreshProfile } = useAuth();
   const qc = useQueryClient();
   const navigate = useNavigate();
+  const { t } = useI18n();
 
   const { data: profile, isLoading } = useQuery({
     queryKey: ["profile", username],
@@ -144,10 +146,10 @@ function ProfilePage() {
   if (!profile) {
     return (
       <div className="rounded-2xl border bg-white p-12 text-center">
-        <h2 className="text-lg font-bold">Profile not found</h2>
-        <p className="text-sm text-gray-500 mt-1">@{username} doesn't exist.</p>
+        <h2 className="text-lg font-bold">{t("profile.notFound.title")}</h2>
+        <p className="text-sm text-gray-500 mt-1">@{username} {t("profile.notFound.desc")}</p>
         <Link to="/" className="text-primary text-sm font-semibold mt-4 inline-block">
-          Back to feed
+          {t("profile.notFound.back")}
         </Link>
       </div>
     );
@@ -195,7 +197,7 @@ function ProfilePage() {
                       }
                     }}
                   >
-                    <MessageCircle className="h-4 w-4" /> Message
+                    <MessageCircle className="h-4 w-4" /> {t("profile.message")}
                   </Button>
                   <Button
                     variant={isFollowing ? "outline" : "default"}
@@ -208,7 +210,7 @@ function ProfilePage() {
                     ) : (
                       <UserPlus className="h-4 w-4" />
                     )}
-                    {isFollowing ? "Following" : "Follow"}
+                    {isFollowing ? t("profile.following") : t("profile.follow")}
                   </Button>
                 </>
               )}
@@ -225,7 +227,7 @@ function ProfilePage() {
                 </span>
               )}
               <span className="inline-flex items-center gap-1">
-                <Calendar className="h-3.5 w-3.5" /> Joined{" "}
+                <Calendar className="h-3.5 w-3.5" /> {t("profile.joined")}{" "}
                 {format(new Date(profile.created_at), "MMM yyyy")}
               </span>
             </div>
@@ -244,7 +246,7 @@ function ProfilePage() {
               />
               <div>
                 <span className="font-bold">{posts?.length ?? 0}</span>{" "}
-                <span className="text-gray-500">Posts</span>
+                <span className="text-gray-500">{t("profile.posts")}</span>
               </div>
             </div>
           </div>
@@ -252,13 +254,13 @@ function ProfilePage() {
       </div>
 
       <div className="rounded-2xl border bg-white p-8 text-center shadow-sm">
-        <h2 className="text-lg font-bold mb-1">Posts live in the feed</h2>
+        <h2 className="text-lg font-bold mb-1">{t("profile.postsFeed.title")}</h2>
         <p className="text-sm text-gray-500">
           {profile.display_name || profile.username} has {posts?.length ?? 0} post
           {(posts?.length ?? 0) === 1 ? "" : "s"} - visit the home feed to like and comment.
         </p>
         <Link to="/" className="inline-block mt-4 text-primary font-semibold text-sm">
-          Open community feed →
+          {t("profile.postsFeed.openFeed")}
         </Link>
       </div>
     </div>
@@ -291,6 +293,7 @@ async function fileToDataUrl(file: File, maxDim = 512): Promise<string> {
 }
 
 function EditProfileDialog({ profile, onSaved }: { profile: ProfileFull; onSaved: () => void }) {
+  const { t } = useI18n();
   const [open, setOpen] = useState(false);
   const [displayName, setDisplayName] = useState(profile.display_name ?? "");
   const [bio, setBio] = useState(profile.bio ?? "");
@@ -316,14 +319,14 @@ function EditProfileDialog({ profile, onSaved }: { profile: ProfileFull; onSaved
     const f = e.target.files?.[0];
     if (!f) return;
     if (f.size > 5 * 1024 * 1024) {
-      toast.error("Image must be under 5MB");
+      toast.error(t("profile.edit.imageTooLarge"));
       return;
     }
     try {
       const dataUrl = await fileToDataUrl(f);
       setAvatarUrl(dataUrl);
     } catch {
-      toast.error("Could not read image");
+      toast.error(t("profile.edit.imageReadError"));
     }
   }
 
@@ -357,7 +360,7 @@ function EditProfileDialog({ profile, onSaved }: { profile: ProfileFull; onSaved
       toast.error(error.message);
       return;
     }
-    toast.success("Profile updated");
+    toast.success(t("profile.edit.updated"));
     setOpen(false);
     onSaved();
   }
@@ -369,17 +372,17 @@ function EditProfileDialog({ profile, onSaved }: { profile: ProfileFull; onSaved
       <DialogTrigger asChild>
         <Button variant="outline" className="gap-2">
           <Edit3 className="h-4 w-4" />
-          Edit profile
+          {t("profile.edit.button")}
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Edit profile</DialogTitle>
-          <DialogDescription>Update how you appear in the community.</DialogDescription>
+          <DialogTitle>{t("profile.edit.title")}</DialogTitle>
+          <DialogDescription>{t("profile.edit.description")}</DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
           <div className="space-y-1.5">
-            <Label>Cover image</Label>
+            <Label>{t("profile.edit.coverImage")}</Label>
             <div
               className="h-28 w-full rounded-lg border bg-gradient-to-r from-primary via-primary-glow to-primary bg-cover bg-center relative overflow-hidden"
               style={coverUrl ? { backgroundImage: `url(${coverUrl})` } : undefined}
@@ -399,11 +402,11 @@ function EditProfileDialog({ profile, onSaved }: { profile: ProfileFull; onSaved
                   ) : (
                     <Camera className="h-4 w-4" />
                   )}
-                  {coverUrl ? "Change cover" : "Upload cover"}
+                  {coverUrl ? t("profile.edit.changeCover") : t("profile.edit.uploadCover")}
                 </Button>
                 {coverUrl && (
                   <Button type="button" size="sm" variant="outline" onClick={() => setCoverUrl("")}>
-                    Remove
+                    {t("profile.edit.remove")}
                   </Button>
                 )}
               </div>
@@ -425,7 +428,7 @@ function EditProfileDialog({ profile, onSaved }: { profile: ProfileFull; onSaved
                 className="gap-2"
                 onClick={() => fileRef.current?.click()}
               >
-                <Camera className="h-4 w-4" /> Upload photo
+                <Camera className="h-4 w-4" /> {t("profile.edit.uploadPhoto")}
               </Button>
               {avatarUrl && (
                 <button
@@ -433,30 +436,30 @@ function EditProfileDialog({ profile, onSaved }: { profile: ProfileFull; onSaved
                   className="text-xs text-red-600 hover:underline text-left"
                   onClick={() => setAvatarUrl("")}
                 >
-                  Remove
+                  {t("profile.edit.remove")}
                 </button>
               )}
             </div>
           </div>
           <div className="space-y-1.5">
-            <Label>Display name</Label>
+            <Label>{t("profile.edit.displayName")}</Label>
             <Input value={displayName} onChange={(e) => setDisplayName(e.target.value)} />
           </div>
           <div className="space-y-1.5">
-            <Label>Bio</Label>
+            <Label>{t("profile.edit.bio")}</Label>
             <Textarea value={bio} onChange={(e) => setBio(e.target.value)} rows={3} />
           </div>
           <div className="space-y-1.5">
-            <Label>Location</Label>
+            <Label>{t("profile.edit.location")}</Label>
             <Input value={location} onChange={(e) => setLocation(e.target.value)} />
           </div>
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => setOpen(false)}>
-            Cancel
+            {t("profile.edit.cancel")}
           </Button>
           <Button onClick={save} disabled={saving}>
-            {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save"}
+            {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : t("profile.edit.save")}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -475,6 +478,7 @@ function FollowersDialog({
   count: number;
   isSelf: boolean;
 }) {
+  const { t } = useI18n();
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -519,7 +523,7 @@ function FollowersDialog({
     },
   });
 
-  const label = mode === "followers" ? "Followers" : "Following";
+  const label = mode === "followers" ? t("profile.followers.title") : t("profile.following.title");
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -565,7 +569,7 @@ function FollowersDialog({
             })
           ) : (
             <div className="p-6 text-center text-sm text-gray-500">
-              No {label.toLowerCase()} yet.
+              {mode === "followers" ? t("profile.followers.empty") : t("profile.following.empty")}
             </div>
           )}
         </div>

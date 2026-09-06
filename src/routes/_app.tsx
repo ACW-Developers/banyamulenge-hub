@@ -26,7 +26,7 @@ import {
 
 } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
+import { toast } from "@/lib/notify";
 
 import { LanguageSelector } from "@/components/language-selector";
 

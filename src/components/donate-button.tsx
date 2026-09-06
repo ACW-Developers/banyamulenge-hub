@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Heart, Globe2, Archive, Server, Loader2 } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/lib/notify";
 import { useServerFn } from "@tanstack/react-start";
 import { useRouterState } from "@tanstack/react-router";
 
@@ -18,28 +18,20 @@ import {
 } from "@/components/ui/dialog";
 import { useAuth } from "@/lib/auth-context";
 import { createDonationCheckout, verifyDonation } from "@/lib/donations.functions";
+import { useI18n } from "@/lib/i18n";
 
 const PRESETS = [5, 10, 25, 50, 100, 200];
 
-const REASONS = [
-  {
-    icon: Server,
-    title: "Keep the platform running",
-    text: "Hosting, storage and continuous development of new modules for the community.",
-  },
-  {
-    icon: Archive,
-    title: "Preserve our heritage",
-    text: "Digitising artifacts, photographs, oral histories and archival documents.",
-  },
-  {
-    icon: Globe2,
-    title: "Gather history worldwide",
-    text: "Funding researchers and elders across the diaspora to collect Banyamulenge history.",
-  },
-];
+function useReasons(t: (k: string) => string) {
+  return [
+    { icon: Server, title: t("home.donate.reason1Title"), text: t("home.donate.reason1Text") },
+    { icon: Archive, title: t("home.donate.reason2Title"), text: t("home.donate.reason2Text") },
+    { icon: Globe2, title: t("home.donate.reason3Title"), text: t("home.donate.reason3Text") },
+  ];
+}
 
 export function DonateButton() {
+  const { t } = useI18n();
   const { user, profile } = useAuth();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [open, setOpen] = useState(false);
@@ -49,6 +41,7 @@ export function DonateButton() {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const REASONS = useReasons(t);
 
   const startCheckout = useServerFn(createDonationCheckout);
   const confirmDonation = useServerFn(verifyDonation);
@@ -67,26 +60,26 @@ export function DonateButton() {
     const clean = window.location.pathname + (params.toString() ? `?${params}` : "");
     window.history.replaceState({}, "", clean);
     if (sid === "cancelled") {
-      toast.info("Donation cancelled — no charge was made.");
+      toast.info(t("home.donate.cancelled"));
       return;
     }
     confirmDonation({ data: { sessionId: sid } })
       .then((r) => {
-        if (r.paid) toast.success(`Thank you! Your $${(r.amountCents / 100).toFixed(2)} donation was received.`);
-        else toast.info("Your donation is still processing.");
+        if (r.paid) toast.success(t("home.donate.thankYou").replace("{amount}", (r.amountCents / 100).toFixed(2)));
+        else toast.info(t("home.donate.processing"));
       })
-      .catch(() => toast.error("We could not confirm the donation status."));
+      .catch(() => toast.error(t("home.donate.confirmFailed")));
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const effectiveAmount = custom ? Math.round(parseFloat(custom) * 100) : amount * 100;
 
   const handleDonate = async () => {
     if (!Number.isFinite(effectiveAmount) || effectiveAmount < 100) {
-      toast.error("Please enter an amount of at least $1.");
+      toast.error(t("home.donate.minAmount"));
       return;
     }
     if (effectiveAmount > 1000000) {
-      toast.error("Maximum online donation is $10,000. Contact us for larger gifts.");
+      toast.error(t("home.donate.maxAmount"));
       return;
     }
     setLoading(true);
@@ -103,9 +96,9 @@ export function DonateButton() {
         },
       });
       if (res.url) window.location.href = res.url;
-      else toast.error("Could not start checkout.");
+      else toast.error(t("home.donate.checkoutFailed"));
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Could not start checkout.");
+      toast.error(e instanceof Error ? e.message : t("home.donate.checkoutFailed"));
     } finally {
       setLoading(false);
     }
@@ -116,10 +109,10 @@ export function DonateButton() {
       <DialogTrigger asChild>
         <button
           className="group inline-flex items-center gap-2 rounded-full border border-emerald-700/40 bg-emerald-600 px-3 sm:px-4 h-10 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 hover:shadow-md transition"
-          aria-label="Donate"
+          aria-label={t("home.donate.aria")}
         >
           <Heart className="h-4 w-4 fill-current group-hover:scale-110 transition-transform" />
-          <span className="hidden sm:inline">Donate</span>
+          <span className="hidden sm:inline">{t("home.donate.button")}</span>
         </button>
 
       </DialogTrigger>
@@ -127,12 +120,9 @@ export function DonateButton() {
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl">
             <Heart className="h-5 w-5 text-primary fill-primary" />
-            Support Banyamulenge Hub
+            {t("home.donate.dialogTitle")}
           </DialogTitle>
-          <DialogDescription>
-            Every contribution keeps this platform free for the community and funds the worldwide
-            effort to gather and safeguard our history.
-          </DialogDescription>
+          <DialogDescription>{t("home.donate.dialogDescription")}</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-3">
@@ -150,7 +140,7 @@ export function DonateButton() {
         </div>
 
         <div className="space-y-3 pt-1">
-          <Label>Choose an amount (USD)</Label>
+          <Label>{t("home.donate.chooseAmount")}</Label>
           <div className="grid grid-cols-3 gap-2">
             {PRESETS.map((p) => {
               const active = !custom && amount === p;
@@ -175,7 +165,7 @@ export function DonateButton() {
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="donate-custom">Or enter your own amount</Label>
+            <Label htmlFor="donate-custom">{t("home.donate.ownAmount")}</Label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">
                 $
@@ -183,7 +173,7 @@ export function DonateButton() {
               <Input
                 id="donate-custom"
                 inputMode="decimal"
-                placeholder="Any amount"
+                placeholder={t("home.donate.amountPlaceholder")}
                 value={custom}
                 onChange={(e) => setCustom(e.target.value.replace(/[^0-9.]/g, ""))}
                 className="pl-7"
@@ -193,37 +183,37 @@ export function DonateButton() {
 
           <div className="grid gap-3 sm:grid-cols-2">
             <div className="space-y-1.5">
-              <Label htmlFor="donate-name">Your name</Label>
+              <Label htmlFor="donate-name">{t("home.donate.nameLabel")}</Label>
               <Input
                 id="donate-name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 maxLength={100}
-                placeholder="Optional"
+                placeholder={t("home.donate.optional")}
               />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="donate-email">Email for receipt</Label>
+              <Label htmlFor="donate-email">{t("home.donate.emailLabel")}</Label>
               <Input
                 id="donate-email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 maxLength={255}
-                placeholder="Optional"
+                placeholder={t("home.donate.optional")}
               />
             </div>
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="donate-message">Message (optional)</Label>
+            <Label htmlFor="donate-message">{t("home.donate.messageLabel")}</Label>
             <Textarea
               id="donate-message"
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               maxLength={500}
               rows={2}
-              placeholder="Say something to the community…"
+              placeholder={t("home.donate.messagePlaceholder")}
             />
           </div>
 
@@ -233,12 +223,12 @@ export function DonateButton() {
             ) : (
               <>
                 <Heart className="h-4 w-4 mr-2 fill-current" />
-                Donate ${(effectiveAmount / 100 || 0).toFixed(2)}
+                {t("home.donate.donateAmount").replace("{amount}", (effectiveAmount / 100 || 0).toFixed(2))}
               </>
             )}
           </Button>
           <p className="text-[11px] text-center text-muted-foreground">
-            Payments are processed securely by Stripe. You'll return here once complete.
+            {t("home.donate.disclaimer")}
           </p>
         </div>
       </DialogContent>

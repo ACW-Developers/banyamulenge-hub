@@ -39,6 +39,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { notifyError, notifySuccess } from "@/lib/notify";
+import { useI18n } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_app/admin/settings")({
   component: SettingsAdmin,
@@ -47,12 +48,13 @@ export const Route = createFileRoute("/_app/admin/settings")({
 const COLORS = ["#f97316", "#0ea5e9", "#8b5cf6", "#10b981", "#ec4899", "#facc15", "#64748b"];
 
 function SettingsAdmin() {
+  const { t } = useI18n();
   return (
     <div className="space-y-8 max-w-6xl">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
+        <h1 className="text-2xl font-bold text-gray-900">{t("admin.settings.title")}</h1>
         <p className="text-sm text-gray-500 mt-1">
-          Change your password and monitor platform traffic.
+          {t("admin.settings.subtitle")}
         </p>
       </div>
 
@@ -64,6 +66,7 @@ function SettingsAdmin() {
 }
 
 function PasswordSection() {
+  const { t } = useI18n();
   const [current, setCurrent] = useState("");
   const [next, setNext] = useState("");
   const [confirm, setConfirm] = useState("");
@@ -72,25 +75,25 @@ function PasswordSection() {
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (next.length < 6) return notifyError("Password must be at least 6 characters");
-    if (next !== confirm) return notifyError("Passwords do not match");
+    if (next.length < 6) return notifyError(t("admin.settings.password.tooShort"));
+    if (next !== confirm) return notifyError(t("admin.settings.password.mismatch"));
     setBusy(true);
     // Re-authenticate with current password
     const { data: sess } = await supabase.auth.getUser();
     const email = sess.user?.email;
     if (!email) {
       setBusy(false);
-      return notifyError("Not signed in");
+      return notifyError(t("admin.settings.password.notSignedIn"));
     }
     const { error: signErr } = await supabase.auth.signInWithPassword({ email, password: current });
     if (signErr) {
       setBusy(false);
-      return notifyError("Current password is wrong");
+      return notifyError(t("admin.settings.password.wrongCurrent"));
     }
     const { error } = await supabase.auth.updateUser({ password: next });
     setBusy(false);
     if (error) return notifyError(error.message);
-    notifySuccess("Password updated");
+    notifySuccess(t("admin.settings.password.updated"));
     setCurrent("");
     setNext("");
     setConfirm("");
@@ -100,11 +103,11 @@ function PasswordSection() {
     <section className="rounded-2xl border bg-white shadow-sm">
       <div className="px-6 py-4 border-b flex items-center gap-2">
         <Lock className="h-5 w-5 text-primary" />
-        <h2 className="font-bold">Change password</h2>
+        <h2 className="font-bold">{t("admin.settings.password.title")}</h2>
       </div>
       <form onSubmit={submit} className="p-6 grid sm:grid-cols-3 gap-4 items-end">
         <div className="space-y-1.5">
-          <Label>Current password</Label>
+          <Label>{t("admin.settings.password.current")}</Label>
           <div className="relative">
             <Input
               type={show ? "text" : "password"}
@@ -123,7 +126,7 @@ function PasswordSection() {
           </div>
         </div>
         <div className="space-y-1.5">
-          <Label>New password</Label>
+          <Label>{t("admin.settings.password.new")}</Label>
           <Input
             type={show ? "text" : "password"}
             value={next}
@@ -133,7 +136,7 @@ function PasswordSection() {
           />
         </div>
         <div className="space-y-1.5">
-          <Label>Confirm new</Label>
+          <Label>{t("admin.settings.password.confirm")}</Label>
           <Input
             type={show ? "text" : "password"}
             value={confirm}
@@ -145,7 +148,7 @@ function PasswordSection() {
         <div className="sm:col-span-3">
           <Button disabled={busy} className="gap-2">
             {busy && <Loader2 className="h-4 w-4 animate-spin" />}
-            Update password
+            {t("admin.settings.password.submit")}
           </Button>
         </div>
       </form>
@@ -181,6 +184,7 @@ const EMPTY_STATS: TrafficStats = {
 };
 
 function TrafficSection() {
+  const { t } = useI18n();
   const [days, setDays] = useState(30);
 
   const { data, isLoading, isFetching, refetch, error } = useQuery({
@@ -211,25 +215,25 @@ function TrafficSection() {
 
   const kpis = [
     {
-      label: `Total visits (${days}d)`,
+      label: `${t("admin.settings.traffic.totalVisits")} (${days}d)`,
       value: stats.total,
       icon: BarChart3,
       accent: "text-primary bg-primary/10",
     },
     {
-      label: "Visits today",
+      label: t("admin.settings.traffic.visitsToday"),
       value: stats.today,
       icon: Activity,
       accent: "text-amber-600 bg-amber-100",
     },
     {
-      label: "Signed-in visitors",
+      label: t("admin.settings.traffic.signedInVisitors"),
       value: stats.unique_visitors,
       icon: Users,
       accent: "text-emerald-600 bg-emerald-100",
     },
     {
-      label: "All-time visits",
+      label: t("admin.settings.traffic.allTimeVisits"),
       value: stats.total_all_time,
       icon: Globe,
       accent: "text-violet-600 bg-violet-100",
@@ -238,12 +242,12 @@ function TrafficSection() {
 
   const deviceKpis = [
     {
-      label: "Desktop",
+      label: t("admin.settings.traffic.desktop"),
       value: stats.devices.find((d) => d.name === "Desktop")?.value ?? 0,
       icon: Monitor,
     },
     {
-      label: "Mobile",
+      label: t("admin.settings.traffic.mobile"),
       value: stats.devices.find((d) => d.name === "Mobile")?.value ?? 0,
       icon: Smartphone,
     },
@@ -253,18 +257,18 @@ function TrafficSection() {
     <section className="rounded-2xl border bg-white shadow-sm">
       <div className="px-6 py-4 border-b flex flex-wrap items-center gap-2">
         <BarChart3 className="h-5 w-5 text-primary" />
-        <h2 className="font-bold">Traffic &amp; analytics</h2>
+        <h2 className="font-bold">{t("admin.settings.traffic.title")}</h2>
         <div className="ml-auto flex items-center gap-2">
           <select
             value={days}
             onChange={(e) => setDays(Number(e.target.value))}
             className="h-8 rounded-md border border-gray-200 bg-white px-2 text-xs text-gray-600"
           >
-            <option value={1}>Today</option>
-            <option value={7}>Last 7 days</option>
-            <option value={30}>Last 30 days</option>
-            <option value={90}>Last 90 days</option>
-            <option value={365}>Last 12 months</option>
+            <option value={1}>{t("admin.settings.traffic.today")}</option>
+            <option value={7}>{t("admin.settings.traffic.last7")}</option>
+            <option value={30}>{t("admin.settings.traffic.last30")}</option>
+            <option value={90}>{t("admin.settings.traffic.last90")}</option>
+            <option value={365}>{t("admin.settings.traffic.last12months")}</option>
           </select>
           <Button
             variant="outline"
@@ -274,14 +278,14 @@ function TrafficSection() {
             disabled={isFetching}
           >
             <RefreshCw className={`h-3.5 w-3.5 ${isFetching ? "animate-spin" : ""}`} />
-            Refresh
+            {t("admin.settings.traffic.refresh")}
           </Button>
         </div>
       </div>
       <div className="p-6 space-y-6">
         {error ? (
           <p className="text-sm text-red-600">
-            Could not load analytics: {(error as Error).message}
+            {t("admin.settings.traffic.loadError")} {(error as Error).message}
           </p>
         ) : isLoading ? (
           <div className="flex justify-center py-12">
@@ -330,7 +334,7 @@ function TrafficSection() {
 
             <div className="grid lg:grid-cols-2 gap-6">
               <div className="rounded-xl border p-4">
-                <h3 className="text-sm font-semibold mb-3">Visits over time</h3>
+                <h3 className="text-sm font-semibold mb-3">{t("admin.settings.traffic.visitsOverTime")}</h3>
                 <div className="h-56">
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={stats.timeline}>
@@ -351,7 +355,7 @@ function TrafficSection() {
               </div>
 
               <div className="rounded-xl border p-4">
-                <h3 className="text-sm font-semibold mb-3">Devices</h3>
+                <h3 className="text-sm font-semibold mb-3">{t("admin.settings.traffic.devices")}</h3>
                 <div className="h-56">
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
@@ -376,7 +380,7 @@ function TrafficSection() {
               </div>
 
               <div className="rounded-xl border p-4">
-                <h3 className="text-sm font-semibold mb-3">Browsers</h3>
+                <h3 className="text-sm font-semibold mb-3">{t("admin.settings.traffic.browsers")}</h3>
                 <div className="h-56">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={stats.browsers}>
@@ -391,7 +395,7 @@ function TrafficSection() {
               </div>
 
               <div className="rounded-xl border p-4">
-                <h3 className="text-sm font-semibold mb-3">Top countries / regions</h3>
+                <h3 className="text-sm font-semibold mb-3">{t("admin.settings.traffic.topCountries")}</h3>
                 <ul className="space-y-2">
                   {stats.countries.map((c, i) => {
                     const pct = stats.total ? Math.round((c.value / stats.total) * 100) : 0;
@@ -416,7 +420,7 @@ function TrafficSection() {
                     );
                   })}
                   {stats.countries.length === 0 && (
-                    <li className="text-xs text-gray-500">No visits yet.</li>
+                    <li className="text-xs text-gray-500">{t("admin.settings.traffic.noVisits")}</li>
                   )}
                 </ul>
               </div>
@@ -429,10 +433,11 @@ function TrafficSection() {
 }
 
 function PlatformInfo() {
+  const { t } = useI18n();
   const info = [
-    { label: "Platform", value: "Banyamulenge Community Heritage", icon: Palette },
-    { label: "Version", value: "1.0.0", icon: Settings },
-    { label: "Security", value: "Managed backend, RLS enforced", icon: Shield },
+    { label: t("admin.settings.platform"), value: "Banyamulenge Community Heritage", icon: Palette },
+    { label: t("admin.settings.version"), value: "1.0.0", icon: Settings },
+    { label: t("admin.settings.security"), value: t("admin.settings.securityValue"), icon: Shield },
   ];
   return (
     <div className="grid sm:grid-cols-3 gap-4">

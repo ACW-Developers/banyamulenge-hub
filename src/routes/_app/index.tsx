@@ -37,15 +37,16 @@ export const Route = createFileRoute("/_app/")({
 });
 
 function FeedError({ reset }: { reset: () => void }) {
+  const { t } = useI18n();
   return (
     <div className="max-w-md mx-auto text-center py-16">
-      <h2 className="text-lg font-bold">The feed didn't load</h2>
-      <p className="text-sm text-gray-500 mt-1">Check your connection and try again.</p>
+      <h2 className="text-lg font-bold">{t("feed.error.title")}</h2>
+      <p className="text-sm text-gray-500 mt-1">{t("feed.error.sub")}</p>
       <button
         onClick={reset}
         className="mt-4 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
       >
-        Try again
+        {t("feed.error.retry")}
       </button>
     </div>
   );
@@ -115,7 +116,7 @@ function FeedPage() {
         </h1>
         <p className="mt-2 text-sm sm:text-base text-gray-500">{t("title.communitySub")}</p>
       </div>
-      <div className="grid lg:grid-cols-[minmax(0,1fr)_340px] gap-6">
+      <div className="grid lg:grid-cols-[minmax(0,1fr)_300px] gap-6">
         <div className="min-w-0 space-y-6">
           <PostComposer queryKey={feedKey} />
 

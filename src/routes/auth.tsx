@@ -1,10 +1,11 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { toast } from "sonner";
+import { toast } from "@/lib/notify";
 import { Mail, Lock, User, Loader2, ArrowLeft, Eye, EyeOff, MailCheck } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
+import { useI18n } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -32,6 +33,7 @@ type Mode = "signin" | "signup" | "forgot";
 function AuthPage() {
   const navigate = useNavigate();
   const { session, loading } = useAuth();
+  const { t } = useI18n();
   const [mode, setMode] = useState<Mode>("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -100,10 +102,10 @@ function AuthPage() {
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
         <div className="relative z-10 p-10 text-white max-w-xl">
           <h1 className="text-3xl font-bold leading-tight drop-shadow-lg">
-            One community. One heritage. Everywhere in the world.
+            {t("auth.tagline")}
           </h1>
           <p className="mt-3 text-white/90 drop-shadow">
-            Preserve our stories, connect across continents, and celebrate Banyamulenge culture.
+            {t("auth.taglineSub")}
           </p>
         </div>
       </div>
@@ -118,7 +120,7 @@ function AuthPage() {
                 alt="Banyamulenge Heritage Hub"
                 className="h-36 w-auto object-contain"
               />
-              <p className="text-xs text-muted-foreground mt-2">Community Heritage Platform</p>
+              <p className="text-xs text-muted-foreground mt-2">{t("auth.subtitle")}</p>
             </div>
 
             {!isForgot && (
@@ -132,7 +134,7 @@ function AuthPage() {
                       : "text-muted-foreground"
                   }`}
                 >
-                  Login
+                  {t("auth.login")}
                 </button>
                 <button
                   type="button"
@@ -143,16 +145,16 @@ function AuthPage() {
                       : "text-muted-foreground"
                   }`}
                 >
-                  Sign Up
+                  {t("auth.signup")}
                 </button>
               </div>
             )}
 
             {isForgot && (
               <div className="mb-6 text-center">
-                <h2 className="text-lg font-bold">Forgot your password?</h2>
+                <h2 className="text-lg font-bold">{t("auth.forgotTitle")}</h2>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Enter your email and we'll send you a link to set a new password.
+                  {t("auth.forgotSub")}
                 </p>
               </div>
             )}
@@ -160,14 +162,14 @@ function AuthPage() {
             <form onSubmit={handleSubmit} className="space-y-4">
               {mode === "signup" && (
                 <div className="space-y-1.5">
-                  <Label htmlFor="name">Full name</Label>
+                  <Label htmlFor="name">{t("auth.fullName")}</Label>
                   <div className="relative">
                     <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
                       id="name"
                       value={displayName}
                       onChange={(e) => setDisplayName(e.target.value)}
-                      placeholder="Your name"
+                      placeholder={t("auth.yourName")}
                       className={inputClass}
                       required
                     />
@@ -176,7 +178,7 @@ function AuthPage() {
               )}
 
               <div className="space-y-1.5">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">{t("auth.email")}</Label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
@@ -195,7 +197,7 @@ function AuthPage() {
               {!isForgot && (
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between">
-                    <Label htmlFor="password">Password</Label>
+                    <Label htmlFor="password">{t("auth.password")}</Label>
                     {mode === "signin" && (
                       <button
                         type="button"
@@ -205,7 +207,7 @@ function AuthPage() {
                         }}
                         className="text-xs font-medium text-primary hover:underline"
                       >
-                        Forgot password?
+                        {t("auth.forgot")}
                       </button>
                     )}
                   </div>
@@ -246,10 +248,7 @@ function AuthPage() {
                     htmlFor="terms"
                     className="text-xs font-normal leading-relaxed text-muted-foreground"
                   >
-                    I agree to the{" "}
-                    <span className="font-semibold text-primary">Terms and Conditions</span> and the{" "}
-                    <span className="font-semibold text-primary">Privacy Policy</span> of
-                    Banyamulenge Heritage Hub.
+                    {t("auth.terms")}
                   </Label>
                 </div>
               )}
@@ -257,10 +256,7 @@ function AuthPage() {
               {isForgot && resetSent && (
                 <div className="flex items-start gap-2 rounded-lg border-2 border-emerald-600/30 bg-emerald-50 p-3 text-xs text-emerald-800">
                   <MailCheck className="h-4 w-4 shrink-0 mt-0.5" />
-                  <span>
-                    Email sent. Open the link in your inbox to set a new password, then log in
-                    again.
-                  </span>
+                  <span>{t("auth.checkInbox")}</span>
                 </div>
               )}
 
@@ -277,14 +273,14 @@ function AuthPage() {
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : isForgot ? (
                   resetSent ? (
-                    "Reset link sent"
+                    t("auth.resetSent")
                   ) : (
-                    "Send reset link"
+                    t("auth.sendReset")
                   )
                 ) : mode === "signin" ? (
-                  "Login"
+                  t("auth.login")
                 ) : (
-                  "Create Account"
+                  t("auth.createAccount")
                 )}
               </Button>
             </form>
@@ -298,13 +294,13 @@ function AuthPage() {
                 }}
                 className="mt-4 w-full text-center text-xs font-medium text-primary hover:underline"
               >
-                Back to login
+                {t("auth.backToLogin")}
               </button>
             )}
 
             <div className="mt-6 text-center text-xs text-muted-foreground">
               <Link to="/" className="inline-flex items-center gap-1 hover:text-primary">
-                <ArrowLeft className="h-3 w-3" /> Back to home
+                <ArrowLeft className="h-3 w-3" /> {t("auth.backHome")}
               </Link>
             </div>
           </div>

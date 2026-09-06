@@ -20,7 +20,8 @@ import {
   UsersRound,
   Tag,
 } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/lib/notify";
+import { useI18n } from "@/lib/i18n";
 
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
@@ -85,36 +86,36 @@ type Listing = {
 
 const KINDS: {
   value: Kind;
-  label: string;
-  desc: string;
+  labelKey: string;
+  descKey: string;
   icon: typeof Store;
   color: string;
 }[] = [
   {
     value: "service",
-    label: "Services",
-    desc: "Advertise a service you offer",
+    labelKey: "marketplace.kind.service.label",
+    descKey: "marketplace.kind.service.desc",
     icon: Briefcase,
     color: "from-amber-500 to-orange-500",
   },
   {
     value: "product",
-    label: "Products",
-    desc: "Sell items in the community",
+    labelKey: "marketplace.kind.product.label",
+    descKey: "marketplace.kind.product.desc",
     icon: Package,
     color: "from-emerald-500 to-teal-500",
   },
   {
     value: "customer",
-    label: "Find Customers",
-    desc: "Reach potential clients",
+    labelKey: "marketplace.kind.customer.label",
+    descKey: "marketplace.kind.customer.desc",
     icon: UserSearch,
     color: "from-sky-500 to-blue-500",
   },
   {
     value: "job",
-    label: "Hiring",
-    desc: "Post open roles",
+    labelKey: "marketplace.kind.job.label",
+    descKey: "marketplace.kind.job.desc",
     icon: UsersRound,
     color: "from-fuchsia-500 to-purple-500",
   },
@@ -124,6 +125,7 @@ const key = ["marketplace"] as const;
 
 function MarketplacePage() {
   const { user, isAdmin } = useAuth();
+  const { t } = useI18n();
   const qc = useQueryClient();
   const [tab, setTab] = useState<"all" | Kind>("all");
   const [q, setQ] = useState("");
@@ -166,7 +168,7 @@ function MarketplacePage() {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("Listing removed");
+      toast.success(t("marketplace.listingRemoved"));
       qc.invalidateQueries({ queryKey: key });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -179,14 +181,13 @@ function MarketplacePage() {
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div className="max-w-2xl">
             <div className="inline-flex items-center gap-2 rounded-full bg-white/70 backdrop-blur px-3 py-1 text-xs font-semibold text-primary border border-primary/20">
-              <Store className="h-3.5 w-3.5" /> Community Marketplace
+              <Store className="h-3.5 w-3.5" /> {t("marketplace.badge")}
             </div>
             <h1 className="mt-3 text-3xl md:text-4xl font-bold tracking-tight text-gray-900">
-              Trade, hire and grow together
+              {t("marketplace.title")}
             </h1>
             <p className="mt-2 text-gray-600 text-sm md:text-base">
-              Advertise your services, sell products, find customers or hire employees within the
-              Banyamulenge community.
+              {t("marketplace.subtitle")}
             </p>
           </div>
           {user && (
@@ -197,7 +198,7 @@ function MarketplacePage() {
               }}
               className="gap-2"
             >
-              <Plus className="h-4 w-4" /> Post a listing
+              <Plus className="h-4 w-4" /> {t("marketplace.postListing")}
             </Button>
           )}
         </div>
@@ -220,8 +221,8 @@ function MarketplacePage() {
                 >
                   <Icon className="h-4 w-4" />
                 </div>
-                <div className="mt-2 text-sm font-semibold text-gray-900">{k.label}</div>
-                <div className="text-[11px] text-gray-500">{k.desc}</div>
+                <div className="mt-2 text-sm font-semibold text-gray-900">{t(k.labelKey)}</div>
+                <div className="text-[11px] text-gray-500">{t(k.descKey)}</div>
               </button>
             );
           })}
@@ -235,17 +236,17 @@ function MarketplacePage() {
           <Input
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="Search title, category, location…"
+            placeholder={t("marketplace.searchPlaceholder")}
             className="pl-9"
           />
         </div>
         <div className="flex items-center gap-2 overflow-x-auto">
           <TabPill active={tab === "all"} onClick={() => setTab("all")}>
-            All
+            {t("marketplace.tab.all")}
           </TabPill>
           {KINDS.map((k) => (
             <TabPill key={k.value} active={tab === k.value} onClick={() => setTab(k.value)}>
-              {k.label}
+              {t(k.labelKey)}
             </TabPill>
           ))}
         </div>
@@ -259,7 +260,7 @@ function MarketplacePage() {
       ) : filtered.length === 0 ? (
         <div className="text-center py-16 border border-dashed rounded-2xl bg-white">
           <Store className="h-8 w-8 text-gray-300 mx-auto" />
-          <p className="mt-3 text-sm text-gray-500">No listings match your search yet.</p>
+          <p className="mt-3 text-sm text-gray-500">{t("marketplace.empty")}</p>
           {user && (
             <Button
               variant="outline"
@@ -270,7 +271,7 @@ function MarketplacePage() {
                 setOpen(true);
               }}
             >
-              <Plus className="h-4 w-4" /> Create the first one
+              <Plus className="h-4 w-4" /> {t("marketplace.createFirst")}
             </Button>
           )}
         </div>
@@ -303,7 +304,7 @@ function MarketplacePage() {
                   <span
                     className={`absolute top-2 left-2 rounded-full bg-gradient-to-br ${meta?.color ?? "from-gray-500 to-gray-700"} text-white text-[10px] font-bold px-2.5 py-1 shadow`}
                   >
-                    {meta?.label ?? l.kind}
+                    {meta ? t(meta.labelKey) : l.kind}
                   </span>
                   {l.price != null && (
                     <span className="absolute top-2 right-2 rounded-full bg-white/95 text-gray-900 text-xs font-bold px-2.5 py-1 shadow">
@@ -325,14 +326,14 @@ function MarketplacePage() {
                             setOpen(true);
                           }}
                           className="text-gray-400 hover:text-primary p-1"
-                          aria-label="Edit"
+                          aria-label={t("marketplace.edit")}
                         >
                           <Pencil className="h-3.5 w-3.5" />
                         </button>
                         <button
-                          onClick={() => confirm("Delete this listing?") && del.mutate(l.id)}
+                          onClick={() => confirm(t("marketplace.confirmDelete")) && del.mutate(l.id)}
                           className="text-gray-400 hover:text-red-500 p-1"
-                          aria-label="Delete"
+                          aria-label={t("marketplace.delete")}
                         >
                           <Trash2 className="h-3.5 w-3.5" />
                         </button>
@@ -384,7 +385,7 @@ function MarketplacePage() {
                           rel="noopener noreferrer"
                           className="inline-flex items-center gap-1 text-primary font-semibold hover:underline"
                         >
-                          Visit <ExternalLink className="h-3 w-3" />
+                          {t("marketplace.visit")} <ExternalLink className="h-3 w-3" />
                         </a>
                       )}
                     </div>
@@ -439,6 +440,7 @@ function ListingDialog({
   editing: Listing | null;
 }) {
   const { user } = useAuth();
+  const { t } = useI18n();
   const qc = useQueryClient();
   const [busy, setBusy] = useState(false);
   const [kind, setKind] = useState<Kind>(editing?.kind ?? "service");
@@ -462,14 +464,14 @@ function ListingDialog({
   function pick(e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0];
     if (!f) return;
-    if (f.size > 5 * 1024 * 1024) return toast.error("Image must be under 5 MB");
+    if (f.size > 5 * 1024 * 1024) return toast.error(t("marketplace.imageTooLarge"));
     setFile(f);
     setPreview(URL.createObjectURL(f));
   }
 
   async function submit() {
     if (!user || !title.trim() || !description.trim() || !category.trim()) {
-      toast.error("Title, category and description are required");
+      toast.error(t("marketplace.requiredFields"));
       return;
     }
     setBusy(true);
@@ -496,11 +498,11 @@ function ListingDialog({
           .update(payload)
           .eq("id", editing.id);
         if (error) throw error;
-        toast.success("Listing updated");
+        toast.success(t("marketplace.listingUpdated"));
       } else {
         const { error } = await supabase.from("marketplace_listings").insert(payload);
         if (error) throw error;
-        toast.success("Listing published");
+        toast.success(t("marketplace.listingPublished"));
       }
       qc.invalidateQueries({ queryKey: key });
       onOpenChange(false);
@@ -515,40 +517,40 @@ function ListingDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{editing ? "Edit listing" : "New marketplace listing"}</DialogTitle>
+          <DialogTitle>{editing ? t("marketplace.dialog.editTitle") : t("marketplace.dialog.newTitle")}</DialogTitle>
         </DialogHeader>
         <div className="space-y-3">
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label>Type</Label>
+              <Label>{t("marketplace.field.type")}</Label>
               <Select value={kind} onValueChange={(v) => setKind(v as Kind)}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                   {KINDS.map((k) => (
                     <SelectItem key={k.value} value={k.value}>
-                      {k.label}
+                      {t(k.labelKey)}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-1.5">
-              <Label>Category</Label>
+              <Label>{t("marketplace.field.category")}</Label>
               <Input
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                placeholder="e.g. Tailoring, Electronics"
+                placeholder={t("marketplace.field.categoryPlaceholder")}
               />
             </div>
           </div>
 
           <div className="space-y-1.5">
-            <Label>Title</Label>
+            <Label>{t("marketplace.field.title")}</Label>
             <Input value={title} onChange={(e) => setTitle(e.target.value)} />
           </div>
 
           <div className="space-y-1.5">
-            <Label>Description</Label>
+            <Label>{t("marketplace.field.description")}</Label>
             <Textarea
               rows={4}
               value={description}
@@ -558,7 +560,7 @@ function ListingDialog({
 
           <div className="grid grid-cols-3 gap-3">
             <div className="space-y-1.5 col-span-2">
-              <Label>Price (optional)</Label>
+              <Label>{t("marketplace.field.price")}</Label>
               <Input
                 type="number"
                 value={price}
@@ -567,29 +569,29 @@ function ListingDialog({
               />
             </div>
             <div className="space-y-1.5">
-              <Label>Currency</Label>
+              <Label>{t("marketplace.field.currency")}</Label>
               <Input value={currency ?? ""} onChange={(e) => setCurrency(e.target.value)} />
             </div>
           </div>
 
           <div className="space-y-1.5">
-            <Label>Location</Label>
+            <Label>{t("marketplace.field.location")}</Label>
             <Input value={location ?? ""} onChange={(e) => setLocation(e.target.value)} />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label>Contact email</Label>
+              <Label>{t("marketplace.field.contactEmail")}</Label>
               <Input value={email ?? ""} onChange={(e) => setEmail(e.target.value)} />
             </div>
             <div className="space-y-1.5">
-              <Label>Phone</Label>
+              <Label>{t("marketplace.field.phone")}</Label>
               <Input value={phone ?? ""} onChange={(e) => setPhone(e.target.value)} />
             </div>
           </div>
 
           <div className="space-y-1.5">
-            <Label>External link (optional)</Label>
+            <Label>{t("marketplace.field.externalLink")}</Label>
             <Input
               value={link ?? ""}
               onChange={(e) => setLink(e.target.value)}
@@ -598,9 +600,9 @@ function ListingDialog({
           </div>
 
           <div className="space-y-1.5">
-            <Label>Image (optional)</Label>
+            <Label>{t("marketplace.field.image")}</Label>
             <label className="cursor-pointer inline-flex items-center gap-2 px-3 py-2 rounded-lg border text-sm text-gray-600 hover:bg-gray-50 w-fit">
-              <ImageIcon className="h-4 w-4" /> Choose image
+              <ImageIcon className="h-4 w-4" /> {t("marketplace.field.chooseImage")}
               <input type="file" accept="image/*" className="hidden" onChange={pick} />
             </label>
             {preview && (
@@ -616,10 +618,10 @@ function ListingDialog({
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
+            {t("marketplace.cancel")}
           </Button>
           <Button onClick={submit} disabled={busy}>
-            {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : editing ? "Save" : "Publish"}
+            {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : editing ? t("marketplace.save") : t("marketplace.publish")}
           </Button>
         </DialogFooter>
       </DialogContent>

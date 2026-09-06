@@ -19,7 +19,8 @@ import {
   X,
 } from "lucide-react";
 import { format } from "date-fns";
-import { toast } from "sonner";
+import { toast } from "@/lib/notify";
+import { useI18n } from "@/lib/i18n";
 
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
@@ -81,6 +82,7 @@ type GroupMessage = {
 };
 
 function GroupChatPage() {
+  const { t } = useI18n();
   const { id } = useParams({ from: "/_app/community/$id" });
   const { user, isAdmin } = useAuth();
   const qc = useQueryClient();
@@ -204,7 +206,7 @@ function GroupChatPage() {
       .from("conversation_participants")
       .insert({ conversation_id: id, user_id: user.id });
     if (error) return toast.error(error.message);
-    toast.success("You joined the group");
+    toast.success(t("community.youJoinedGroup"));
     qc.invalidateQueries({ queryKey: groupKey });
     qc.invalidateQueries({ queryKey: ["community-groups"] });
     qc.invalidateQueries({ queryKey: ["conversations", user.id] });
@@ -218,7 +220,7 @@ function GroupChatPage() {
       .eq("conversation_id", id)
       .eq("user_id", user.id);
     if (error) return toast.error(error.message);
-    toast.success("You left the group");
+    toast.success(t("community.youLeftGroup"));
     qc.invalidateQueries({ queryKey: ["community-groups"] });
     qc.invalidateQueries({ queryKey: ["conversations", user.id] });
     navigate({ to: "/community" });
@@ -231,14 +233,14 @@ function GroupChatPage() {
       .eq("conversation_id", id)
       .eq("user_id", userId);
     if (error) return toast.error(error.message);
-    toast.success("Member removed");
+    toast.success(t("community.memberRemoved"));
     qc.invalidateQueries({ queryKey: groupKey });
   }
 
   async function deleteGroup() {
     const { error } = await supabase.from("conversations").delete().eq("id", id);
     if (error) return toast.error(error.message);
-    toast.success("Group deleted");
+    toast.success(t("community.groupDeleted"));
     qc.invalidateQueries({ queryKey: ["community-groups"] });
     qc.invalidateQueries({ queryKey: ["conversations", user?.id] });
     navigate({ to: "/community" });
@@ -255,9 +257,9 @@ function GroupChatPage() {
   if (!group || !group.is_group) {
     return (
       <div className="text-center py-16 space-y-2">
-        <p className="text-gray-500">Group not found.</p>
+        <p className="text-gray-500">{t("community.groupNotFound")}</p>
         <Link to="/community" className="text-primary text-sm">
-          Back to Community
+          {t("community.backToCommunity")}
         </Link>
       </div>
     );
@@ -269,7 +271,7 @@ function GroupChatPage() {
         to="/community"
         className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-primary"
       >
-        <ArrowLeft className="h-4 w-4" /> All groups
+        <ArrowLeft className="h-4 w-4" /> {t("community.allGroups")}
       </Link>
 
       <div className="rounded-2xl border bg-white p-5 shadow-sm flex flex-wrap items-center gap-4">
@@ -280,9 +282,9 @@ function GroupChatPage() {
           </AvatarFallback>
         </Avatar>
         <div className="flex-1 min-w-[180px]">
-          <h1 className="text-2xl font-bold text-gray-900 truncate">{group.title ?? "Group"}</h1>
+          <h1 className="text-2xl font-bold text-gray-900 truncate">{group.title ?? t("community.defaultGroupName")}</h1>
           <div className="text-xs text-gray-500 mt-1">
-            {members.length} member{members.length === 1 ? "" : "s"}
+            {members.length} {members.length === 1 ? t("community.member") : t("community.members")}
           </div>
           {group.description && (
             <p className="text-sm text-gray-600 mt-2">{group.description}</p>
@@ -291,11 +293,11 @@ function GroupChatPage() {
         <div className="flex items-center gap-2">
           {isMember ? (
             <Button variant="outline" className="gap-2" onClick={() => setSettingsOpen(true)}>
-              <Settings className="h-4 w-4" /> Group info
+              <Settings className="h-4 w-4" /> {t("community.groupInfo")}
             </Button>
           ) : (
             <Button className="gap-2" onClick={join} disabled={!user}>
-              <UserPlus className="h-4 w-4" /> Join group
+              <UserPlus className="h-4 w-4" /> {t("community.joinGroup")}
             </Button>
           )}
         </div>
@@ -308,7 +310,7 @@ function GroupChatPage() {
               messages.map((m) => {
                 const mine = m.sender_id === user?.id;
                 const sender = members.find((p) => p.user_id === m.sender_id)?.profiles;
-                const name = sender?.display_name || sender?.username || "Member";
+                const name = sender?.display_name || sender?.username || t("community.memberFallback");
                 return (
                   <div key={m.id} className={`flex gap-2 ${mine ? "justify-end" : "justify-start"}`}>
                     {!mine && (
@@ -335,7 +337,7 @@ function GroupChatPage() {
                                 loading="lazy"
                                 decoding="async"
                                 src={m.attachment_url}
-                                alt={m.attachment_name ?? "Shared image"}
+                                alt={m.attachment_name ?? t("community.sharedImage")}
                                 className="rounded-lg max-h-64 object-cover"
                                 
                               />
@@ -348,7 +350,7 @@ function GroupChatPage() {
                               className="inline-flex items-center gap-2 underline"
                             >
                               <FileText className="h-4 w-4" />
-                              {m.attachment_name ?? "Attachment"}
+                              {m.attachment_name ?? t("community.attachment")}
                             </a>
                           )
                         ) : (
@@ -364,7 +366,7 @@ function GroupChatPage() {
                             onClick={() => deleteMessage(m.id)}
                             className="text-[10px] text-gray-400 hover:text-red-500"
                           >
-                            Delete
+                            {t("community.delete")}
                           </button>
                         )}
                       </div>
@@ -374,7 +376,7 @@ function GroupChatPage() {
               })
             ) : (
               <div className="text-center py-12 text-sm text-gray-500">
-                No messages yet. Say hello 👋
+                {t("community.noMessages")}
               </div>
             )}
             <div ref={bottomRef} />
@@ -385,7 +387,7 @@ function GroupChatPage() {
               size="icon"
               onClick={() => imgRef.current?.click()}
               disabled={uploading}
-              aria-label="Attach image"
+              aria-label={t("community.attachImage")}
             >
               <ImageIcon className="h-4 w-4" />
             </Button>
@@ -394,14 +396,14 @@ function GroupChatPage() {
               size="icon"
               onClick={() => fileRef.current?.click()}
               disabled={uploading}
-              aria-label="Attach file"
+              aria-label={t("community.attachFile")}
             >
               <Paperclip className="h-4 w-4" />
             </Button>
             <Input
               value={text}
               onChange={(e) => setText(e.target.value)}
-              placeholder="Message the group..."
+              placeholder={t("community.messagePlaceholder")}
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
                   e.preventDefault();
@@ -415,13 +417,13 @@ function GroupChatPage() {
               ) : (
                 <Send className="h-4 w-4" />
               )}
-              Send
+              {t("community.send")}
             </Button>
           </div>
         </div>
       ) : (
         <div className="rounded-2xl border bg-amber-50 border-amber-200 p-8 text-center text-sm text-amber-800">
-          This group's chat is private. Join the group to read and send messages.
+          {t("community.privateChatNotice")}
         </div>
       )}
 
@@ -490,6 +492,7 @@ function GroupInfoDialog({
   onLeave: () => void;
   onDelete: () => void;
 }) {
+  const { t } = useI18n();
   const [title, setTitle] = useState(group.title ?? "");
   const [description, setDescription] = useState(group.description ?? "");
   const [saving, setSaving] = useState(false);
@@ -509,7 +512,7 @@ function GroupInfoDialog({
       .eq("id", group.id);
     setSaving(false);
     if (error) return toast.error(error.message);
-    toast.success("Group updated");
+    toast.success(t("community.groupUpdated"));
     onSaved();
   }
 
@@ -523,7 +526,7 @@ function GroupInfoDialog({
         .update({ avatar_url: url })
         .eq("id", group.id);
       if (error) throw error;
-      toast.success("Group icon updated");
+      toast.success(t("community.groupIconUpdated"));
       onSaved();
     } catch (e) {
       toast.error((e as Error).message);
@@ -537,7 +540,7 @@ function GroupInfoDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[85vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Group info</DialogTitle>
+          <DialogTitle>{t("community.groupInfo")}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
@@ -554,7 +557,7 @@ function GroupInfoDialog({
                   onClick={() => iconRef.current?.click()}
                   disabled={iconBusy}
                   className="absolute -bottom-1 -right-1 h-8 w-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow"
-                  aria-label="Change group icon"
+                  aria-label={t("community.changeGroupIcon")}
                 >
                   {iconBusy ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
@@ -566,19 +569,19 @@ function GroupInfoDialog({
             </div>
             <div className="text-sm text-gray-500">
               {canManage
-                ? "Tap the camera to upload a group icon from your device."
-                : "Only the group owner can change these details."}
+                ? t("community.manageHintOwner")
+                : t("community.manageHintMember")}
             </div>
           </div>
 
           {canManage ? (
             <div className="space-y-3">
               <div className="space-y-1.5">
-                <Label>Group name</Label>
+                <Label>{t("community.groupName")}</Label>
                 <Input value={title} onChange={(e) => setTitle(e.target.value)} />
               </div>
               <div className="space-y-1.5">
-                <Label>Description</Label>
+                <Label>{t("community.description")}</Label>
                 <Textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
@@ -586,18 +589,18 @@ function GroupInfoDialog({
                 />
               </div>
               <Button onClick={save} disabled={saving} className="gap-2">
-                {saving && <Loader2 className="h-4 w-4 animate-spin" />} Save changes
+                {saving && <Loader2 className="h-4 w-4 animate-spin" />} {t("community.saveChanges")}
               </Button>
             </div>
           ) : null}
 
           <div className="space-y-2">
             <div className="text-sm font-semibold text-gray-700">
-              Members ({members.length})
+              {t("community.membersCount")} ({members.length})
             </div>
             <div className="divide-y rounded-xl border">
               {members.map((m) => {
-                const name = m.profiles?.display_name || m.profiles?.username || "Member";
+                const name = m.profiles?.display_name || m.profiles?.username || t("community.memberFallback");
                 return (
                   <div key={m.user_id} className="flex items-center gap-3 p-3">
                     <Avatar className="h-9 w-9">
@@ -610,11 +613,11 @@ function GroupInfoDialog({
                       <div className="text-sm font-semibold truncate flex items-center gap-1.5">
                         {name}
                         {isOwnerOf(m.user_id) && (
-                          <Crown className="h-3.5 w-3.5 text-amber-500" aria-label="Owner" />
+                          <Crown className="h-3.5 w-3.5 text-amber-500" aria-label={t("community.owner")} />
                         )}
                       </div>
                       <div className="text-xs text-gray-500 truncate">
-                        @{m.profiles?.username ?? "member"}
+                        @{m.profiles?.username ?? t("community.memberFallbackAt")}
                       </div>
                     </div>
                     {canManage && !isOwnerOf(m.user_id) && m.user_id !== currentUserId && (
@@ -624,7 +627,7 @@ function GroupInfoDialog({
                         className="text-red-600 gap-1"
                         onClick={() => onRemoveMember(m.user_id)}
                       >
-                        <UserMinus className="h-4 w-4" /> Remove
+                        <UserMinus className="h-4 w-4" /> {t("community.remove")}
                       </Button>
                     )}
                   </div>
@@ -637,16 +640,16 @@ function GroupInfoDialog({
         <DialogFooter className="flex-col sm:flex-row gap-2">
           {currentUserId && group.created_by !== currentUserId && (
             <Button variant="outline" className="gap-2" onClick={onLeave}>
-              <LogOut className="h-4 w-4" /> Exit group
+              <LogOut className="h-4 w-4" /> {t("community.exitGroup")}
             </Button>
           )}
           {canManage && (
             <Button variant="destructive" className="gap-2" onClick={onDelete}>
-              <Trash2 className="h-4 w-4" /> Delete group
+              <Trash2 className="h-4 w-4" /> {t("community.deleteGroup")}
             </Button>
           )}
           <Button variant="ghost" className="gap-2" onClick={() => onOpenChange(false)}>
-            <X className="h-4 w-4" /> Close
+            <X className="h-4 w-4" /> {t("community.close")}
           </Button>
         </DialogFooter>
 

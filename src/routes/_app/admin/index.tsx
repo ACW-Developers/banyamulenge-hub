@@ -3,12 +3,14 @@ import { useQuery } from "@tanstack/react-query";
 import { Users, FileText, MessageCircle, Activity, TrendingUp, Shield } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
+import { useI18n } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_app/admin/")({
   component: AdminDashboard,
 });
 
 function AdminDashboard() {
+  const { t } = useI18n();
   const { data: stats } = useQuery({
     queryKey: ["admin-stats"],
     queryFn: async () => {
@@ -44,22 +46,22 @@ function AdminDashboard() {
   });
 
   const cards = [
-    { label: "Total Users", value: stats?.users, icon: Users, color: "text-blue-600 bg-blue-50" },
-    { label: "Posts", value: stats?.posts, icon: FileText, color: "text-orange-600 bg-orange-50" },
-    { label: "Groups", value: stats?.groups, icon: Users, color: "text-purple-600 bg-purple-50" },
+    { label: t("admin.dashboard.card.totalUsers"), value: stats?.users, icon: Users, color: "text-blue-600 bg-blue-50" },
+    { label: t("admin.dashboard.card.posts"), value: stats?.posts, icon: FileText, color: "text-orange-600 bg-orange-50" },
+    { label: t("admin.dashboard.card.groups"), value: stats?.groups, icon: Users, color: "text-purple-600 bg-purple-50" },
     {
-      label: "Messages",
+      label: t("admin.dashboard.card.messages"),
       value: stats?.msgs,
       icon: MessageCircle,
       color: "text-emerald-600 bg-emerald-50",
     },
     {
-      label: "Activity Logs",
+      label: t("admin.dashboard.card.activityLogs"),
       value: stats?.logs,
       icon: Activity,
       color: "text-pink-600 bg-pink-50",
     },
-    { label: "Admins", value: stats?.admins, icon: Shield, color: "text-amber-600 bg-amber-50" },
+    { label: t("admin.dashboard.card.admins"), value: stats?.admins, icon: Shield, color: "text-amber-600 bg-amber-50" },
   ];
 
   const today = new Date();
@@ -68,9 +70,9 @@ function AdminDashboard() {
     <div className="space-y-6">
       <div className="flex items-end justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{t("admin.dashboard.title")}</h1>
           <p className="text-sm text-gray-500 mt-1">
-            Banyamulenge Community Heritage - Platform Overview
+            {t("admin.dashboard.subtitle")}
           </p>
         </div>
         <div className="text-sm text-gray-500">{format(today, "EEEE, MMMM d, yyyy")}</div>
@@ -104,7 +106,7 @@ function AdminDashboard() {
         <div className="rounded-2xl border bg-white p-6 shadow-sm">
           <div className="flex items-center gap-2 mb-4">
             <TrendingUp className="h-5 w-5 text-primary" />
-            <h2 className="font-bold">Recent Sign-ups</h2>
+            <h2 className="font-bold">{t("admin.dashboard.recentSignups")}</h2>
           </div>
           <div className="space-y-3">
             {latestUsers?.map((u) => {
@@ -141,7 +143,7 @@ function AdminDashboard() {
         <div className="rounded-2xl border bg-white p-6 shadow-sm">
           <div className="flex items-center gap-2 mb-4">
             <Shield className="h-5 w-5 text-primary" />
-            <h2 className="font-bold">Quick Actions</h2>
+            <h2 className="font-bold">{t("admin.dashboard.quickActions")}</h2>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <Link
@@ -149,32 +151,32 @@ function AdminDashboard() {
               className="rounded-xl border p-4 hover:border-primary/50 hover:bg-primary/5 transition"
             >
               <Users className="h-5 w-5 text-primary mb-2" />
-              <div className="font-semibold text-sm">Manage Users</div>
-              <div className="text-xs text-gray-500 mt-1">Roles & members</div>
+              <div className="font-semibold text-sm">{t("admin.dashboard.manageUsers")}</div>
+              <div className="text-xs text-gray-500 mt-1">{t("admin.dashboard.rolesMembers")}</div>
             </Link>
             <Link
               to="/admin/logs"
               className="rounded-xl border p-4 hover:border-primary/50 hover:bg-primary/5 transition"
             >
               <Activity className="h-5 w-5 text-primary mb-2" />
-              <div className="font-semibold text-sm">Activity Logs</div>
-              <div className="text-xs text-gray-500 mt-1">Recent actions</div>
+              <div className="font-semibold text-sm">{t("admin.dashboard.activityLogsLink")}</div>
+              <div className="text-xs text-gray-500 mt-1">{t("admin.dashboard.recentActions")}</div>
             </Link>
             <Link
               to="/admin/settings"
               className="rounded-xl border p-4 hover:border-primary/50 hover:bg-primary/5 transition"
             >
               <Shield className="h-5 w-5 text-primary mb-2" />
-              <div className="font-semibold text-sm">Platform Settings</div>
-              <div className="text-xs text-gray-500 mt-1">Configuration</div>
+              <div className="font-semibold text-sm">{t("admin.dashboard.platformSettings")}</div>
+              <div className="text-xs text-gray-500 mt-1">{t("admin.dashboard.configuration")}</div>
             </Link>
             <Link
               to="/community"
               className="rounded-xl border p-4 hover:border-primary/50 hover:bg-primary/5 transition"
             >
               <Users className="h-5 w-5 text-primary mb-2" />
-              <div className="font-semibold text-sm">View Community</div>
-              <div className="text-xs text-gray-500 mt-1">Groups</div>
+              <div className="font-semibold text-sm">{t("admin.dashboard.viewCommunity")}</div>
+              <div className="text-xs text-gray-500 mt-1">{t("admin.dashboard.groupsLink")}</div>
             </Link>
           </div>
         </div>
