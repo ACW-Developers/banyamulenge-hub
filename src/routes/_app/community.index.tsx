@@ -13,6 +13,7 @@ import {
   Crown,
 } from "lucide-react";
 import { toast } from "@/lib/notify";
+import { useI18n } from "@/lib/i18n";
 import { formatDistanceToNow } from "date-fns";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -66,6 +67,7 @@ export type GroupRow = {
 };
 
 function CommunityPage() {
+  const { t } = useI18n();
   const { user, isAdmin } = useAuth();
   const qc = useQueryClient();
   const navigate = useNavigate();
@@ -94,7 +96,7 @@ function CommunityPage() {
 
   const membership = useMutation({
     mutationFn: async ({ groupId, member }: { groupId: string; member: boolean }) => {
-      if (!user) throw new Error("Sign in first");
+      if (!user) throw new Error(t("community.signInFirst"));
       if (member) {
         const { error } = await supabase
           .from("conversation_participants")
@@ -110,7 +112,7 @@ function CommunityPage() {
       }
     },
     onSuccess: (_d, v) => {
-      toast.success(v.member ? "You left the group" : "You joined the group");
+      toast.success(v.member ? t("community.youLeftGroup") : t("community.youJoinedGroup"));
       qc.invalidateQueries({ queryKey: ["community-groups"] });
       qc.invalidateQueries({ queryKey: ["conversations", user?.id] });
     },
@@ -132,7 +134,7 @@ function CommunityPage() {
       .single();
     if (error || !data) {
       setBusy(false);
-      toast.error(error?.message ?? "Could not create group");
+      toast.error(error?.message ?? t("community.couldNotCreateGroup"));
       return;
     }
     const { error: cpErr } = await supabase
@@ -143,7 +145,7 @@ function CommunityPage() {
       toast.error(cpErr.message);
       return;
     }
-    toast.success("Group created");
+    toast.success(t("community.groupCreated"));
     setOpen(false);
     setName("");
     setDesc("");
@@ -171,50 +173,49 @@ function CommunityPage() {
     <div className="max-w-5xl mx-auto space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Community Groups</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{t("community.title")}</h1>
           <p className="text-sm text-gray-500 mt-1">
-            Join a group to unlock its private chat. Only members can read and send messages.
+            {t("community.subtitle")}
           </p>
         </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
             <Button className="gap-2" disabled={!user}>
-              <Plus className="h-4 w-4" /> New group
+              <Plus className="h-4 w-4" /> {t("community.newGroup")}
             </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Create a group</DialogTitle>
+              <DialogTitle>{t("community.createGroup")}</DialogTitle>
             </DialogHeader>
             <div className="space-y-3">
               <div className="space-y-1.5">
-                <Label>Group name</Label>
+                <Label>{t("community.groupName")}</Label>
                 <Input
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="Nairobi Chapter"
+                  placeholder={t("community.groupNamePlaceholder")}
                 />
               </div>
               <div className="space-y-1.5">
-                <Label>Description</Label>
+                <Label>{t("community.description")}</Label>
                 <Textarea
                   value={desc}
                   onChange={(e) => setDesc(e.target.value)}
                   rows={3}
-                  placeholder="What is this group about?"
+                  placeholder={t("community.descriptionPlaceholder")}
                 />
               </div>
               <p className="text-xs text-gray-500">
-                You become the group owner and can edit details, set the group icon, remove members
-                or delete the group.
+                {t("community.ownerHint")}
               </p>
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setOpen(false)}>
-                Cancel
+                {t("community.cancel")}
               </Button>
               <Button onClick={createGroup} disabled={busy || !name.trim()}>
-                {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : "Create"}
+                {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : t("community.create")}
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -226,7 +227,7 @@ function CommunityPage() {
         <Input
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder="Search groups..."
+          placeholder={t("community.searchPlaceholder")}
           className="pl-9 bg-white"
         />
       </div>
@@ -238,14 +239,14 @@ function CommunityPage() {
       ) : filtered.length === 0 ? (
         <div className="rounded-2xl border bg-white p-12 text-center">
           <Users className="h-10 w-10 mx-auto text-primary mb-3" />
-          <p className="text-sm text-gray-600">No groups yet. Create the first one.</p>
+          <p className="text-sm text-gray-600">{t("community.noGroups")}</p>
         </div>
       ) : (
         <div className="space-y-8">
           {mine.length > 0 && (
             <section className="space-y-3">
               <h2 className="text-sm font-bold uppercase tracking-wider text-gray-500">
-                Your groups
+                {t("community.yourGroups")}
               </h2>
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {mine.map((g) => (
@@ -265,7 +266,7 @@ function CommunityPage() {
           {others.length > 0 && (
             <section className="space-y-3">
               <h2 className="text-sm font-bold uppercase tracking-wider text-gray-500">
-                Discover groups
+                {t("community.discoverGroups")}
               </h2>
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {others.map((g) => (
