@@ -29,6 +29,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { logActivity } from "@/lib/tracking";
 import { notifyError, notifySuccess } from "@/lib/notify";
+import { useI18n } from "@/lib/i18n";
 
 export type FeedPost = {
   id: string;
@@ -58,6 +59,7 @@ export function postImages(post: FeedPost): string[] {
 export function PostCard({ post, queryKey }: { post: FeedPost; queryKey: readonly unknown[] }) {
   const { user, isAdmin } = useAuth();
   const qc = useQueryClient();
+  const { t } = useI18n();
   const [showComments, setShowComments] = useState(false);
   const [commentText, setCommentText] = useState("");
   const [lightbox, setLightbox] = useState<string | null>(null);
@@ -70,7 +72,7 @@ export function PostCard({ post, queryKey }: { post: FeedPost; queryKey: readonl
 
   const toggleLike = useMutation({
     mutationFn: async () => {
-      if (!user) throw new Error("Sign in first");
+      if (!user) throw new Error(t("home.post.signInFirst"));
       if (liked) {
         const { error } = await supabase
           .from("likes")
@@ -118,7 +120,7 @@ export function PostCard({ post, queryKey }: { post: FeedPost; queryKey: readonl
       if (error) throw error;
     },
     onSuccess: () => {
-      notifySuccess("Post deleted");
+      notifySuccess(t("home.post.deleted"));
       qc.invalidateQueries({ queryKey });
     },
     onError: (e: Error) => notifyError(e.message),
@@ -133,7 +135,7 @@ export function PostCard({ post, queryKey }: { post: FeedPost; queryKey: readonl
       if (error) throw error;
     },
     onSuccess: () => {
-      notifySuccess(post.is_announcement ? "Unmarked as announcement" : "Marked as announcement");
+      notifySuccess(post.is_announcement ? t("home.post.unmarkedAnnouncement") : t("home.post.markedAnnouncement"));
       qc.invalidateQueries({ queryKey });
     },
     onError: (e: Error) => notifyError(e.message),
@@ -170,10 +172,10 @@ export function PostCard({ post, queryKey }: { post: FeedPost; queryKey: readonl
     const url = `${window.location.origin}/?post=${post.id}`;
     try {
       if (navigator.share) {
-        await navigator.share({ title: "Community post", text: post.content.slice(0, 80), url });
+        await navigator.share({ title: t("home.post.shareTitle"), text: post.content.slice(0, 80), url });
       } else {
         await navigator.clipboard.writeText(url);
-        notifySuccess("Link copied");
+        notifySuccess(t("home.post.linkCopied"));
       }
       if (user) logActivity(user.id, "post.share", "post", post.id);
     } catch {
@@ -191,7 +193,7 @@ export function PostCard({ post, queryKey }: { post: FeedPost; queryKey: readonl
     >
       {post.is_announcement && (
         <div className="flex items-center gap-2 mb-3 text-amber-700 text-xs font-bold uppercase tracking-wider">
-          <Megaphone className="h-4 w-4" /> Community Announcement
+          <Megaphone className="h-4 w-4" /> {t("home.post.announcement")}
         </div>
       )}
       <header className="flex items-center gap-3 mb-3">
@@ -227,12 +229,12 @@ export function PostCard({ post, queryKey }: { post: FeedPost; queryKey: readonl
               {isAdmin && (
                 <DropdownMenuItem onClick={() => toggleAnnouncement.mutate()}>
                   <Megaphone className="h-4 w-4 mr-2" />
-                  {post.is_announcement ? "Unmark announcement" : "Mark as announcement"}
+                  {post.is_announcement ? t("home.post.unmarkAnnouncement") : t("home.post.markAnnouncement")}
                 </DropdownMenuItem>
               )}
               {(canDelete || isAdmin) && (
                 <DropdownMenuItem onClick={() => del.mutate()} className="text-red-600">
-                  <Trash2 className="h-4 w-4 mr-2" /> Delete
+                  <Trash2 className="h-4 w-4 mr-2" /> {t("home.post.delete")}
                 </DropdownMenuItem>
               )}
             </DropdownMenuContent>
@@ -282,7 +284,7 @@ export function PostCard({ post, queryKey }: { post: FeedPost; queryKey: readonl
           {post.comments.length}
         </Button>
         <Button variant="ghost" size="sm" className="gap-2" onClick={share}>
-          <Share2 className="h-4 w-4" /> Share
+          <Share2 className="h-4 w-4" /> {t("home.post.share")}
         </Button>
       </footer>
 
@@ -317,7 +319,7 @@ export function PostCard({ post, queryKey }: { post: FeedPost; queryKey: readonl
               <Textarea
                 value={commentText}
                 onChange={(e) => setCommentText(e.target.value)}
-                placeholder="Write a comment..."
+                placeholder={t("home.post.commentPlaceholder")}
                 className="min-h-[40px] resize-none text-sm"
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && !e.shiftKey) {
@@ -354,6 +356,7 @@ export function PostComposer({
 }) {
   const { user, profile, isAdmin } = useAuth();
   const qc = useQueryClient();
+  const { t } = useI18n();
   const [content, setContent] = useState("");
   const [files, setFiles] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
@@ -371,11 +374,11 @@ export function PostComposer({
     if (!picked.length) return;
     const room = MAX_PHOTOS - files.length;
     if (room <= 0) {
-      notifyError(`You can attach up to ${MAX_PHOTOS} photos`);
+      notifyError(t("home.composer.maxPhotos").replace("{max}", String(MAX_PHOTOS)));
       return;
     }
     const tooBig = picked.filter((f) => f.size > 5 * 1024 * 1024);
-    if (tooBig.length) notifyError("Each image must be under 5 MB");
+    if (tooBig.length) notifyError(t("home.composer.imageTooBig"));
     const accepted = picked.filter((f) => f.size <= 5 * 1024 * 1024).slice(0, room);
     if (!accepted.length) return;
     setFiles((prev) => [...prev, ...accepted]);
@@ -396,7 +399,7 @@ export function PostComposer({
     e.target.value = "";
     if (!f) return;
     if (f.size > 40 * 1024 * 1024) {
-      notifyError("Video must be under 40 MB");
+      notifyError(t("home.composer.videoTooBig"));
       return;
     }
     // Validate duration
@@ -406,7 +409,7 @@ export function PostComposer({
     v.onloadedmetadata = () => {
       if (v.duration > 120.5) {
         URL.revokeObjectURL(url);
-        notifyError("Video must be 2 minutes or shorter");
+        notifyError(t("home.composer.videoTooLong"));
         return;
       }
       setVideoFile(f);
@@ -414,7 +417,7 @@ export function PostComposer({
     };
     v.onerror = () => {
       URL.revokeObjectURL(url);
-      notifyError("Could not read that video file");
+      notifyError(t("home.composer.videoUnreadable"));
     };
     v.src = url;
   }
@@ -447,9 +450,12 @@ export function PostComposer({
       setVideoFile(null);
       setVideoPreview(null);
       setIsAnnouncement(false);
-      notifySuccess("Post shared", {
+      notifySuccess(t("home.composer.postShared"), {
         description: image_urls.length
-          ? `${image_urls.length} photo${image_urls.length > 1 ? "s" : ""} attached`
+          ? (image_urls.length > 1
+              ? t("home.composer.photosAttachedPlural")
+              : t("home.composer.photosAttached")
+            ).replace("{count}", String(image_urls.length))
           : undefined,
       });
       logActivity(user.id, "post.create", "post");
@@ -474,7 +480,7 @@ export function PostComposer({
           <Textarea
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            placeholder={`Share something with the community, ${profile?.display_name || "friend"}...`}
+            placeholder={t("home.composer.placeholder").replace("{name}", profile?.display_name || t("home.composer.friend"))}
             className="min-h-[80px] resize-none border-0 bg-gray-50 focus-visible:ring-1"
           />
           {previews.length > 0 && (
@@ -492,7 +498,7 @@ export function PostComposer({
                   <button
                     onClick={() => removeImage(i)}
                     className="absolute top-1.5 right-1.5 rounded-full bg-black/60 text-white p-1 hover:bg-black"
-                    aria-label="Remove image"
+                    aria-label={t("home.post.removeImage")}
                     type="button"
                   >
                     <TrashIcon />
@@ -510,7 +516,7 @@ export function PostComposer({
                   setVideoPreview(null);
                 }}
                 className="absolute top-2 right-2 rounded-full bg-black/60 text-white p-1 hover:bg-black"
-                aria-label="Remove video"
+                aria-label={t("home.post.removeVideo")}
                 type="button"
               >
                 <TrashIcon />
@@ -520,7 +526,7 @@ export function PostComposer({
           <div className="flex flex-wrap items-center gap-2">
             <label className="cursor-pointer inline-flex items-center gap-2 px-3 py-2 rounded-lg border text-sm text-gray-600 hover:bg-gray-50">
               <ImageIcon />
-              Photos
+              {t("home.composer.photos")}
               <input
                 type="file"
                 accept="image/*"
@@ -534,7 +540,7 @@ export function PostComposer({
             </label>
             <label className="cursor-pointer inline-flex items-center gap-2 px-3 py-2 rounded-lg border text-sm text-gray-600 hover:bg-gray-50">
               <VideoIcon />
-              Video
+              {t("home.composer.video")}
               <input type="file" accept="video/*" className="hidden" onChange={pickVideo} />
             </label>
             {isAdmin && !groupId && (
@@ -548,13 +554,13 @@ export function PostComposer({
                 }`}
               >
                 <Megaphone className="h-4 w-4" />
-                Announcement
+                {t("home.composer.announcement")}
               </button>
             )}
             <div className="ml-auto">
               <Button disabled={!content.trim() || busy} onClick={submit} className="gap-2">
                 {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-                Post
+                {t("home.composer.post")}
               </Button>
             </div>
           </div>
@@ -587,6 +593,7 @@ function VideoIcon() {
 
 /** Horizontally swipeable photo gallery with counter and dot progress. */
 function PostGallery({ images, onOpen }: { images: string[]; onOpen: (src: string) => void }) {
+  const { t } = useI18n();
   const trackRef = useRef<HTMLDivElement | null>(null);
   const [index, setIndex] = useState(0);
   const multi = images.length > 1;
@@ -639,7 +646,7 @@ function PostGallery({ images, onOpen }: { images: string[]; onOpen: (src: strin
             <button
               type="button"
               onClick={() => go(-1)}
-              aria-label="Previous photo"
+              aria-label={t("home.post.previousPhoto")}
               className="absolute left-2 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70"
             >
               <ChevronLeft className="h-4 w-4" />
@@ -649,7 +656,7 @@ function PostGallery({ images, onOpen }: { images: string[]; onOpen: (src: strin
             <button
               type="button"
               onClick={() => go(1)}
-              aria-label="Next photo"
+              aria-label={t("home.post.nextPhoto")}
               className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70"
             >
               <ChevronRight className="h-4 w-4" />

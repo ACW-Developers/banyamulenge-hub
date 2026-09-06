@@ -492,6 +492,7 @@ function GroupInfoDialog({
   onLeave: () => void;
   onDelete: () => void;
 }) {
+  const { t } = useI18n();
   const [title, setTitle] = useState(group.title ?? "");
   const [description, setDescription] = useState(group.description ?? "");
   const [saving, setSaving] = useState(false);
@@ -511,7 +512,7 @@ function GroupInfoDialog({
       .eq("id", group.id);
     setSaving(false);
     if (error) return toast.error(error.message);
-    toast.success("Group updated");
+    toast.success(t("community.groupUpdated"));
     onSaved();
   }
 
@@ -525,7 +526,7 @@ function GroupInfoDialog({
         .update({ avatar_url: url })
         .eq("id", group.id);
       if (error) throw error;
-      toast.success("Group icon updated");
+      toast.success(t("community.groupIconUpdated"));
       onSaved();
     } catch (e) {
       toast.error((e as Error).message);
@@ -539,7 +540,7 @@ function GroupInfoDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[85vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Group info</DialogTitle>
+          <DialogTitle>{t("community.groupInfo")}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
@@ -556,7 +557,7 @@ function GroupInfoDialog({
                   onClick={() => iconRef.current?.click()}
                   disabled={iconBusy}
                   className="absolute -bottom-1 -right-1 h-8 w-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow"
-                  aria-label="Change group icon"
+                  aria-label={t("community.changeGroupIcon")}
                 >
                   {iconBusy ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
@@ -568,19 +569,19 @@ function GroupInfoDialog({
             </div>
             <div className="text-sm text-gray-500">
               {canManage
-                ? "Tap the camera to upload a group icon from your device."
-                : "Only the group owner can change these details."}
+                ? t("community.manageHintOwner")
+                : t("community.manageHintMember")}
             </div>
           </div>
 
           {canManage ? (
             <div className="space-y-3">
               <div className="space-y-1.5">
-                <Label>Group name</Label>
+                <Label>{t("community.groupName")}</Label>
                 <Input value={title} onChange={(e) => setTitle(e.target.value)} />
               </div>
               <div className="space-y-1.5">
-                <Label>Description</Label>
+                <Label>{t("community.description")}</Label>
                 <Textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
@@ -588,18 +589,18 @@ function GroupInfoDialog({
                 />
               </div>
               <Button onClick={save} disabled={saving} className="gap-2">
-                {saving && <Loader2 className="h-4 w-4 animate-spin" />} Save changes
+                {saving && <Loader2 className="h-4 w-4 animate-spin" />} {t("community.saveChanges")}
               </Button>
             </div>
           ) : null}
 
           <div className="space-y-2">
             <div className="text-sm font-semibold text-gray-700">
-              Members ({members.length})
+              {t("community.membersCount")} ({members.length})
             </div>
             <div className="divide-y rounded-xl border">
               {members.map((m) => {
-                const name = m.profiles?.display_name || m.profiles?.username || "Member";
+                const name = m.profiles?.display_name || m.profiles?.username || t("community.memberFallback");
                 return (
                   <div key={m.user_id} className="flex items-center gap-3 p-3">
                     <Avatar className="h-9 w-9">
@@ -612,11 +613,11 @@ function GroupInfoDialog({
                       <div className="text-sm font-semibold truncate flex items-center gap-1.5">
                         {name}
                         {isOwnerOf(m.user_id) && (
-                          <Crown className="h-3.5 w-3.5 text-amber-500" aria-label="Owner" />
+                          <Crown className="h-3.5 w-3.5 text-amber-500" aria-label={t("community.owner")} />
                         )}
                       </div>
                       <div className="text-xs text-gray-500 truncate">
-                        @{m.profiles?.username ?? "member"}
+                        @{m.profiles?.username ?? t("community.memberFallbackAt")}
                       </div>
                     </div>
                     {canManage && !isOwnerOf(m.user_id) && m.user_id !== currentUserId && (
@@ -626,7 +627,7 @@ function GroupInfoDialog({
                         className="text-red-600 gap-1"
                         onClick={() => onRemoveMember(m.user_id)}
                       >
-                        <UserMinus className="h-4 w-4" /> Remove
+                        <UserMinus className="h-4 w-4" /> {t("community.remove")}
                       </Button>
                     )}
                   </div>
@@ -639,16 +640,16 @@ function GroupInfoDialog({
         <DialogFooter className="flex-col sm:flex-row gap-2">
           {currentUserId && group.created_by !== currentUserId && (
             <Button variant="outline" className="gap-2" onClick={onLeave}>
-              <LogOut className="h-4 w-4" /> Exit group
+              <LogOut className="h-4 w-4" /> {t("community.exitGroup")}
             </Button>
           )}
           {canManage && (
             <Button variant="destructive" className="gap-2" onClick={onDelete}>
-              <Trash2 className="h-4 w-4" /> Delete group
+              <Trash2 className="h-4 w-4" /> {t("community.deleteGroup")}
             </Button>
           )}
           <Button variant="ghost" className="gap-2" onClick={() => onOpenChange(false)}>
-            <X className="h-4 w-4" /> Close
+            <X className="h-4 w-4" /> {t("community.close")}
           </Button>
         </DialogFooter>
 

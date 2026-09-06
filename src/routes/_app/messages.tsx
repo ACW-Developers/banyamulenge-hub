@@ -522,6 +522,7 @@ function ChatPane({
   const [editText, setEditText] = useState("");
   const [busyId, setBusyId] = useState<string | null>(null);
   const chatQc = useQueryClient();
+  const { t } = useI18n();
 
   function refreshChat() {
     chatQc.invalidateQueries({ queryKey: ["messages", convoId] });
@@ -546,12 +547,12 @@ function ChatPane({
       return;
     }
     if (!data?.length) {
-      toast.error("Message was already read — it can no longer be edited.");
+      toast.error(t("messages.alreadyReadEditError"));
       refreshChat();
       return;
     }
     setEditingId(null);
-    notifySuccess("Message edited");
+    notifySuccess(t("messages.messageEditedToast"));
     refreshChat();
   }
 
@@ -569,11 +570,11 @@ function ChatPane({
       return;
     }
     if (!data?.length) {
-      toast.error("Message was already read — it can no longer be unsent.");
+      toast.error(t("messages.alreadyReadUnsendError"));
       refreshChat();
       return;
     }
-    notifySuccess("Message unsent");
+    notifySuccess(t("messages.messageUnsentToast"));
     refreshChat();
   }
 
@@ -604,9 +605,9 @@ function ChatPane({
   const acceptCall = () => sessionRef.current?.accept();
   const hangup = () => sessionRef.current?.hangup();
 
-  const headerName = isGroup ? groupTitle : other?.display_name || other?.username || "Unknown";
+  const headerName = isGroup ? groupTitle : other?.display_name || other?.username || t("messages.unknown");
   const headerSub = isGroup
-    ? `${participants.length} members`
+    ? t("messages.membersCount").replace("{count}", String(participants.length))
     : other?.username
       ? `@${other.username}`
       : "";
@@ -623,7 +624,7 @@ function ChatPane({
           type="button"
           onClick={onClose}
           className="md:hidden -ml-1 h-9 w-9 rounded-full border flex items-center justify-center text-gray-600 shrink-0"
-          aria-label="Back to conversations"
+          aria-label={t("messages.backToConversations")}
         >
           <ArrowLeft className="h-4 w-4" />
         </button>
@@ -639,12 +640,12 @@ function ChatPane({
           type="button"
           onClick={() => isGroup && setMembersOpen(true)}
           className={`min-w-0 flex-1 text-left ${isGroup ? "hover:opacity-80 cursor-pointer" : "cursor-default"}`}
-          aria-label={isGroup ? "View group members" : undefined}
+          aria-label={isGroup ? t("messages.viewGroupMembers") : undefined}
         >
           <div className="font-semibold text-sm truncate">{headerName}</div>
           <div className="text-xs text-gray-500 truncate">
             {headerSub}
-            {isGroup && <span className="text-primary ml-1">· tap to manage</span>}
+            {isGroup && <span className="text-primary ml-1">{t("messages.tapToManage")}</span>}
           </div>
         </button>
 
@@ -653,14 +654,14 @@ function ChatPane({
             variant="outline"
             size="icon"
             onClick={startCall}
-            aria-label="Start audio call"
-            title="Start audio call"
+            aria-label={t("messages.startAudioCall")}
+            title={t("messages.startAudioCall")}
           >
             <Phone className="h-4 w-4 text-primary" />
           </Button>
         )}
         {!isGroup && inCall && (
-          <Button variant="destructive" size="icon" onClick={hangup} aria-label="End call">
+          <Button variant="destructive" size="icon" onClick={hangup} aria-label={t("messages.endCall")}>
             <PhoneOff className="h-4 w-4" />
           </Button>
         )}
@@ -669,18 +670,18 @@ function ChatPane({
       {inCall && (
         <div className="px-4 py-2 border-b bg-primary/5 text-xs flex items-center justify-between">
           <span className="font-medium text-primary">
-            {callStatus === "ringing" && "Calling…"}
-            {callStatus === "incoming" && "Incoming call"}
-            {callStatus === "connecting" && "Connecting…"}
-            {callStatus === "in-call" && "In call · audio"}
+            {callStatus === "ringing" && t("messages.calling")}
+            {callStatus === "incoming" && t("messages.incomingCall")}
+            {callStatus === "connecting" && t("messages.connecting")}
+            {callStatus === "in-call" && t("messages.inCallAudio")}
           </span>
           {callStatus === "incoming" && (
             <div className="flex gap-2">
               <Button size="sm" onClick={acceptCall} className="gap-1">
-                <Phone className="h-3 w-3" /> Accept
+                <Phone className="h-3 w-3" /> {t("messages.accept")}
               </Button>
               <Button size="sm" variant="destructive" onClick={hangup} className="gap-1">
-                <PhoneOff className="h-3 w-3" /> Decline
+                <PhoneOff className="h-3 w-3" /> {t("messages.decline")}
               </Button>
             </div>
           )}
@@ -703,7 +704,7 @@ function ChatPane({
                     <button
                       type="button"
                       className="md:hidden h-7 w-7 rounded-full border bg-white text-gray-500 flex items-center justify-center shrink-0"
-                      aria-label="Message options"
+                      aria-label={t("messages.messageOptions")}
                     >
                       <MoreVertical className="h-3.5 w-3.5" />
                     </button>
@@ -716,11 +717,11 @@ function ChatPane({
                           setEditText(m.content ?? "");
                         }}
                       >
-                        <Pencil className="h-4 w-4 mr-2" /> Edit
+                        <Pencil className="h-4 w-4 mr-2" /> {t("messages.edit")}
                       </DropdownMenuItem>
                     )}
                     <DropdownMenuItem className="text-red-600" onClick={() => unsend(m.id)}>
-                      <Undo2 className="h-4 w-4 mr-2" /> Delete
+                      <Undo2 className="h-4 w-4 mr-2" /> {t("messages.delete")}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -735,8 +736,8 @@ function ChatPane({
                         setEditText(m.content ?? "");
                       }}
                       className="h-7 w-7 rounded-full border bg-white text-gray-500 hover:text-primary flex items-center justify-center"
-                      aria-label="Edit message"
-                      title="Edit message"
+                      aria-label={t("messages.editMessage")}
+                      title={t("messages.editMessage")}
                     >
                       <Pencil className="h-3.5 w-3.5" />
                     </button>
@@ -746,8 +747,8 @@ function ChatPane({
                     onClick={() => unsend(m.id)}
                     disabled={busyId === m.id}
                     className="h-7 w-7 rounded-full border bg-white text-gray-500 hover:text-destructive flex items-center justify-center"
-                    aria-label="Unsend message"
-                    title="Unsend message"
+                    aria-label={t("messages.unsendMessage")}
+                    title={t("messages.unsendMessage")}
                   >
                     <Undo2 className="h-3.5 w-3.5" />
                   </button>
@@ -795,7 +796,7 @@ function ChatPane({
                         className="h-7 text-xs"
                         onClick={() => setEditingId(null)}
                       >
-                        Cancel
+                        {t("messages.cancel")}
                       </Button>
                       <Button
                         size="sm"
@@ -803,7 +804,7 @@ function ChatPane({
                         disabled={busyId === m.id || !editText.trim()}
                         onClick={() => void saveEdit(m.id)}
                       >
-                        Save
+                        {t("messages.save")}
                       </Button>
                     </div>
                   </div>
@@ -813,15 +814,15 @@ function ChatPane({
                 <div
                   className={`text-[10px] mt-1 flex items-center gap-1 ${mine ? "opacity-90 justify-end" : "text-gray-400"}`}
                 >
-                  {m.edited_at && <span className="italic">edited</span>}
+                  {m.edited_at && <span className="italic">{t("messages.edited")}</span>}
                   <span>{formatDistanceToNow(new Date(m.created_at), { addSuffix: true })}</span>
                   {mine &&
                     (m.read_at ? (
-                      <CheckCheck className="h-3.5 w-3.5 text-sky-300" aria-label="Read" />
+                      <CheckCheck className="h-3.5 w-3.5 text-sky-300" aria-label={t("messages.readAria")} />
                     ) : m.delivered_at ? (
-                      <CheckCheck className="h-3.5 w-3.5" aria-label="Delivered" />
+                      <CheckCheck className="h-3.5 w-3.5" aria-label={t("messages.deliveredAria")} />
                     ) : (
-                      <Check className="h-3.5 w-3.5" aria-label="Sent" />
+                      <Check className="h-3.5 w-3.5" aria-label={t("messages.sentAria")} />
                     ))}
                 </div>
               </div>
@@ -830,7 +831,7 @@ function ChatPane({
         })}
 
         {messages.length === 0 && (
-          <div className="text-center text-xs text-gray-400 py-8">Send the first message.</div>
+          <div className="text-center text-xs text-gray-400 py-8">{t("messages.sendFirstMessage")}</div>
         )}
       </div>
 
@@ -840,8 +841,8 @@ function ChatPane({
           size="icon"
           onClick={onPickImage}
           disabled={uploading}
-          aria-label="Attach image"
-          title="Attach image"
+          aria-label={t("messages.attachImage")}
+          title={t("messages.attachImage")}
         >
           <ImageIcon className="h-4 w-4" />
         </Button>
@@ -850,8 +851,8 @@ function ChatPane({
           size="icon"
           onClick={onPickFile}
           disabled={uploading}
-          aria-label="Attach file"
-          title="Attach file"
+          aria-label={t("messages.attachFile")}
+          title={t("messages.attachFile")}
         >
           <Paperclip className="h-4 w-4" />
         </Button>
@@ -864,7 +865,7 @@ function ChatPane({
               onSend();
             }
           }}
-          placeholder={uploading ? "Uploading…" : "Type a message..."}
+          placeholder={uploading ? t("messages.uploading") : t("messages.typeAMessage")}
           className="bg-gray-50 border-gray-200"
           disabled={uploading}
         />
@@ -903,6 +904,7 @@ function AttachmentBubble({
   name: string | null;
   mine: boolean;
 }) {
+  const { t } = useI18n();
   const [open, setOpen] = useState(false);
   const isImg = type?.startsWith("image/");
   if (isImg) {
@@ -925,7 +927,7 @@ function AttachmentBubble({
             <button
               className="absolute top-4 right-4 text-white p-2"
               onClick={() => setOpen(false)}
-              aria-label="Close"
+              aria-label={t("messages.close")}
             >
               <X className="h-5 w-5" />
             </button>
@@ -949,13 +951,14 @@ function AttachmentBubble({
       className={`flex items-center gap-2 mb-1 rounded-md px-2 py-1.5 text-xs font-medium underline ${mine ? "bg-white/10" : "bg-gray-100"}`}
     >
       <FileText className="h-4 w-4 shrink-0" />
-      <span className="truncate max-w-[180px]">{name ?? "Download"}</span>
+      <span className="truncate max-w-[180px]">{name ?? t("messages.download")}</span>
     </a>
   );
 }
 
 function NewChatDialog({ onOpened }: { onOpened: (id: string) => void }) {
   const { user } = useAuth();
+  const { t } = useI18n();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [busy, setBusy] = useState<string | null>(null);
@@ -992,15 +995,15 @@ function NewChatDialog({ onOpened }: { onOpened: (id: string) => void }) {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="outline" className="gap-2">
-          <Plus className="h-4 w-4" /> New chat
+          <Plus className="h-4 w-4" /> {t("messages.newChat")}
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Start a conversation</DialogTitle>
+          <DialogTitle>{t("messages.startConversation")}</DialogTitle>
         </DialogHeader>
         <Input
-          placeholder="Search members..."
+          placeholder={t("messages.searchMembers")}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
@@ -1038,6 +1041,7 @@ function NewChatDialog({ onOpened }: { onOpened: (id: string) => void }) {
 
 function NewGroupDialog({ onOpened }: { onOpened: (id: string) => void }) {
   const { user } = useAuth();
+  const { t } = useI18n();
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [query, setQuery] = useState("");
@@ -1071,8 +1075,8 @@ function NewGroupDialog({ onOpened }: { onOpened: (id: string) => void }) {
   async function create() {
     if (!user) return;
     const trimmed = title.trim();
-    if (!trimmed) return toast.error("Please give the group a name");
-    if (picked.size < 1) return toast.error("Pick at least one member");
+    if (!trimmed) return toast.error(t("messages.groupNameRequired"));
+    if (picked.size < 1) return toast.error(t("messages.pickAtLeastOneMember"));
     setBusy(true);
     try {
       const { data, error } = await supabase.rpc("create_group_conversation", {
@@ -1080,7 +1084,7 @@ function NewGroupDialog({ onOpened }: { onOpened: (id: string) => void }) {
         _members: Array.from(picked),
       });
       if (error) throw error;
-      if (!data) throw new Error("Could not create group");
+      if (!data) throw new Error(t("messages.couldNotCreateGroup"));
       onOpened(data as string);
       setOpen(false);
       setTitle("");
@@ -1097,24 +1101,28 @@ function NewGroupDialog({ onOpened }: { onOpened: (id: string) => void }) {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="outline" className="gap-2">
-          <UsersRound className="h-4 w-4" /> New group
+          <UsersRound className="h-4 w-4" /> {t("messages.newGroup")}
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Create a group chat</DialogTitle>
+          <DialogTitle>{t("messages.createGroupChat")}</DialogTitle>
         </DialogHeader>
         <Input
-          placeholder="Group name (e.g. Family Elders)"
+          placeholder={t("messages.groupNamePlaceholder")}
           value={title}
           onChange={(e) => setTitle(e.target.value)}
         />
         <Input
-          placeholder="Search members to add..."
+          placeholder={t("messages.searchMembersToAdd")}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
-        {picked.size > 0 && <div className="text-xs text-gray-500">{picked.size} selected</div>}
+        {picked.size > 0 && (
+          <div className="text-xs text-gray-500">
+            {t("messages.selectedCount").replace("{count}", String(picked.size))}
+          </div>
+        )}
         <div className="max-h-72 overflow-y-auto -mx-2">
           {people?.map((p) => {
             const initial = (p.display_name || p.username).slice(0, 1).toUpperCase();
@@ -1154,10 +1162,10 @@ function NewGroupDialog({ onOpened }: { onOpened: (id: string) => void }) {
         </div>
         <div className="flex justify-end gap-2 pt-2">
           <Button variant="ghost" onClick={() => setOpen(false)}>
-            Cancel
+            {t("messages.cancel")}
           </Button>
           <Button onClick={create} disabled={busy} className="gap-2">
-            {busy && <Loader2 className="h-4 w-4 animate-spin" />} Create group
+            {busy && <Loader2 className="h-4 w-4 animate-spin" />} {t("messages.createGroup")}
           </Button>
         </div>
       </DialogContent>
@@ -1185,12 +1193,13 @@ function GroupMembersDialog({
   onDeleted: () => void;
 }) {
   const qc = useQueryClient();
+  const { t } = useI18n();
   const isCreator = !!createdBy && createdBy === currentUserId;
   const [busy, setBusy] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
 
   async function removeMember(uid: string) {
-    if (!confirm("Remove this member from the group?")) return;
+    if (!confirm(t("messages.removeMemberConfirm"))) return;
     setBusy(uid);
     const { error } = await supabase
       .from("conversation_participants")
@@ -1199,15 +1208,12 @@ function GroupMembersDialog({
       .eq("user_id", uid);
     setBusy(null);
     if (error) return toast.error(error.message);
-    toast.success("Member removed");
+    toast.success(t("messages.memberRemoved"));
     qc.invalidateQueries({ queryKey: ["conversations", currentUserId] });
   }
 
   async function deleteGroup() {
-    if (
-      !confirm("Delete this group and all its messages? This cannot be undone.")
-    )
-      return;
+    if (!confirm(t("messages.deleteGroupConfirm"))) return;
     setDeleting(true);
     // Delete messages first, then participants, then the conversation itself.
     await supabase.from("messages").delete().eq("conversation_id", convoId);
@@ -1215,7 +1221,7 @@ function GroupMembersDialog({
     const { error } = await supabase.from("conversations").delete().eq("id", convoId);
     setDeleting(false);
     if (error) return toast.error(error.message);
-    toast.success("Group deleted");
+    toast.success(t("messages.groupDeleted"));
     qc.invalidateQueries({ queryKey: ["conversations", currentUserId] });
     onDeleted();
   }
@@ -1236,11 +1242,11 @@ function GroupMembersDialog({
           </DialogTitle>
         </DialogHeader>
         <div className="text-xs text-gray-500 -mt-2">
-          {participants.length} member{participants.length === 1 ? "" : "s"}
+          {t("messages.membersCount").replace("{count}", String(participants.length))}
         </div>
         <div className="max-h-80 overflow-y-auto -mx-2 mt-2">
           {sorted.map((p) => {
-            const name = p.profile?.display_name || p.profile?.username || "Unknown";
+            const name = p.profile?.display_name || p.profile?.username || t("messages.unknown");
             const initial = name.slice(0, 1).toUpperCase();
             const isOwner = p.user_id === createdBy;
             const isMe = p.user_id === currentUserId;
@@ -1261,13 +1267,13 @@ function GroupMembersDialog({
                     {isOwner && (
                       <span
                         className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-amber-700 bg-amber-100 rounded px-1.5 py-0.5"
-                        title="Group creator"
+                        title={t("messages.groupCreator")}
                       >
-                        <Crown className="h-3 w-3" /> Owner
+                        <Crown className="h-3 w-3" /> {t("messages.owner")}
                       </span>
                     )}
                     {isMe && (
-                      <span className="text-[10px] font-medium text-gray-500">(you)</span>
+                      <span className="text-[10px] font-medium text-gray-500">{t("messages.you.short")}</span>
                     )}
                   </div>
                   {p.profile?.username && (
@@ -1280,8 +1286,8 @@ function GroupMembersDialog({
                     size="icon"
                     onClick={() => removeMember(p.user_id)}
                     disabled={busy === p.user_id}
-                    aria-label={`Remove ${name}`}
-                    title="Remove from group"
+                    aria-label={t("messages.removeAria").replace("{name}", name)}
+                    title={t("messages.removeFromGroup")}
                   >
                     {busy === p.user_id ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
@@ -1307,7 +1313,7 @@ function GroupMembersDialog({
               ) : (
                 <Trash2 className="h-4 w-4" />
               )}
-              Delete group
+              {t("messages.deleteGroup")}
             </Button>
           </div>
         )}

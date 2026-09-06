@@ -20,6 +20,7 @@ import {
   GraduationCap,
 } from "lucide-react";
 import { toast } from "@/lib/notify";
+import { useI18n } from "@/lib/i18n";
 
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
@@ -81,21 +82,22 @@ type Entry = {
 
 const KINDS: {
   value: Kind;
-  label: string;
+  labelKey: string;
   icon: typeof Briefcase;
   color: string;
 }[] = [
-  { value: "professional", label: "Professionals", icon: Briefcase, color: "from-blue-500 to-indigo-500" },
-  { value: "church", label: "Churches", icon: Church, color: "from-amber-500 to-orange-500" },
-  { value: "organization", label: "Organizations", icon: Landmark, color: "from-emerald-500 to-teal-500" },
-  { value: "business", label: "Businesses", icon: Building2, color: "from-rose-500 to-pink-500" },
-  { value: "mentor", label: "Mentors", icon: GraduationCap, color: "from-fuchsia-500 to-purple-500" },
+  { value: "professional", labelKey: "directory.kind.professional", icon: Briefcase, color: "from-blue-500 to-indigo-500" },
+  { value: "church", labelKey: "directory.kind.church", icon: Church, color: "from-amber-500 to-orange-500" },
+  { value: "organization", labelKey: "directory.kind.organization", icon: Landmark, color: "from-emerald-500 to-teal-500" },
+  { value: "business", labelKey: "directory.kind.business", icon: Building2, color: "from-rose-500 to-pink-500" },
+  { value: "mentor", labelKey: "directory.kind.mentor", icon: GraduationCap, color: "from-fuchsia-500 to-purple-500" },
 ];
 
 const key = ["directory"] as const;
 
 function DirectoryPage() {
   const { user, isAdmin } = useAuth();
+  const { t } = useI18n();
   const qc = useQueryClient();
   const [tab, setTab] = useState<"all" | Kind>("all");
   const [q, setQ] = useState("");
@@ -138,7 +140,7 @@ function DirectoryPage() {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("Entry removed");
+      toast.success(t("directory.entryRemoved"));
       qc.invalidateQueries({ queryKey: key });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -150,14 +152,13 @@ function DirectoryPage() {
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div className="max-w-2xl">
             <div className="inline-flex items-center gap-2 rounded-full bg-white/70 backdrop-blur px-3 py-1 text-xs font-semibold text-primary border border-primary/20">
-              <BookUser className="h-3.5 w-3.5" /> Community Directory
+              <BookUser className="h-3.5 w-3.5" /> {t("directory.badge")}
             </div>
             <h1 className="mt-3 text-3xl md:text-4xl font-bold tracking-tight text-gray-900">
-              Find the people and places you need
+              {t("directory.title")}
             </h1>
             <p className="mt-2 text-gray-600 text-sm md:text-base">
-              Search professionals, churches, organizations, businesses and mentors across the
-              Banyamulenge community.
+              {t("directory.subtitle")}
             </p>
           </div>
           {user && (
@@ -168,7 +169,7 @@ function DirectoryPage() {
               }}
               className="gap-2"
             >
-              <Plus className="h-4 w-4" /> Add entry
+              <Plus className="h-4 w-4" /> {t("directory.addEntry")}
             </Button>
           )}
         </div>
@@ -190,7 +191,7 @@ function DirectoryPage() {
                 >
                   <Icon className="h-4 w-4" />
                 </div>
-                <div className="mt-2 text-sm font-semibold text-gray-900">{k.label}</div>
+                <div className="mt-2 text-sm font-semibold text-gray-900">{t(k.labelKey)}</div>
               </button>
             );
           })}
@@ -203,17 +204,17 @@ function DirectoryPage() {
           <Input
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="Search name, category, location…"
+            placeholder={t("directory.searchPlaceholder")}
             className="pl-9"
           />
         </div>
         <div className="flex items-center gap-2 overflow-x-auto">
           <TabPill active={tab === "all"} onClick={() => setTab("all")}>
-            All
+            {t("directory.tab.all")}
           </TabPill>
           {KINDS.map((k) => (
             <TabPill key={k.value} active={tab === k.value} onClick={() => setTab(k.value)}>
-              {k.label}
+              {t(k.labelKey)}
             </TabPill>
           ))}
         </div>
@@ -226,7 +227,7 @@ function DirectoryPage() {
       ) : filtered.length === 0 ? (
         <div className="text-center py-16 border border-dashed rounded-2xl bg-white">
           <BookUser className="h-8 w-8 text-gray-300 mx-auto" />
-          <p className="mt-3 text-sm text-gray-500">No entries match your search yet.</p>
+          <p className="mt-3 text-sm text-gray-500">{t("directory.empty")}</p>
           {user && (
             <Button
               variant="outline"
@@ -237,7 +238,7 @@ function DirectoryPage() {
                 setOpen(true);
               }}
             >
-              <Plus className="h-4 w-4" /> Add the first one
+              <Plus className="h-4 w-4" /> {t("directory.addFirst")}
             </Button>
           )}
         </div>
@@ -270,7 +271,7 @@ function DirectoryPage() {
                     </div>
                   )}
                   <span className="absolute top-2 left-2 rounded-full bg-white/90 text-gray-900 text-[10px] font-bold px-2.5 py-1 shadow">
-                    {meta?.label ?? e.kind}
+                    {meta ? t(meta.labelKey) : e.kind}
                   </span>
                 </div>
 
@@ -287,14 +288,14 @@ function DirectoryPage() {
                             setOpen(true);
                           }}
                           className="text-gray-400 hover:text-primary p-1"
-                          aria-label="Edit"
+                          aria-label={t("directory.edit")}
                         >
                           <Pencil className="h-3.5 w-3.5" />
                         </button>
                         <button
-                          onClick={() => confirm("Delete this entry?") && del.mutate(e.id)}
+                          onClick={() => confirm(t("directory.confirmDelete")) && del.mutate(e.id)}
                           className="text-gray-400 hover:text-red-500 p-1"
-                          aria-label="Delete"
+                          aria-label={t("directory.delete")}
                         >
                           <Trash2 className="h-3.5 w-3.5" />
                         </button>
@@ -399,6 +400,7 @@ function EntryDialog({
   editing: Entry | null;
 }) {
   const { user } = useAuth();
+  const { t } = useI18n();
   const qc = useQueryClient();
   const [busy, setBusy] = useState(false);
   const [kind, setKind] = useState<Kind>(editing?.kind ?? "professional");
@@ -415,14 +417,14 @@ function EntryDialog({
   function pick(e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0];
     if (!f) return;
-    if (f.size > 5 * 1024 * 1024) return toast.error("Image must be under 5 MB");
+    if (f.size > 5 * 1024 * 1024) return toast.error(t("directory.imageTooLarge"));
     setFile(f);
     setPreview(URL.createObjectURL(f));
   }
 
   async function submit() {
     if (!user || !name.trim() || !description.trim()) {
-      toast.error("Name and description are required");
+      toast.error(t("directory.nameDescRequired"));
       return;
     }
     setBusy(true);
@@ -447,11 +449,11 @@ function EntryDialog({
           .update(payload)
           .eq("id", editing.id);
         if (error) throw error;
-        toast.success("Entry updated");
+        toast.success(t("directory.entryUpdated"));
       } else {
         const { error } = await supabase.from("directory_entries").insert(payload);
         if (error) throw error;
-        toast.success("Entry added");
+        toast.success(t("directory.entryAdded"));
       }
       qc.invalidateQueries({ queryKey: key });
       onOpenChange(false);
@@ -466,40 +468,40 @@ function EntryDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{editing ? "Edit entry" : "New directory entry"}</DialogTitle>
+          <DialogTitle>{editing ? t("directory.dialog.editTitle") : t("directory.dialog.newTitle")}</DialogTitle>
         </DialogHeader>
         <div className="space-y-3">
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label>Type</Label>
+              <Label>{t("directory.field.type")}</Label>
               <Select value={kind} onValueChange={(v) => setKind(v as Kind)}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                   {KINDS.map((k) => (
                     <SelectItem key={k.value} value={k.value}>
-                      {k.label}
+                      {t(k.labelKey)}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-1.5">
-              <Label>Category (optional)</Label>
+              <Label>{t("directory.field.category")}</Label>
               <Input
                 value={category ?? ""}
                 onChange={(e) => setCategory(e.target.value)}
-                placeholder="e.g. Doctor, Baptist"
+                placeholder={t("directory.field.categoryPlaceholder")}
               />
             </div>
           </div>
 
           <div className="space-y-1.5">
-            <Label>Name</Label>
+            <Label>{t("directory.field.name")}</Label>
             <Input value={name} onChange={(e) => setName(e.target.value)} />
           </div>
 
           <div className="space-y-1.5">
-            <Label>Description</Label>
+            <Label>{t("directory.field.description")}</Label>
             <Textarea
               rows={4}
               value={description}
@@ -508,23 +510,23 @@ function EntryDialog({
           </div>
 
           <div className="space-y-1.5">
-            <Label>Location</Label>
+            <Label>{t("directory.field.location")}</Label>
             <Input value={location ?? ""} onChange={(e) => setLocation(e.target.value)} />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label>Email</Label>
+              <Label>{t("directory.field.email")}</Label>
               <Input value={email ?? ""} onChange={(e) => setEmail(e.target.value)} />
             </div>
             <div className="space-y-1.5">
-              <Label>Phone</Label>
+              <Label>{t("directory.field.phone")}</Label>
               <Input value={phone ?? ""} onChange={(e) => setPhone(e.target.value)} />
             </div>
           </div>
 
           <div className="space-y-1.5">
-            <Label>Website</Label>
+            <Label>{t("directory.field.website")}</Label>
             <Input
               value={website ?? ""}
               onChange={(e) => setWebsite(e.target.value)}
@@ -533,9 +535,9 @@ function EntryDialog({
           </div>
 
           <div className="space-y-1.5">
-            <Label>Image (optional)</Label>
+            <Label>{t("directory.field.image")}</Label>
             <label className="cursor-pointer inline-flex items-center gap-2 px-3 py-2 rounded-lg border text-sm text-gray-600 hover:bg-gray-50 w-fit">
-              <ImageIcon className="h-4 w-4" /> Choose image
+              <ImageIcon className="h-4 w-4" /> {t("directory.field.chooseImage")}
               <input type="file" accept="image/*" className="hidden" onChange={pick} />
             </label>
             {preview && (
@@ -551,10 +553,10 @@ function EntryDialog({
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
+            {t("directory.cancel")}
           </Button>
           <Button onClick={submit} disabled={busy}>
-            {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : editing ? "Save" : "Add"}
+            {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : editing ? t("directory.save") : t("directory.add")}
           </Button>
         </DialogFooter>
       </DialogContent>
