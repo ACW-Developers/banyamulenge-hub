@@ -52,6 +52,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { z } from "zod";
+import { useI18n } from "@/lib/i18n";
 
 const searchSchema = z.object({ c: z.string().optional() });
 
@@ -90,6 +91,7 @@ type ConversationRow = {
 
 function MessagesPage() {
   const { user } = useAuth();
+  const { t } = useI18n();
   const search = Route.useSearch();
   const qc = useQueryClient();
   const [activeId, setActiveId] = useState<string | null>(search.c ?? null);
@@ -194,8 +196,8 @@ function MessagesPage() {
           row.sender_id !== user.id &&
           row.conversation_id !== activeId
         ) {
-          notifyInfo("New message", {
-            description: (row.content || row.attachment_name || "Attachment")?.slice(0, 80),
+          notifyInfo(t("messages.newMessageToast"), {
+            description: (row.content || row.attachment_name || t("messages.attachmentFallback"))?.slice(0, 80),
             push: true,
           });
         }
@@ -229,7 +231,7 @@ function MessagesPage() {
       setText(body);
       return;
     }
-    notifySuccess("Message sent");
+    notifySuccess(t("messages.sentToast"));
     qc.invalidateQueries({ queryKey: ["messages", activeId] });
     qc.invalidateQueries({ queryKey: ["conversations", user.id] });
   }
@@ -248,7 +250,7 @@ function MessagesPage() {
         attachment_name: att.name,
       });
       if (error) throw error;
-      notifySuccess("Attachment sent");
+      notifySuccess(t("messages.attachmentSentToast"));
       qc.invalidateQueries({ queryKey: ["messages", activeId] });
       qc.invalidateQueries({ queryKey: ["conversations", user.id] });
     } catch (e) {
@@ -261,9 +263,9 @@ function MessagesPage() {
     <div className="max-w-6xl mx-auto">
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Messages</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{t("messages.title")}</h1>
           <p className="text-sm text-gray-500 mt-1">
-            Private conversations with community members.
+            {t("messages.subtitle")}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -278,7 +280,7 @@ function MessagesPage() {
           <div className="p-3 border-b">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <Input placeholder="Search..." className="pl-9 bg-gray-50 border-gray-200" />
+              <Input placeholder={t("messages.searchPlaceholder")} className="pl-9 bg-gray-50 border-gray-200" />
             </div>
           </div>
           <div className="flex-1 overflow-y-auto">
@@ -291,8 +293,8 @@ function MessagesPage() {
                 const other = c.conversation_participants.find((p) => p.user_id !== user?.id);
                 const p = c.is_group
                   ? {
-                      username: c.title ?? "Group",
-                      display_name: c.title ?? "Group",
+                      username: c.title ?? t("messages.group"),
+                      display_name: c.title ?? t("messages.group"),
                       avatar_url: c.avatar_url ?? null,
                     }
                   : other?.profiles;
@@ -309,13 +311,13 @@ function MessagesPage() {
                 const lastText = lastMsg
                   ? lastMsg.attachment_url
                     ? lastMsg.attachment_type?.startsWith("image/")
-                      ? "📷 Photo"
-                      : `📎 ${lastMsg.attachment_name ?? "Attachment"}`
+                      ? t("messages.photo")
+                      : `📎 ${lastMsg.attachment_name ?? t("messages.attachmentFallback")}`
                     : (lastMsg.content ?? "")
                   : "";
                 const preview = lastMsg
-                  ? `${lastIsMine ? "You: " : ""}${lastText}`
-                  : "No messages yet";
+                  ? `${lastIsMine ? t("messages.you") : ""}${lastText}`
+                  : t("messages.noMessagesYet");
                 return (
                   <button
                     key={c.id}
@@ -339,7 +341,7 @@ function MessagesPage() {
                         >
                           {c.is_group && (
                             <span className="text-[9px] uppercase tracking-wider bg-amber-100 text-amber-700 rounded px-1.5 py-0.5 shrink-0">
-                              Group
+                              {t("messages.group")}
                             </span>
                           )}
                           <span className="truncate">{p.display_name || p.username}</span>
@@ -360,15 +362,15 @@ function MessagesPage() {
                               {lastMsg.read_at ? (
                                 <CheckCheck
                                   className="h-3.5 w-3.5 text-sky-500"
-                                  aria-label="Read"
+                                  aria-label={t("messages.readAria")}
                                 />
                               ) : lastMsg.delivered_at ? (
                                 <CheckCheck
                                   className="h-3.5 w-3.5 text-gray-400"
-                                  aria-label="Delivered"
+                                  aria-label={t("messages.deliveredAria")}
                                 />
                               ) : (
-                                <Check className="h-3.5 w-3.5 text-gray-400" aria-label="Sent" />
+                                <Check className="h-3.5 w-3.5 text-gray-400" aria-label={t("messages.sentAria")} />
                               )}
                             </>
                           )}
@@ -384,7 +386,7 @@ function MessagesPage() {
                 );
               })
             ) : (
-              <div className="p-6 text-center text-sm text-gray-500">No conversations yet.</div>
+              <div className="p-6 text-center text-sm text-gray-500">{t("messages.noConversations")}</div>
             )}
           </div>
         </div>
@@ -393,7 +395,7 @@ function MessagesPage() {
         {active && user && (
           <button
             type="button"
-            aria-label="Close conversation"
+            aria-label={t("messages.closeConversation")}
             onClick={() => setActiveId(null)}
             className="md:hidden fixed inset-0 z-40 bg-black/50 backdrop-blur-[2px]"
           />
@@ -413,7 +415,7 @@ function MessagesPage() {
               convoId={active.id}
               userId={user.id}
               isGroup={active.is_group}
-              groupTitle={active.title ?? "Group"}
+              groupTitle={active.title ?? t("messages.group")}
               createdBy={active.created_by}
               participants={active.conversation_participants.map((cp) => ({
                 user_id: cp.user_id,
@@ -436,9 +438,9 @@ function MessagesPage() {
           ) : (
             <div className="flex-1 flex flex-col items-center justify-center text-center p-6">
               <MessageCircle className="h-12 w-12 text-primary mb-3" />
-              <h3 className="font-bold">Select a conversation</h3>
+              <h3 className="font-bold">{t("messages.selectConversation")}</h3>
               <p className="text-sm text-gray-500 mt-1">
-                Or start a new one from anyone's profile.
+                {t("messages.selectConversationSub")}
               </p>
             </div>
           )}

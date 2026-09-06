@@ -304,6 +304,7 @@ function GroupCard({
   pending: boolean;
   onToggle: () => void;
 }) {
+  const { t } = useI18n();
   const members = group.conversation_participants ?? [];
   return (
     <div className="rounded-2xl border bg-white p-5 shadow-sm hover:shadow-md transition flex flex-col">
@@ -316,11 +317,11 @@ function GroupCard({
         </Avatar>
         <div className="min-w-0">
           <div className="font-bold truncate flex items-center gap-1.5">
-            {group.title ?? "Group"}
-            {isOwner && <Crown className="h-3.5 w-3.5 text-amber-500" aria-label="You own this" />}
+            {group.title ?? t("community.defaultGroupName")}
+            {isOwner && <Crown className="h-3.5 w-3.5 text-amber-500" aria-label={t("community.youOwnThis")} />}
           </div>
           <div className="text-xs text-gray-500">
-            {members.length} member{members.length === 1 ? "" : "s"} ·{" "}
+            {members.length} {members.length === 1 ? t("community.member") : t("community.members")} ·{" "}
             {formatDistanceToNow(new Date(group.last_message_at), { addSuffix: true })}
           </div>
         </div>
@@ -333,7 +334,7 @@ function GroupCard({
           <>
             <Button size="sm" asChild className="flex-1 gap-1">
               <Link to="/community/$id" params={{ id: group.id }}>
-                <MessagesSquare className="h-4 w-4" /> Open chat
+                <MessagesSquare className="h-4 w-4" /> {t("community.openChat")}
               </Link>
             </Button>
             {!isOwner && (
@@ -344,13 +345,13 @@ function GroupCard({
                 onClick={onToggle}
                 disabled={pending}
               >
-                <LogOut className="h-4 w-4" /> Exit
+                <LogOut className="h-4 w-4" /> {t("community.exit")}
               </Button>
             )}
             {isOwner && (
               <Button size="sm" variant="secondary" asChild className="gap-1">
                 <Link to="/community/$id" params={{ id: group.id }}>
-                  Manage <ArrowRight className="h-3.5 w-3.5" />
+                  {t("community.manage")} <ArrowRight className="h-3.5 w-3.5" />
                 </Link>
               </Button>
             )}
@@ -358,12 +359,12 @@ function GroupCard({
         ) : (
           <>
             <Button size="sm" className="flex-1 gap-1" onClick={onToggle} disabled={pending}>
-              <UserPlus className="h-4 w-4" /> Join group
+              <UserPlus className="h-4 w-4" /> {t("community.joinGroup")}
             </Button>
             {canManage && (
               <Button size="sm" variant="secondary" asChild className="gap-1">
                 <Link to="/community/$id" params={{ id: group.id }}>
-                  Manage
+                  {t("community.manage")}
                 </Link>
               </Button>
             )}

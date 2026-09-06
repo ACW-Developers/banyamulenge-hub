@@ -9,6 +9,7 @@ import { toast } from "@/lib/notify";
 import { openConversationWith } from "@/lib/messaging";
 import { useNavigate } from "@tanstack/react-router";
 import { logActivity } from "@/lib/tracking";
+import { useI18n } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_app/explore")({
   component: ExplorePage,
@@ -28,6 +29,7 @@ type PersonRow = {
 
 function ExplorePage() {
   const { user } = useAuth();
+  const { t } = useI18n();
   const qc = useQueryClient();
   const navigate = useNavigate();
 
@@ -103,9 +105,9 @@ function ExplorePage() {
           <Users className="h-6 w-6" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Explore the community</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{t("explore.title")}</h1>
           <p className="text-sm text-gray-500 mt-0.5">
-            Meet Banyamulenge members from around the world.
+            {t("explore.subtitle")}
           </p>
         </div>
       </div>
@@ -156,7 +158,7 @@ function ExplorePage() {
                     <span className="inline-flex items-center gap-1 text-gray-500">
                       <Users className="h-3.5 w-3.5" />
                       <strong className="text-gray-900">{p.followers}</strong>
-                      <span>followers</span>
+                      <span>{t("explore.followers")}</span>
                     </span>
                   </div>
                   {!isSelf && (
@@ -172,11 +174,11 @@ function ExplorePage() {
                       >
                         {p.isFollowing ? (
                           <>
-                            <UserCheck className="h-4 w-4" /> Following
+                            <UserCheck className="h-4 w-4" /> {t("explore.following")}
                           </>
                         ) : (
                           <>
-                            <UserPlus className="h-4 w-4" /> Follow
+                            <UserPlus className="h-4 w-4" /> {t("explore.follow")}
                           </>
                         )}
                       </Button>
@@ -186,7 +188,7 @@ function ExplorePage() {
                         className="gap-1 border-primary/30 text-primary hover:bg-primary/10"
                         onClick={() => message(p.id)}
                       >
-                        <MessageCircle className="h-4 w-4" /> Chat
+                        <MessageCircle className="h-4 w-4" /> {t("explore.chat")}
                       </Button>
                     </div>
                   )}

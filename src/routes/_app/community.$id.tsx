@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "@/lib/notify";
+import { useI18n } from "@/lib/i18n";
 
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
@@ -81,6 +82,7 @@ type GroupMessage = {
 };
 
 function GroupChatPage() {
+  const { t } = useI18n();
   const { id } = useParams({ from: "/_app/community/$id" });
   const { user, isAdmin } = useAuth();
   const qc = useQueryClient();
@@ -204,7 +206,7 @@ function GroupChatPage() {
       .from("conversation_participants")
       .insert({ conversation_id: id, user_id: user.id });
     if (error) return toast.error(error.message);
-    toast.success("You joined the group");
+    toast.success(t("community.youJoinedGroup"));
     qc.invalidateQueries({ queryKey: groupKey });
     qc.invalidateQueries({ queryKey: ["community-groups"] });
     qc.invalidateQueries({ queryKey: ["conversations", user.id] });
@@ -218,7 +220,7 @@ function GroupChatPage() {
       .eq("conversation_id", id)
       .eq("user_id", user.id);
     if (error) return toast.error(error.message);
-    toast.success("You left the group");
+    toast.success(t("community.youLeftGroup"));
     qc.invalidateQueries({ queryKey: ["community-groups"] });
     qc.invalidateQueries({ queryKey: ["conversations", user.id] });
     navigate({ to: "/community" });
@@ -231,14 +233,14 @@ function GroupChatPage() {
       .eq("conversation_id", id)
       .eq("user_id", userId);
     if (error) return toast.error(error.message);
-    toast.success("Member removed");
+    toast.success(t("community.memberRemoved"));
     qc.invalidateQueries({ queryKey: groupKey });
   }
 
   async function deleteGroup() {
     const { error } = await supabase.from("conversations").delete().eq("id", id);
     if (error) return toast.error(error.message);
-    toast.success("Group deleted");
+    toast.success(t("community.groupDeleted"));
     qc.invalidateQueries({ queryKey: ["community-groups"] });
     qc.invalidateQueries({ queryKey: ["conversations", user?.id] });
     navigate({ to: "/community" });
@@ -255,9 +257,9 @@ function GroupChatPage() {
   if (!group || !group.is_group) {
     return (
       <div className="text-center py-16 space-y-2">
-        <p className="text-gray-500">Group not found.</p>
+        <p className="text-gray-500">{t("community.groupNotFound")}</p>
         <Link to="/community" className="text-primary text-sm">
-          Back to Community
+          {t("community.backToCommunity")}
         </Link>
       </div>
     );
@@ -269,7 +271,7 @@ function GroupChatPage() {
         to="/community"
         className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-primary"
       >
-        <ArrowLeft className="h-4 w-4" /> All groups
+        <ArrowLeft className="h-4 w-4" /> {t("community.allGroups")}
       </Link>
 
       <div className="rounded-2xl border bg-white p-5 shadow-sm flex flex-wrap items-center gap-4">
@@ -280,9 +282,9 @@ function GroupChatPage() {
           </AvatarFallback>
         </Avatar>
         <div className="flex-1 min-w-[180px]">
-          <h1 className="text-2xl font-bold text-gray-900 truncate">{group.title ?? "Group"}</h1>
+          <h1 className="text-2xl font-bold text-gray-900 truncate">{group.title ?? t("community.defaultGroupName")}</h1>
           <div className="text-xs text-gray-500 mt-1">
-            {members.length} member{members.length === 1 ? "" : "s"}
+            {members.length} {members.length === 1 ? t("community.member") : t("community.members")}
           </div>
           {group.description && (
             <p className="text-sm text-gray-600 mt-2">{group.description}</p>
@@ -291,11 +293,11 @@ function GroupChatPage() {
         <div className="flex items-center gap-2">
           {isMember ? (
             <Button variant="outline" className="gap-2" onClick={() => setSettingsOpen(true)}>
-              <Settings className="h-4 w-4" /> Group info
+              <Settings className="h-4 w-4" /> {t("community.groupInfo")}
             </Button>
           ) : (
             <Button className="gap-2" onClick={join} disabled={!user}>
-              <UserPlus className="h-4 w-4" /> Join group
+              <UserPlus className="h-4 w-4" /> {t("community.joinGroup")}
             </Button>
           )}
         </div>
@@ -308,7 +310,7 @@ function GroupChatPage() {
               messages.map((m) => {
                 const mine = m.sender_id === user?.id;
                 const sender = members.find((p) => p.user_id === m.sender_id)?.profiles;
-                const name = sender?.display_name || sender?.username || "Member";
+                const name = sender?.display_name || sender?.username || t("community.memberFallback");
                 return (
                   <div key={m.id} className={`flex gap-2 ${mine ? "justify-end" : "justify-start"}`}>
                     {!mine && (
@@ -335,7 +337,7 @@ function GroupChatPage() {
                                 loading="lazy"
                                 decoding="async"
                                 src={m.attachment_url}
-                                alt={m.attachment_name ?? "Shared image"}
+                                alt={m.attachment_name ?? t("community.sharedImage")}
                                 className="rounded-lg max-h-64 object-cover"
                                 
                               />
@@ -348,7 +350,7 @@ function GroupChatPage() {
                               className="inline-flex items-center gap-2 underline"
                             >
                               <FileText className="h-4 w-4" />
-                              {m.attachment_name ?? "Attachment"}
+                              {m.attachment_name ?? t("community.attachment")}
                             </a>
                           )
                         ) : (
@@ -364,7 +366,7 @@ function GroupChatPage() {
                             onClick={() => deleteMessage(m.id)}
                             className="text-[10px] text-gray-400 hover:text-red-500"
                           >
-                            Delete
+                            {t("community.delete")}
                           </button>
                         )}
                       </div>
@@ -374,7 +376,7 @@ function GroupChatPage() {
               })
             ) : (
               <div className="text-center py-12 text-sm text-gray-500">
-                No messages yet. Say hello 👋
+                {t("community.noMessages")}
               </div>
             )}
             <div ref={bottomRef} />
@@ -385,7 +387,7 @@ function GroupChatPage() {
               size="icon"
               onClick={() => imgRef.current?.click()}
               disabled={uploading}
-              aria-label="Attach image"
+              aria-label={t("community.attachImage")}
             >
               <ImageIcon className="h-4 w-4" />
             </Button>
@@ -394,14 +396,14 @@ function GroupChatPage() {
               size="icon"
               onClick={() => fileRef.current?.click()}
               disabled={uploading}
-              aria-label="Attach file"
+              aria-label={t("community.attachFile")}
             >
               <Paperclip className="h-4 w-4" />
             </Button>
             <Input
               value={text}
               onChange={(e) => setText(e.target.value)}
-              placeholder="Message the group..."
+              placeholder={t("community.messagePlaceholder")}
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
                   e.preventDefault();
@@ -415,13 +417,13 @@ function GroupChatPage() {
               ) : (
                 <Send className="h-4 w-4" />
               )}
-              Send
+              {t("community.send")}
             </Button>
           </div>
         </div>
       ) : (
         <div className="rounded-2xl border bg-amber-50 border-amber-200 p-8 text-center text-sm text-amber-800">
-          This group's chat is private. Join the group to read and send messages.
+          {t("community.privateChatNotice")}
         </div>
       )}
 
