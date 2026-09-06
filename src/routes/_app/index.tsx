@@ -115,7 +115,7 @@ function FeedPage() {
         </h1>
         <p className="mt-2 text-sm sm:text-base text-gray-500">{t("title.communitySub")}</p>
       </div>
-      <div className="grid lg:grid-cols-[minmax(0,1fr)_340px] gap-6">
+      <div className="grid lg:grid-cols-[minmax(0,1fr)_300px] gap-6">
         <div className="min-w-0 space-y-6">
           <PostComposer queryKey={feedKey} />
 

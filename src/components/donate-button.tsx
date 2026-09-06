@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Heart, Globe2, Archive, Server, Loader2 } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/lib/notify";
 import { useServerFn } from "@tanstack/react-start";
 import { useRouterState } from "@tanstack/react-router";
 

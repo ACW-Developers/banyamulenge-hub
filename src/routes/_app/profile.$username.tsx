@@ -12,7 +12,7 @@ import {
   MessageCircle,
 } from "lucide-react";
 import { format } from "date-fns";
-import { toast } from "sonner";
+import { toast } from "@/lib/notify";
 
 import { supabase } from "@/integrations/supabase/client";
 import { uploadPostImage } from "@/lib/upload";

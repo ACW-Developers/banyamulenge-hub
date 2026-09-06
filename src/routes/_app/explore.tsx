@@ -5,7 +5,7 @@ import { useAuth } from "@/lib/auth-context";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Loader2, UserPlus, UserCheck, Users, MapPin, MessageCircle } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/lib/notify";
 import { openConversationWith } from "@/lib/messaging";
 import { useNavigate } from "@tanstack/react-router";
 import { logActivity } from "@/lib/tracking";
