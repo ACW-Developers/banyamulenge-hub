@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { Loader2 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { toast } from "@/lib/notify";
+import { useI18n } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_app/admin")({
   component: AdminLayout,
@@ -11,10 +12,11 @@ export const Route = createFileRoute("/_app/admin")({
 function AdminLayout() {
   const { isAdmin, loading } = useAuth();
   const navigate = useNavigate();
+  const { t } = useI18n();
 
   useEffect(() => {
     if (!loading && !isAdmin) {
-      toast.error("Admin access required");
+      toast.error(t("admin.accessRequired"));
       navigate({ to: "/" });
     }
   }, [isAdmin, loading, navigate]);
