@@ -102,8 +102,8 @@ export const exportBackup = createServerFn({ method: "POST" })
  * updated, missing rows are inserted; nothing is deleted.
  */
 export const importBackup = createServerFn({ method: "POST" })
-  .inputValidator((input: { backup: unknown }) => input)
   .middleware([requireSupabaseAuth])
+  .inputValidator((input: { backup: unknown }) => input)
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase as unknown as { from: (t: string) => any }, context.userId);
 

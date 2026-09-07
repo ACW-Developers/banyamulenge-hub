@@ -135,6 +135,7 @@ function AppLayout() {
     { to: "/messages", label: t("nav.messages"), icon: MessageCircle, badge: notif.unreadMessages },
     { to: "/heritage", label: t("nav.heritage"), icon: Landmark, badge: 0 },
     { to: "/museum", label: t("nav.museum"), icon: Gem, badge: 0 },
+    { to: "/gallery", label: t("nav.gallery"), icon: Images, badge: 0 },
     { to: "/family-tree", label: t("nav.familyTree"), icon: Trees, badge: 0 },
     {
       to: profile?.username ? `/profile/${profile.username}` : "/",
