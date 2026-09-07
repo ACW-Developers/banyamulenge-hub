@@ -40,7 +40,8 @@ const COMPOSITE_KEYS: Partial<Record<TableName, string>> = {
   conversation_participants: "conversation_id,user_id",
 };
 
-type Row = Record<string, unknown>;
+type JsonValue = string | number | boolean | null | JsonValue[] | { [k: string]: JsonValue };
+type Row = Record<string, JsonValue>;
 type Backup = {
   format: string;
   version: number;
