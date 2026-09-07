@@ -1,10 +1,22 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Loader2, UserPlus, UserCheck, Users, MapPin, MessageCircle } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import {
+  Loader2,
+  UserPlus,
+  UserCheck,
+  Users,
+  MapPin,
+  MessageCircle,
+  Search,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import { toast } from "@/lib/notify";
 import { openConversationWith } from "@/lib/messaging";
 import { useNavigate } from "@tanstack/react-router";
@@ -27,11 +39,15 @@ type PersonRow = {
   isFollowing: boolean;
 };
 
+const PAGE_SIZE = 30;
+
 function ExplorePage() {
   const { user } = useAuth();
   const { t } = useI18n();
   const qc = useQueryClient();
   const navigate = useNavigate();
+  const [q, setQ] = useState("");
+  const [page, setPage] = useState(1);
 
   const { data: people, isLoading } = useQuery({
     queryKey: ["explore-people", user?.id],
@@ -40,7 +56,7 @@ function ExplorePage() {
         .from("profiles")
         .select("id, username, display_name, avatar_url, cover_url, bio, location")
         .order("created_at", { ascending: false })
-        .limit(60);
+        .limit(2000);
       if (error) throw error;
       const rows = profiles ?? [];
       const ids = rows.map((p) => p.id);
@@ -64,6 +80,21 @@ function ExplorePage() {
       }));
     },
   });
+
+  const filtered = useMemo(() => {
+    const ql = q.trim().toLowerCase();
+    if (!ql) return people ?? [];
+    return (people ?? []).filter(
+      (p) =>
+        p.username.toLowerCase().includes(ql) ||
+        (p.display_name ?? "").toLowerCase().includes(ql) ||
+        (p.location ?? "").toLowerCase().includes(ql),
+    );
+  }, [people, q]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const current = Math.min(page, totalPages);
+  const pageRows = filtered.slice((current - 1) * PAGE_SIZE, current * PAGE_SIZE);
 
   const toggleFollow = useMutation({
     mutationFn: async ({ id, isFollowing }: { id: string; isFollowing: boolean }) => {
@@ -100,15 +131,39 @@ function ExplorePage() {
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">
-      <div className="flex items-center gap-3">
-        <div className="h-11 w-11 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
-          <Users className="h-6 w-6" />
+      <div className="rounded-2xl border bg-white p-5 sm:p-6 shadow-sm">
+        <div className="flex items-center gap-3">
+          <div className="h-11 w-11 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+            <Users className="h-6 w-6" />
+          </div>
+          <div className="min-w-0">
+            <h1 className="text-2xl font-bold text-gray-900">{t("explore.title")}</h1>
+            <p className="text-sm text-gray-500 mt-0.5">{t("explore.subtitle")}</p>
+          </div>
         </div>
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">{t("explore.title")}</h1>
-          <p className="text-sm text-gray-500 mt-0.5">
-            {t("explore.subtitle")}
-          </p>
+
+        <div className="mt-5 flex flex-col sm:flex-row gap-3 sm:items-center">
+          <div className="relative flex-1">
+            <Search className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <Input
+              value={q}
+              onChange={(e) => {
+                setQ(e.target.value);
+                setPage(1);
+              }}
+              placeholder={t("explore.searchPlaceholder", "Search people by name or username…")}
+              className="pl-9"
+            />
+          </div>
+          <div className="text-xs text-gray-500 whitespace-nowrap">
+            {filtered.length.toLocaleString()} {t("explore.members", "members")}
+            {filtered.length > PAGE_SIZE && (
+              <>
+                {" · "}
+                {t("explore.page", "Page")} {current}/{totalPages}
+              </>
+            )}
+          </div>
         </div>
       </div>
 
@@ -116,9 +171,16 @@ function ExplorePage() {
         <div className="flex justify-center py-12">
           <Loader2 className="h-6 w-6 animate-spin text-primary" />
         </div>
+      ) : pageRows.length === 0 ? (
+        <div className="text-center py-16 border border-dashed rounded-2xl bg-white">
+          <Users className="h-8 w-8 text-gray-300 mx-auto" />
+          <p className="mt-3 text-sm text-gray-500">
+            {t("explore.noResults", "No members match your search.")}
+          </p>
+        </div>
       ) : (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {(people ?? []).map((p) => {
+          {pageRows.map((p) => {
             const initial = (p.display_name || p.username).slice(0, 1).toUpperCase();
             const isSelf = user?.id === p.id;
             return (
@@ -196,6 +258,51 @@ function ExplorePage() {
               </div>
             );
           })}
+        </div>
+      )}
+
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center gap-2 pt-2">
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-1"
+            disabled={current <= 1}
+            onClick={() => setPage(current - 1)}
+          >
+            <ChevronLeft className="h-4 w-4" /> {t("explore.prev", "Previous")}
+          </Button>
+          <div className="flex items-center gap-1">
+            {Array.from({ length: totalPages })
+              .map((_, i) => i + 1)
+              .filter(
+                (n) => n === 1 || n === totalPages || Math.abs(n - current) <= 1,
+              )
+              .map((n, i, arr) => (
+                <span key={n} className="flex items-center gap-1">
+                  {i > 0 && arr[i - 1] !== n - 1 && <span className="text-gray-400 px-1">…</span>}
+                  <button
+                    onClick={() => setPage(n)}
+                    className={`h-8 min-w-8 rounded-lg px-2 text-xs font-semibold border transition ${
+                      n === current
+                        ? "bg-primary text-primary-foreground border-primary"
+                        : "bg-white text-gray-600 border-gray-200 hover:border-primary/40"
+                    }`}
+                  >
+                    {n}
+                  </button>
+                </span>
+              ))}
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-1"
+            disabled={current >= totalPages}
+            onClick={() => setPage(current + 1)}
+          >
+            {t("explore.next", "Next")} <ChevronRight className="h-4 w-4" />
+          </Button>
         </div>
       )}
     </div>
