@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Landmark, Users, BookOpen, Music2, HeartHandshake, Globe2, Home } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
+import { SubtribesSection } from "@/components/subtribes-section";
 
 import gourdsImg from "@/assets/heritage/gourds.jpeg";
 import womenImg from "@/assets/heritage/women.jpeg";
@@ -191,6 +192,8 @@ function HeritagePage() {
           ))}
         </div>
       </Section>
+
+      <SubtribesSection />
 
       <Section icon={HeartHandshake} title={t("heritage.hospitality.title")}>
         <p dangerouslySetInnerHTML={{ __html: t("heritage.hospitality.p1") }} />

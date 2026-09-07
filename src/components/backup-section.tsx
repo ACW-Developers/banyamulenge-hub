@@ -17,7 +17,7 @@ export function BackupSection() {
     setExporting(true);
     setReport(null);
     try {
-      const backup = await runExport({ data: undefined as never });
+      const backup = await (runExport as unknown as () => Promise<{ tables: Record<string, unknown[]> }>)();
       const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
