@@ -22,6 +22,7 @@ import {
   BookUser,
   RefreshCw,
   Gem,
+  Images,
   DollarSign,
 
 } from "lucide-react";
