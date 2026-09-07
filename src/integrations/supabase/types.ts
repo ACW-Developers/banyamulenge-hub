@@ -371,6 +371,45 @@ export type Database = {
           },
         ]
       }
+      gallery_items: {
+        Row: {
+          category: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          image_url: string
+          sort_order: number
+          taken_on: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          image_url: string
+          sort_order?: number
+          taken_on?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          image_url?: string
+          sort_order?: number
+          taken_on?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       group_members: {
         Row: {
           group_id: string
@@ -802,6 +841,51 @@ export type Database = {
           location?: string | null
           updated_at?: string
           username?: string
+        }
+        Relationships: []
+      }
+      subtribes: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string
+          id: string
+          identity: string | null
+          image_url: string | null
+          loved: string | null
+          name: string
+          notable_people: string | null
+          origins: string | null
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description: string
+          id?: string
+          identity?: string | null
+          image_url?: string | null
+          loved?: string | null
+          name: string
+          notable_people?: string | null
+          origins?: string | null
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string
+          id?: string
+          identity?: string | null
+          image_url?: string | null
+          loved?: string | null
+          name?: string
+          notable_people?: string | null
+          origins?: string | null
+          sort_order?: number
+          updated_at?: string
         }
         Relationships: []
       }

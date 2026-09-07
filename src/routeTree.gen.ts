@@ -17,6 +17,7 @@ import { Route as AppMuseumRouteImport } from './routes/_app/museum'
 import { Route as AppMessagesRouteImport } from './routes/_app/messages'
 import { Route as AppMarketplaceRouteImport } from './routes/_app/marketplace'
 import { Route as AppHeritageRouteImport } from './routes/_app/heritage'
+import { Route as AppGalleryRouteImport } from './routes/_app/gallery'
 import { Route as AppFamilyTreeRouteImport } from './routes/_app/family-tree'
 import { Route as AppExploreRouteImport } from './routes/_app/explore'
 import { Route as AppDirectoryRouteImport } from './routes/_app/directory'
@@ -67,6 +68,11 @@ const AppMarketplaceRoute = AppMarketplaceRouteImport.update({
 const AppHeritageRoute = AppHeritageRouteImport.update({
   id: '/heritage',
   path: '/heritage',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppGalleryRoute = AppGalleryRouteImport.update({
+  id: '/gallery',
+  path: '/gallery',
   getParentRoute: () => AppRoute,
 } as any)
 const AppFamilyTreeRoute = AppFamilyTreeRouteImport.update({
@@ -138,6 +144,7 @@ export interface FileRoutesByFullPath {
   '/directory': typeof AppDirectoryRoute
   '/explore': typeof AppExploreRoute
   '/family-tree': typeof AppFamilyTreeRoute
+  '/gallery': typeof AppGalleryRoute
   '/heritage': typeof AppHeritageRoute
   '/marketplace': typeof AppMarketplaceRoute
   '/messages': typeof AppMessagesRoute
@@ -157,6 +164,7 @@ export interface FileRoutesByTo {
   '/directory': typeof AppDirectoryRoute
   '/explore': typeof AppExploreRoute
   '/family-tree': typeof AppFamilyTreeRoute
+  '/gallery': typeof AppGalleryRoute
   '/heritage': typeof AppHeritageRoute
   '/marketplace': typeof AppMarketplaceRoute
   '/messages': typeof AppMessagesRoute
@@ -180,6 +188,7 @@ export interface FileRoutesById {
   '/_app/directory': typeof AppDirectoryRoute
   '/_app/explore': typeof AppExploreRoute
   '/_app/family-tree': typeof AppFamilyTreeRoute
+  '/_app/gallery': typeof AppGalleryRoute
   '/_app/heritage': typeof AppHeritageRoute
   '/_app/marketplace': typeof AppMarketplaceRoute
   '/_app/messages': typeof AppMessagesRoute
@@ -204,6 +213,7 @@ export interface FileRouteTypes {
     | '/directory'
     | '/explore'
     | '/family-tree'
+    | '/gallery'
     | '/heritage'
     | '/marketplace'
     | '/messages'
@@ -223,6 +233,7 @@ export interface FileRouteTypes {
     | '/directory'
     | '/explore'
     | '/family-tree'
+    | '/gallery'
     | '/heritage'
     | '/marketplace'
     | '/messages'
@@ -245,6 +256,7 @@ export interface FileRouteTypes {
     | '/_app/directory'
     | '/_app/explore'
     | '/_app/family-tree'
+    | '/_app/gallery'
     | '/_app/heritage'
     | '/_app/marketplace'
     | '/_app/messages'
@@ -322,6 +334,13 @@ declare module '@tanstack/react-router' {
       path: '/heritage'
       fullPath: '/heritage'
       preLoaderRoute: typeof AppHeritageRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/gallery': {
+      id: '/_app/gallery'
+      path: '/gallery'
+      fullPath: '/gallery'
+      preLoaderRoute: typeof AppGalleryRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/family-tree': {
@@ -436,6 +455,7 @@ interface AppRouteChildren {
   AppDirectoryRoute: typeof AppDirectoryRoute
   AppExploreRoute: typeof AppExploreRoute
   AppFamilyTreeRoute: typeof AppFamilyTreeRoute
+  AppGalleryRoute: typeof AppGalleryRoute
   AppHeritageRoute: typeof AppHeritageRoute
   AppMarketplaceRoute: typeof AppMarketplaceRoute
   AppMessagesRoute: typeof AppMessagesRoute
@@ -451,6 +471,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppDirectoryRoute: AppDirectoryRoute,
   AppExploreRoute: AppExploreRoute,
   AppFamilyTreeRoute: AppFamilyTreeRoute,
+  AppGalleryRoute: AppGalleryRoute,
   AppHeritageRoute: AppHeritageRoute,
   AppMarketplaceRoute: AppMarketplaceRoute,
   AppMessagesRoute: AppMessagesRoute,
