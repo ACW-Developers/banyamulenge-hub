@@ -48,6 +48,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { trackVisit, logActivity } from "@/lib/tracking";
+import { moduleKeyForPath, useModuleSettings } from "@/lib/module-visibility";
 import { useNotifications } from "@/lib/notifications";
 import { DonateButton } from "@/components/donate-button";
 
@@ -67,6 +68,7 @@ function AppLayout() {
   const { t } = useI18n();
   const qc = useQueryClient();
   const [refreshing, setRefreshing] = useState(false);
+  const { isVisible, isLoading: modulesLoading } = useModuleSettings();
 
   const handleHardRefresh = async () => {
     if (refreshing) return;
@@ -101,8 +103,16 @@ function AppLayout() {
   };
 
   useEffect(() => {
-    if (!loading && !session) navigate({ to: "/auth" });
+    if (!loading && !session) navigate({ to: "/heritage" });
   }, [session, loading, navigate]);
+
+  // Modules switched off by the super administrator are unreachable for everyone else.
+  useEffect(() => {
+    if (modulesLoading) return;
+    const key = moduleKeyForPath(pathname);
+    if (key && key !== "home" && !isVisible(key)) navigate({ to: "/" });
+  }, [pathname, modulesLoading, isVisible, navigate]);
+
 
   useEffect(() => {
     if (!user) return;
@@ -128,23 +138,25 @@ function AppLayout() {
   const totalNotif = notif.unreadMessages + notif.newPosts + notif.newFollowers;
 
   const nav = [
-    { to: "/", label: t("nav.home"), icon: Home, badge: notif.newPosts },
-    { to: "/explore", label: t("nav.explore"), icon: Compass, badge: notif.newFollowers },
-    { to: "/community", label: t("nav.community"), icon: Users, badge: 0 },
-    { to: "/marketplace", label: t("nav.marketplace"), icon: Store, badge: 0 },
-    { to: "/directory", label: t("nav.directory"), icon: BookUser, badge: 0 },
-    { to: "/messages", label: t("nav.messages"), icon: MessageCircle, badge: notif.unreadMessages },
-    { to: "/heritage", label: t("nav.heritage"), icon: Landmark, badge: 0 },
-    { to: "/museum", label: t("nav.museum"), icon: Gem, badge: 0 },
-    { to: "/gallery", label: t("nav.gallery"), icon: Images, badge: 0 },
-    { to: "/family-tree", label: t("nav.familyTree"), icon: Trees, badge: 0 },
+    { key: "home", to: "/", label: t("nav.home"), icon: Home, badge: notif.newPosts },
+    { key: "explore", to: "/explore", label: t("nav.explore"), icon: Compass, badge: notif.newFollowers },
+    { key: "community", to: "/community", label: t("nav.community"), icon: Users, badge: 0 },
+    { key: "marketplace", to: "/marketplace", label: t("nav.marketplace"), icon: Store, badge: 0 },
+    { key: "directory", to: "/directory", label: t("nav.directory"), icon: BookUser, badge: 0 },
+    { key: "messages", to: "/messages", label: t("nav.messages"), icon: MessageCircle, badge: notif.unreadMessages },
+    { key: "heritage", to: "/heritage", label: t("nav.heritage"), icon: Landmark, badge: 0 },
+    { key: "museum", to: "/museum", label: t("nav.museum"), icon: Gem, badge: 0 },
+    { key: "gallery", to: "/gallery", label: t("nav.gallery"), icon: Images, badge: 0 },
+    { key: "family-tree", to: "/family-tree", label: t("nav.familyTree"), icon: Trees, badge: 0 },
     {
+      key: "profile",
       to: profile?.username ? `/profile/${profile.username}` : "/",
       label: t("nav.profile"),
       icon: UserIcon,
       badge: notif.newFollowers,
     },
-  ];
+  ].filter((item) => isVisible(item.key));
+
 
   const adminNav = [
     { to: "/admin", label: t("nav.admin"), icon: Shield, badge: 0 },
@@ -238,8 +250,8 @@ function AppLayout() {
                 {t("nav.main")}
               </div>
             )}
-            {nav.map((item) => (
-              <NavItem key={item.label} {...item} collapsed={!sidebarOpen} />
+            {nav.map(({ key, ...item }) => (
+              <NavItem key={key} {...item} collapsed={!sidebarOpen} />
             ))}
             {isAdmin && (
               <>

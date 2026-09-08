@@ -50,6 +50,29 @@ export const common: ModuleDict = {
     "auth.terms": "I agree to the Terms and Conditions and the Privacy Policy of Banyamulenge Heritage Hub.",
     "auth.checkInbox": "Email sent. Open the link in your inbox to set a new password, then log in again.",
 
+    "land.nav.story": "Story",
+    "land.nav.origins": "Origins",
+    "land.nav.culture": "Culture",
+    "land.nav.lineages": "Lineages",
+    "land.nav.subtribes": "Subtribes",
+    "land.enterApp": "Enter the hub",
+    "land.cta.join": "Create your free account",
+    "land.cta.read": "Read our story",
+    "land.cta.title": "Be part of the story",
+    "land.cta.sub":
+      "Create a free account to join the community, share your family history, explore the virtual museum and connect with Banyamulenge around the world.",
+    "land.footer.explore": "Explore",
+    "land.footer.join": "Join us",
+    "land.footer.rights": "All rights reserved.",
+
+    "admin.modules.title": "Module visibility",
+    "admin.modules.sub":
+      "Switch parts of the platform on or off for everyone. Only the super administrator can change this.",
+    "admin.modules.visible": "Visible to everyone",
+    "admin.modules.hidden": "Hidden from everyone",
+    "admin.modules.saved": "Visibility updated",
+    "admin.modules.superOnly": "Only the super administrator can change module visibility.",
+
     "common.save": "Save",
     "common.cancel": "Cancel",
     "common.delete": "Delete",
@@ -121,6 +144,29 @@ export const common: ModuleDict = {
     "auth.terms": "Nakubali Sheria na Masharti pamoja na Sera ya Faragha ya Banyamulenge Heritage Hub.",
     "auth.checkInbox": "Barua pepe imetumwa. Fungua kiungo kwenye kikasha chako uweke nenosiri jipya, kisha uingie tena.",
 
+    "land.nav.story": "Historia",
+    "land.nav.origins": "Asili",
+    "land.nav.culture": "Utamaduni",
+    "land.nav.lineages": "Koo",
+    "land.nav.subtribes": "Makabila madogo",
+    "land.enterApp": "Ingia kwenye jukwaa",
+    "land.cta.join": "Fungua akaunti bila malipo",
+    "land.cta.read": "Soma historia yetu",
+    "land.cta.title": "Kuwa sehemu ya historia",
+    "land.cta.sub":
+      "Fungua akaunti bila malipo ili kujiunga na jumuiya, kushiriki historia ya familia yako, kutembelea jumba la makumbusho na kuungana na Wabanyamulenge kote duniani.",
+    "land.footer.explore": "Gundua",
+    "land.footer.join": "Jiunge nasi",
+    "land.footer.rights": "Haki zote zimehifadhiwa.",
+
+    "admin.modules.title": "Uonekano wa moduli",
+    "admin.modules.sub":
+      "Washa au zima sehemu za jukwaa kwa watumiaji wote. Ni msimamizi mkuu pekee anayeweza kubadilisha haya.",
+    "admin.modules.visible": "Inaonekana kwa wote",
+    "admin.modules.hidden": "Imefichwa kwa wote",
+    "admin.modules.saved": "Uonekano umesasishwa",
+    "admin.modules.superOnly": "Ni msimamizi mkuu pekee anayeweza kubadilisha uonekano wa moduli.",
+
     "common.save": "Hifadhi",
     "common.cancel": "Ghairi",
     "common.delete": "Futa",
@@ -191,6 +237,29 @@ export const common: ModuleDict = {
     "auth.taglineSub": "Turinde inkuru zacu, twiyunge ku migabane yose, kandi twubahirize umuco w\u2019Abanyamulenge.",
     "auth.terms": "Nemeye Amabwiriza n\u2019Amasezerano ndetse na Politiki y\u2019Ibanga bya Banyamulenge Heritage Hub.",
     "auth.checkInbox": "Imeyili yoherejwe. Fungura umurongo uri muri imeyili yawe ushyireho ijambobanga rishya, hanyuma wongere winjire.",
+
+    "land.nav.story": "Inkuru yacu",
+    "land.nav.origins": "Inkomoko",
+    "land.nav.culture": "Umuco",
+    "land.nav.lineages": "Imiryango",
+    "land.nav.subtribes": "Amashyanga",
+    "land.enterApp": "Injira mu rubuga",
+    "land.cta.join": "Fungura konti ku buntu",
+    "land.cta.read": "Soma inkuru yacu",
+    "land.cta.title": "Ba umwe mu nkuru yacu",
+    "land.cta.sub":
+      "Fungura konti ku buntu wifatanye n'umuryango, usangize amateka y'umuryango wawe, usure inzu ndangamurage kandi wiyunge n'Abanyamulenge bo hose ku isi.",
+    "land.footer.explore": "Shakisha",
+    "land.footer.join": "Twifatanye",
+    "land.footer.rights": "Uburenganzira bwose burafitwe.",
+
+    "admin.modules.title": "Kugaragara kw'ibice by'urubuga",
+    "admin.modules.sub":
+      "Funga cyangwa ufungure ibice by'urubuga ku bakoresha bose. Ni umuyobozi mukuru wenyine ubishobora.",
+    "admin.modules.visible": "Bigaragarira bose",
+    "admin.modules.hidden": "Byahishwe kuri bose",
+    "admin.modules.saved": "Byavuguruwe",
+    "admin.modules.superOnly": "Ni umuyobozi mukuru wenyine ushobora guhindura ibi.",
 
     "common.save": "Bika",
     "common.cancel": "Hagarika",
