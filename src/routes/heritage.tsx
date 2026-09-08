@@ -267,66 +267,54 @@ function LandingFooter() {
           <h3 className="text-sm font-semibold text-white">
             {t("land.footer.modules", "Modules")}
           </h3>
-          <ul className="mt-3 space-y-2 text-sm">
-            <li>
-              <Link to="/" className="hover:text-white">
-                {t("nav.home")}
-              </Link>
-            </li>
-            <li>
-              <Link to="/community" className="hover:text-white">
-                {t("nav.community")}
-              </Link>
-            </li>
-            <li>
-              <Link to="/marketplace" className="hover:text-white">
-                {t("nav.marketplace")}
-              </Link>
-            </li>
-            <li>
-              <Link to="/museum" className="hover:text-white">
-                {t("nav.museum")}
-              </Link>
-            </li>
+          <ul className="mt-3 space-y-2.5 text-sm">
+            {[
+              { to: "/", label: t("nav.home") },
+              { to: "/community", label: t("nav.community") },
+              { to: "/marketplace", label: t("nav.marketplace") },
+              { to: "/museum", label: t("nav.museum") },
+            ].map((l) => (
+              <li key={l.to} className="flex items-center gap-2.5">
+                <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
+                <Link to={l.to} className="hover:text-white transition-colors">
+                  {l.label}
+                </Link>
+              </li>
+            ))}
           </ul>
         </div>
         <div>
           <h3 className="text-sm font-semibold text-white">
             {t("land.footer.explore", "Explore")}
           </h3>
-          <ul className="mt-3 space-y-2 text-sm">
-            <li>
-              <a href="#story" className="hover:text-white">
-                {t("land.nav.story", "Our Story")}
-              </a>
-            </li>
-            <li>
-              <a href="#origins" className="hover:text-white">
-                {t("land.nav.origins", "Origins")}
-              </a>
-            </li>
-            <li>
-              <a href="#lineages" className="hover:text-white">
-                {t("land.nav.lineages", "Lineages")}
-              </a>
-            </li>
-            <li>
-              <a href="#subtribes" className="hover:text-white">
-                {t("land.nav.subtribes", "Subtribes")}
-              </a>
-            </li>
+          <ul className="mt-3 space-y-2.5 text-sm">
+            {[
+              { href: "#story", label: t("land.nav.story", "Our Story") },
+              { href: "#origins", label: t("land.nav.origins", "Origins") },
+              { href: "#lineages", label: t("land.nav.lineages", "Lineages") },
+              { href: "#subtribes", label: t("land.nav.subtribes", "Subtribes") },
+            ].map((l) => (
+              <li key={l.href} className="flex items-center gap-2.5">
+                <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
+                <a href={l.href} className="hover:text-white transition-colors">
+                  {l.label}
+                </a>
+              </li>
+            ))}
           </ul>
         </div>
         <div>
           <h3 className="text-sm font-semibold text-white">{t("land.footer.join", "Join us")}</h3>
-          <ul className="mt-3 space-y-2 text-sm">
-            <li>
-              <Link to="/auth" className="hover:text-white">
+          <ul className="mt-3 space-y-2.5 text-sm">
+            <li className="flex items-center gap-2.5">
+              <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
+              <Link to="/auth" search={{ mode: "signup" }} className="hover:text-white transition-colors">
                 {t("auth.createAccount")}
               </Link>
             </li>
-            <li>
-              <Link to="/auth" className="hover:text-white">
+            <li className="flex items-center gap-2.5">
+              <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
+              <Link to="/auth" search={{ mode: "signin" }} className="hover:text-white transition-colors">
                 {t("auth.login")}
               </Link>
             </li>
