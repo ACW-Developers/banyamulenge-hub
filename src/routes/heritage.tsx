@@ -156,12 +156,12 @@ function LandingNavbar() {
 
   return (
     <header className="sticky top-0 z-40 border-b bg-white/85 backdrop-blur supports-[backdrop-filter]:bg-white/70">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6 h-16 flex items-center gap-4">
+      <div className="relative mx-auto max-w-6xl px-4 sm:px-6 h-16 flex items-center gap-4">
         <Link to="/heritage" className="flex items-center shrink-0">
           <Logo variant="horizontal" className="h-12 w-auto max-w-[190px] object-contain" />
         </Link>
 
-        <nav className="hidden lg:flex items-center gap-1 ml-2">
+        <nav className="hidden lg:flex items-center gap-1 absolute left-1/2 -translate-x-1/2">
           {links.map((l) => (
             <a
               key={l.href}
