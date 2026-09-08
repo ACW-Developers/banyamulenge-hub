@@ -198,7 +198,11 @@ function LandingNavbar() {
                 </Link>
               </Button>
 
-              <Button asChild size="sm" className="h-9 rounded-10 px-4">
+              <Button
+                asChild
+                size="sm"
+                className="hidden sm:inline-flex h-9 rounded-10 px-4 border-2"
+              >
                 <Link to="/auth" search={{ mode: "signup" }}>
                   <UserPlus className="h-4 w-4" />
                   {t("auth.signup")}
@@ -208,7 +212,7 @@ function LandingNavbar() {
           )}
 
           <button
-            className="lg:hidden h-9 w-9 rounded-10 border p-0 flex items-center justify-center text-gray-600"
+            className="lg:hidden h-9 w-9 rounded-lg border p-0 flex items-center justify-center text-gray-600"
             onClick={() => setOpen((v) => !v)}
             aria-label="Menu"
           >
@@ -375,24 +379,31 @@ function HeritageLanding() {
             alt={t("heritage.hero.imageAlt")}
             className="absolute inset-0 h-full w-full object-cover"
           />
+
           <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/45 to-black/20" />
-          <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6 h-full flex flex-col justify-center sm:justify-end items-center sm:items-start text-center sm:text-left pb-12 sm:pb-16 text-white">
+
+          <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6 h-full flex flex-col justify-center items-start text-left text-white">
             <span className="inline-flex w-fit items-center gap-2 rounded-lg border border-white/30 bg-white/10 px-3 py-1 text-xs font-medium backdrop-blur">
-              <Landmark className="h-3.5 w-3.5" /> {t("heritage.title")}
+              <Landmark className="h-3.5 w-3.5" />
+              {t("heritage.title")}
             </span>
+
             <h1 className="mt-4 text-3xl sm:text-5xl lg:text-6xl font-black leading-[1.05] max-w-3xl drop-shadow">
               {t("heritage.hero.title")}
             </h1>
+
             <p className="mt-4 max-w-2xl text-sm sm:text-lg text-white/90 leading-relaxed drop-shadow">
               {t("heritage.subtitle")}
             </p>
-            <div className="mt-7 flex flex-wrap justify-center sm:justify-start gap-3">
+
+            <div className="mt-7 flex flex-wrap justify-start gap-3">
               <Button asChild size="lg" className="rounded-10 px-5">
                 <Link to="/auth" search={{ mode: "signup" }}>
                   {t("land.cta.join", "Create your free account")}
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
+
               <Button
                 asChild
                 size="lg"
@@ -405,7 +416,6 @@ function HeritageLanding() {
           </div>
         </div>
       </section>
-
       <main className="mx-auto w-full max-w-6xl px-4 sm:px-6 py-10 sm:py-14 space-y-6 flex-1">
         <Section
           id="story"
