@@ -156,12 +156,12 @@ function LandingNavbar() {
 
   return (
     <header className="sticky top-0 z-40 border-b bg-white/85 backdrop-blur supports-[backdrop-filter]:bg-white/70">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6 h-16 flex items-center gap-4">
+      <div className="relative mx-auto max-w-6xl px-4 sm:px-6 h-16 flex items-center gap-4">
         <Link to="/heritage" className="flex items-center shrink-0">
           <Logo variant="horizontal" className="h-12 w-auto max-w-[190px] object-contain" />
         </Link>
 
-        <nav className="hidden lg:flex items-center gap-1 ml-2">
+        <nav className="hidden lg:flex items-center gap-1 absolute left-1/2 -translate-x-1/2">
           {links.map((l) => (
             <a
               key={l.href}
@@ -174,7 +174,7 @@ function LandingNavbar() {
         </nav>
 
         <div className="ml-auto flex items-center gap-2">
-          <LanguageSelector />
+          <LanguageSelector className="h-9 rounded-10 px-3 border-2" />
           {session ? (
             <Button asChild size="sm" className="rounded-10 px-4">
               <Link to="/">
@@ -191,13 +191,13 @@ function LandingNavbar() {
                 variant="outline"
                 className="hidden sm:inline-flex rounded-10 px-4 border-2"
               >
-                <Link to="/auth">
+                <Link to="/auth" search={{ mode: "signin" }}>
                   <LogIn className="h-4 w-4" />
                   {t("auth.login")}
                 </Link>
               </Button>
               <Button asChild size="sm" className="rounded-10 px-4">
-                <Link to="/auth">
+                <Link to="/auth" search={{ mode: "signup" }}>
                   <UserPlus className="h-4 w-4" />
                   {t("auth.signup")}
                 </Link>
@@ -227,13 +227,20 @@ function LandingNavbar() {
             </a>
           ))}
           {!session && (
-            <Link
-              to="/auth"
-              onClick={() => setOpen(false)}
-              className="block rounded-lg px-3 py-2 text-sm font-semibold text-primary hover:bg-primary/5"
-            >
-              {t("auth.login")}
-            </Link>
+            <div className="pt-2 grid gap-2">
+              <Button asChild variant="outline" className="w-full rounded-10 border-2">
+                <Link to="/auth" search={{ mode: "signin" }} onClick={() => setOpen(false)}>
+                  <LogIn className="h-4 w-4" />
+                  {t("auth.login")}
+                </Link>
+              </Button>
+              <Button asChild className="w-full rounded-10">
+                <Link to="/auth" search={{ mode: "signup" }} onClick={() => setOpen(false)}>
+                  <UserPlus className="h-4 w-4" />
+                  {t("auth.signup")}
+                </Link>
+              </Button>
+            </div>
           )}
         </div>
       )}
@@ -260,66 +267,54 @@ function LandingFooter() {
           <h3 className="text-sm font-semibold text-white">
             {t("land.footer.modules", "Modules")}
           </h3>
-          <ul className="mt-3 space-y-2 text-sm">
-            <li>
-              <Link to="/" className="hover:text-white">
-                {t("nav.home")}
-              </Link>
-            </li>
-            <li>
-              <Link to="/community" className="hover:text-white">
-                {t("nav.community")}
-              </Link>
-            </li>
-            <li>
-              <Link to="/marketplace" className="hover:text-white">
-                {t("nav.marketplace")}
-              </Link>
-            </li>
-            <li>
-              <Link to="/museum" className="hover:text-white">
-                {t("nav.museum")}
-              </Link>
-            </li>
+          <ul className="mt-3 space-y-2.5 text-sm">
+            {[
+              { to: "/", label: t("nav.home") },
+              { to: "/community", label: t("nav.community") },
+              { to: "/marketplace", label: t("nav.marketplace") },
+              { to: "/museum", label: t("nav.museum") },
+            ].map((l) => (
+              <li key={l.to} className="flex items-center gap-2.5">
+                <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
+                <Link to={l.to} className="hover:text-white transition-colors">
+                  {l.label}
+                </Link>
+              </li>
+            ))}
           </ul>
         </div>
         <div>
           <h3 className="text-sm font-semibold text-white">
             {t("land.footer.explore", "Explore")}
           </h3>
-          <ul className="mt-3 space-y-2 text-sm">
-            <li>
-              <a href="#story" className="hover:text-white">
-                {t("land.nav.story", "Our Story")}
-              </a>
-            </li>
-            <li>
-              <a href="#origins" className="hover:text-white">
-                {t("land.nav.origins", "Origins")}
-              </a>
-            </li>
-            <li>
-              <a href="#lineages" className="hover:text-white">
-                {t("land.nav.lineages", "Lineages")}
-              </a>
-            </li>
-            <li>
-              <a href="#subtribes" className="hover:text-white">
-                {t("land.nav.subtribes", "Subtribes")}
-              </a>
-            </li>
+          <ul className="mt-3 space-y-2.5 text-sm">
+            {[
+              { href: "#story", label: t("land.nav.story", "Our Story") },
+              { href: "#origins", label: t("land.nav.origins", "Origins") },
+              { href: "#lineages", label: t("land.nav.lineages", "Lineages") },
+              { href: "#subtribes", label: t("land.nav.subtribes", "Subtribes") },
+            ].map((l) => (
+              <li key={l.href} className="flex items-center gap-2.5">
+                <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
+                <a href={l.href} className="hover:text-white transition-colors">
+                  {l.label}
+                </a>
+              </li>
+            ))}
           </ul>
         </div>
         <div>
           <h3 className="text-sm font-semibold text-white">{t("land.footer.join", "Join us")}</h3>
-          <ul className="mt-3 space-y-2 text-sm">
-            <li>
-              <Link to="/auth" className="hover:text-white">
+          <ul className="mt-3 space-y-2.5 text-sm">
+            <li className="flex items-center gap-2.5">
+              <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
+              <Link to="/auth" search={{ mode: "signup" }} className="hover:text-white transition-colors">
                 {t("auth.createAccount")}
               </Link>
             </li>
-            <li>
-              <Link to="/auth" className="hover:text-white">
+            <li className="flex items-center gap-2.5">
+              <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
+              <Link to="/auth" search={{ mode: "signin" }} className="hover:text-white transition-colors">
                 {t("auth.login")}
               </Link>
             </li>
@@ -354,7 +349,7 @@ function HeritageLanding() {
 
   const heritageOn = isVisible("heritage");
   useEffect(() => {
-    if (!isLoading && !heritageOn) navigate({ to: "/auth" });
+    if (!isLoading && !heritageOn) navigate({ to: "/auth", search: { mode: "signin" } });
   }, [isLoading, heritageOn, navigate]);
 
   return (
@@ -370,7 +365,7 @@ function HeritageLanding() {
             className="absolute inset-0 h-full w-full object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/45 to-black/20" />
-          <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6 h-full flex flex-col justify-end pb-12 sm:pb-16 text-white">
+          <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6 h-full flex flex-col justify-center sm:justify-end items-center sm:items-start text-center sm:text-left pb-12 sm:pb-16 text-white">
             <span className="inline-flex w-fit items-center gap-2 rounded-lg border border-white/30 bg-white/10 px-3 py-1 text-xs font-medium backdrop-blur">
               <Landmark className="h-3.5 w-3.5" /> {t("heritage.title")}
             </span>
@@ -380,9 +375,9 @@ function HeritageLanding() {
             <p className="mt-4 max-w-2xl text-sm sm:text-lg text-white/90 leading-relaxed drop-shadow">
               {t("heritage.subtitle")}
             </p>
-            <div className="mt-7 flex flex-wrap gap-3">
+            <div className="mt-7 flex flex-wrap justify-center sm:justify-start gap-3">
               <Button asChild size="lg" className="rounded-10 px-5">
-                <Link to="/auth">
+                <Link to="/auth" search={{ mode: "signup" }}>
                   {t("land.cta.join", "Create your free account")}
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
@@ -507,7 +502,7 @@ function HeritageLanding() {
             </p>
             <div className="mt-6 flex flex-wrap justify-center gap-3">
               <Button asChild size="lg" className="rounded-10 px-6">
-                <Link to="/auth">{t("auth.createAccount")}</Link>
+                <Link to="/auth" search={{ mode: "signup" }}>{t("auth.createAccount")}</Link>
               </Button>
               <Button
                 asChild
@@ -515,7 +510,7 @@ function HeritageLanding() {
                 variant="outline"
                 className="rounded-10 px-6 border-2 border-white/50 bg-transparent text-white hover:bg-white hover:text-gray-900"
               >
-                <Link to="/auth">{t("auth.login")}</Link>
+                <Link to="/auth" search={{ mode: "signin" }}>{t("auth.login")}</Link>
               </Button>
             </div>
           </div>

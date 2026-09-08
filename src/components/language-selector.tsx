@@ -9,14 +9,14 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { LANGUAGES, useI18n } from "@/lib/i18n";
 
-export function LanguageSelector() {
+export function LanguageSelector({ className }: { className?: string }) {
   const { lang, setLang, t } = useI18n();
   const active = LANGUAGES.find((l) => l.code === lang) ?? LANGUAGES[0];
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button
-          className="inline-flex items-center gap-1.5 h-10 px-2 rounded-md border border-gray-200 hover:border-primary/40 hover:bg-primary/5 text-gray-600 text-sm transition"
+          className={`inline-flex items-center justify-center gap-1.5 h-10 px-2 rounded-md border border-gray-200 hover:border-primary/40 hover:bg-primary/5 text-gray-600 text-sm transition ${className ?? ""}`}
           aria-label={t("nav.language")}
         >
           <Globe2 className="h-4 w-4" />
