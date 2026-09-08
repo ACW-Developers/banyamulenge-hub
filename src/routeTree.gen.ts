@@ -10,13 +10,13 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as HeritageRouteImport } from './routes/heritage'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as AppIndexRouteImport } from './routes/_app/index'
 import { Route as AppMuseumRouteImport } from './routes/_app/museum'
 import { Route as AppMessagesRouteImport } from './routes/_app/messages'
 import { Route as AppMarketplaceRouteImport } from './routes/_app/marketplace'
-import { Route as AppHeritageRouteImport } from './routes/_app/heritage'
 import { Route as AppGalleryRouteImport } from './routes/_app/gallery'
 import { Route as AppFamilyTreeRouteImport } from './routes/_app/family-tree'
 import { Route as AppExploreRouteImport } from './routes/_app/explore'
@@ -34,6 +34,11 @@ import { Route as AppAdminLogsRouteImport } from './routes/_app/admin/logs'
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HeritageRoute = HeritageRouteImport.update({
+  id: '/heritage',
+  path: '/heritage',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -63,11 +68,6 @@ const AppMessagesRoute = AppMessagesRouteImport.update({
 const AppMarketplaceRoute = AppMarketplaceRouteImport.update({
   id: '/marketplace',
   path: '/marketplace',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppHeritageRoute = AppHeritageRouteImport.update({
-  id: '/heritage',
-  path: '/heritage',
   getParentRoute: () => AppRoute,
 } as any)
 const AppGalleryRoute = AppGalleryRouteImport.update({
@@ -139,13 +139,13 @@ const AppAdminLogsRoute = AppAdminLogsRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
   '/auth': typeof AuthRoute
+  '/heritage': typeof HeritageRoute
   '/reset-password': typeof ResetPasswordRoute
   '/admin': typeof AppAdminRouteWithChildren
   '/directory': typeof AppDirectoryRoute
   '/explore': typeof AppExploreRoute
   '/family-tree': typeof AppFamilyTreeRoute
   '/gallery': typeof AppGalleryRoute
-  '/heritage': typeof AppHeritageRoute
   '/marketplace': typeof AppMarketplaceRoute
   '/messages': typeof AppMessagesRoute
   '/museum': typeof AppMuseumRoute
@@ -160,12 +160,12 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
+  '/heritage': typeof HeritageRoute
   '/reset-password': typeof ResetPasswordRoute
   '/directory': typeof AppDirectoryRoute
   '/explore': typeof AppExploreRoute
   '/family-tree': typeof AppFamilyTreeRoute
   '/gallery': typeof AppGalleryRoute
-  '/heritage': typeof AppHeritageRoute
   '/marketplace': typeof AppMarketplaceRoute
   '/messages': typeof AppMessagesRoute
   '/museum': typeof AppMuseumRoute
@@ -183,13 +183,13 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
+  '/heritage': typeof HeritageRoute
   '/reset-password': typeof ResetPasswordRoute
   '/_app/admin': typeof AppAdminRouteWithChildren
   '/_app/directory': typeof AppDirectoryRoute
   '/_app/explore': typeof AppExploreRoute
   '/_app/family-tree': typeof AppFamilyTreeRoute
   '/_app/gallery': typeof AppGalleryRoute
-  '/_app/heritage': typeof AppHeritageRoute
   '/_app/marketplace': typeof AppMarketplaceRoute
   '/_app/messages': typeof AppMessagesRoute
   '/_app/museum': typeof AppMuseumRoute
@@ -208,13 +208,13 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/heritage'
     | '/reset-password'
     | '/admin'
     | '/directory'
     | '/explore'
     | '/family-tree'
     | '/gallery'
-    | '/heritage'
     | '/marketplace'
     | '/messages'
     | '/museum'
@@ -229,12 +229,12 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/auth'
+    | '/heritage'
     | '/reset-password'
     | '/directory'
     | '/explore'
     | '/family-tree'
     | '/gallery'
-    | '/heritage'
     | '/marketplace'
     | '/messages'
     | '/museum'
@@ -251,13 +251,13 @@ export interface FileRouteTypes {
     | '__root__'
     | '/_app'
     | '/auth'
+    | '/heritage'
     | '/reset-password'
     | '/_app/admin'
     | '/_app/directory'
     | '/_app/explore'
     | '/_app/family-tree'
     | '/_app/gallery'
-    | '/_app/heritage'
     | '/_app/marketplace'
     | '/_app/messages'
     | '/_app/museum'
@@ -275,6 +275,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   AppRoute: typeof AppRouteWithChildren
   AuthRoute: typeof AuthRoute
+  HeritageRoute: typeof HeritageRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
 }
 
@@ -285,6 +286,13 @@ declare module '@tanstack/react-router' {
       path: '/reset-password'
       fullPath: '/reset-password'
       preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/heritage': {
+      id: '/heritage'
+      path: '/heritage'
+      fullPath: '/heritage'
+      preLoaderRoute: typeof HeritageRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -327,13 +335,6 @@ declare module '@tanstack/react-router' {
       path: '/marketplace'
       fullPath: '/marketplace'
       preLoaderRoute: typeof AppMarketplaceRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/_app/heritage': {
-      id: '/_app/heritage'
-      path: '/heritage'
-      fullPath: '/heritage'
-      preLoaderRoute: typeof AppHeritageRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/gallery': {
@@ -456,7 +457,6 @@ interface AppRouteChildren {
   AppExploreRoute: typeof AppExploreRoute
   AppFamilyTreeRoute: typeof AppFamilyTreeRoute
   AppGalleryRoute: typeof AppGalleryRoute
-  AppHeritageRoute: typeof AppHeritageRoute
   AppMarketplaceRoute: typeof AppMarketplaceRoute
   AppMessagesRoute: typeof AppMessagesRoute
   AppMuseumRoute: typeof AppMuseumRoute
@@ -472,7 +472,6 @@ const AppRouteChildren: AppRouteChildren = {
   AppExploreRoute: AppExploreRoute,
   AppFamilyTreeRoute: AppFamilyTreeRoute,
   AppGalleryRoute: AppGalleryRoute,
-  AppHeritageRoute: AppHeritageRoute,
   AppMarketplaceRoute: AppMarketplaceRoute,
   AppMessagesRoute: AppMessagesRoute,
   AppMuseumRoute: AppMuseumRoute,
@@ -487,6 +486,7 @@ const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   AppRoute: AppRouteWithChildren,
   AuthRoute: AuthRoute,
+  HeritageRoute: HeritageRoute,
   ResetPasswordRoute: ResetPasswordRoute,
 }
 export const routeTree = rootRouteImport
