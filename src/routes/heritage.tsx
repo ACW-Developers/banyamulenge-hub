@@ -502,7 +502,7 @@ function HeritageLanding() {
             </p>
             <div className="mt-6 flex flex-wrap justify-center gap-3">
               <Button asChild size="lg" className="rounded-10 px-6">
-                <Link to="/auth">{t("auth.createAccount")}</Link>
+                <Link to="/auth" search={{ mode: "signup" }}>{t("auth.createAccount")}</Link>
               </Button>
               <Button
                 asChild
@@ -510,7 +510,7 @@ function HeritageLanding() {
                 variant="outline"
                 className="rounded-10 px-6 border-2 border-white/50 bg-transparent text-white hover:bg-white hover:text-gray-900"
               >
-                <Link to="/auth">{t("auth.login")}</Link>
+                <Link to="/auth" search={{ mode: "signin" }}>{t("auth.login")}</Link>
               </Button>
             </div>
           </div>
