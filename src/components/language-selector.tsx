@@ -1,4 +1,4 @@
-import { Languages, Check } from "lucide-react";
+import { Globe2, Check, ChevronDown } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,11 +16,12 @@ export function LanguageSelector() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button
-          className="inline-flex items-center gap-1.5 h-10 px-2.5 rounded-md border border-gray-200 hover:border-primary/40 hover:bg-primary/5 text-gray-600 text-sm transition"
+          className="inline-flex items-center gap-1.5 h-10 px-2 rounded-md border border-gray-200 hover:border-primary/40 hover:bg-primary/5 text-gray-600 text-sm transition"
           aria-label={t("nav.language")}
         >
-          <Languages className="h-4 w-4" />
+          <Globe2 className="h-4 w-4" />
           <span className="hidden sm:inline font-medium">{active.flag}</span>
+          <ChevronDown className="hidden sm:block h-3.5 w-3.5 text-muted-foreground" />
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-48">

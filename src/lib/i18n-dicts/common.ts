@@ -65,6 +65,7 @@ export const common: ModuleDict = {
     "land.cta.sub":
       "Create a free account to join the community, share your family history, explore the virtual museum and connect with Banyamulenge around the world.",
     "land.footer.explore": "Explore",
+    "land.footer.modules": "Modules",
     "land.footer.join": "Join us",
     "land.footer.rights": "All rights reserved.",
 
@@ -162,6 +163,7 @@ export const common: ModuleDict = {
     "land.cta.sub":
       "Fungua akaunti bila malipo ili kujiunga na jumuiya, kushiriki historia ya familia yako, kutembelea jumba la makumbusho na kuungana na Wabanyamulenge kote duniani.",
     "land.footer.explore": "Gundua",
+    "land.footer.modules": "Sehemu za mfumo",
     "land.footer.join": "Jiunge nasi",
     "land.footer.rights": "Haki zote zimehifadhiwa.",
 
@@ -260,6 +262,7 @@ export const common: ModuleDict = {
     "land.cta.sub":
       "Fungura konti ku buntu wifatanye n'umuryango, usangize amateka y'umuryango wawe, usure inzu ndangamurage kandi wiyunge n'Abanyamulenge bo hose ku isi.",
     "land.footer.explore": "Shakisha",
+    "land.footer.modules": "Ibice by'urubuga",
     "land.footer.join": "Twifatanye",
     "land.footer.rights": "Uburenganzira bwose burafitwe.",
 

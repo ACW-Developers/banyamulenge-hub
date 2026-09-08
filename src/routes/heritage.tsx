@@ -12,6 +12,9 @@ import {
   X,
   ArrowRight,
   Mail,
+  LogIn,
+  UserPlus,
+  LayoutDashboard,
 } from "lucide-react";
 
 import { useI18n } from "@/lib/i18n";
@@ -174,6 +177,7 @@ function LandingNavbar() {
           {session ? (
             <Button asChild size="sm" className="rounded-10 px-4">
               <Link to="/">
+                <LayoutDashboard className="h-4 w-4" />
                 {t("land.enterApp", "Enter the hub")}
                 <ArrowRight className="ml-1.5 h-4 w-4" />
               </Link>
@@ -186,10 +190,16 @@ function LandingNavbar() {
                 variant="outline"
                 className="hidden sm:inline-flex rounded-10 px-4 border-2"
               >
-                <Link to="/auth">{t("auth.login")}</Link>
+                <Link to="/auth">
+                  <LogIn className="h-4 w-4" />
+                  {t("auth.login")}
+                </Link>
               </Button>
               <Button asChild size="sm" className="rounded-10 px-4">
-                <Link to="/auth">{t("auth.signup")}</Link>
+                <Link to="/auth">
+                  <UserPlus className="h-4 w-4" />
+                  {t("auth.signup")}
+                </Link>
               </Button>
             </>
           )}
@@ -235,8 +245,8 @@ function LandingFooter() {
   const year = new Date().getFullYear();
   return (
     <footer className="mt-16 border-t bg-gray-900 text-gray-300">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6 py-12 grid gap-10 sm:grid-cols-3 lg:grid-cols-4">
-        <div className="sm:col-span-2">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 py-12 grid gap-10 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="sm:col-span-2 lg:col-span-2">
           <Logo
             variant="horizontal"
             className="h-11 w-auto max-w-[200px] object-contain bg-white/95 rounded-lg p-1.5"
@@ -244,6 +254,19 @@ function LandingFooter() {
           <p className="mt-4 text-sm leading-relaxed text-gray-400 max-w-sm">
             {t("auth.taglineSub")}
           </p>
+        </div>
+        <div>
+          <h3 className="text-sm font-semibold text-white">
+            {t("land.footer.modules", "Modules")}
+          </h3>
+          <ul className="mt-3 space-y-2 text-sm">
+            <li><Link to="/" className="hover:text-white">{t("nav.home")}</Link></li>
+            <li><Link to="/community" className="hover:text-white">{t("nav.community")}</Link></li>
+            <li><Link to="/marketplace" className="hover:text-white">{t("nav.marketplace")}</Link></li>
+            <li><Link to="/directory" className="hover:text-white">{t("nav.directory")}</Link></li>
+            <li><Link to="/museum" className="hover:text-white">{t("nav.museum")}</Link></li>
+            <li><Link to="/family-tree" className="hover:text-white">{t("nav.familyTree")}</Link></li>
+          </ul>
         </div>
         <div>
           <h3 className="text-sm font-semibold text-white">
