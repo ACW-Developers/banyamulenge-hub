@@ -250,8 +250,8 @@ function AppLayout() {
                 {t("nav.main")}
               </div>
             )}
-            {nav.map((item) => (
-              <NavItem key={item.label} {...item} collapsed={!sidebarOpen} />
+            {nav.map(({ key, ...item }) => (
+              <NavItem key={key} {...item} collapsed={!sidebarOpen} />
             ))}
             {isAdmin && (
               <>
