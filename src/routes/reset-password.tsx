@@ -104,7 +104,10 @@ function ResetPasswordPage() {
         ) : !hasRecoverySession ? (
           <div className="space-y-4 py-2 text-center">
             <p className="text-sm text-destructive">This reset link is invalid or has expired.</p>
-            <Button className="w-full" onClick={() => navigate({ to: "/auth", replace: true, search: { mode: "signin" } })}>
+            <Button
+              className="w-full"
+              onClick={() => navigate({ to: "/auth", replace: true, search: { mode: "signin" } })}
+            >
               Back to login
             </Button>
           </div>
@@ -168,7 +171,11 @@ function ResetPasswordPage() {
         )}
 
         <div className="mt-6 text-center text-xs text-muted-foreground">
-          <Link to="/auth" search={{ mode: "signin" }} className="inline-flex items-center gap-1 hover:text-primary">
+          <Link
+            to="/auth"
+            search={{ mode: "signin" }}
+            className="inline-flex items-center gap-1 hover:text-primary"
+          >
             <ArrowLeft className="h-3 w-3" /> Back to login
           </Link>
         </div>

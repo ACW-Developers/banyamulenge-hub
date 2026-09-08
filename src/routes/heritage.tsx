@@ -158,7 +158,7 @@ function LandingNavbar() {
     <header className="sticky top-0 z-40 border-b bg-white/85 backdrop-blur supports-[backdrop-filter]:bg-white/70">
       <div className="relative mx-auto max-w-6xl px-4 sm:px-6 h-16 flex items-center gap-4">
         <Link to="/heritage" className="flex items-center shrink-0">
-          <Logo variant="horizontal" className="h-12 w-auto max-w-[190px] object-contain" />
+          <Logo variant="horizontal" className="h-14 w-auto max-w-[190px] object-contain" />
         </Link>
 
         <nav className="hidden lg:flex items-center gap-1 absolute left-1/2 -translate-x-1/2">
@@ -175,8 +175,9 @@ function LandingNavbar() {
 
         <div className="ml-auto flex items-center gap-2">
           <LanguageSelector className="h-9 rounded-10 px-3 border-2" />
+
           {session ? (
-            <Button asChild size="sm" className="rounded-10 px-4">
+            <Button asChild size="sm" className="h-9 rounded-10 px-4">
               <Link to="/">
                 <LayoutDashboard className="h-4 w-4" />
                 {t("land.enterApp", "Enter the hub")}
@@ -189,14 +190,15 @@ function LandingNavbar() {
                 asChild
                 size="sm"
                 variant="outline"
-                className="hidden sm:inline-flex rounded-10 px-4 border-2"
+                className="hidden sm:inline-flex h-9 rounded-10 px-4 border-2"
               >
                 <Link to="/auth" search={{ mode: "signin" }}>
                   <LogIn className="h-4 w-4" />
                   {t("auth.login")}
                 </Link>
               </Button>
-              <Button asChild size="sm" className="rounded-10 px-4">
+
+              <Button asChild size="sm" className="h-9 rounded-10 px-4">
                 <Link to="/auth" search={{ mode: "signup" }}>
                   <UserPlus className="h-4 w-4" />
                   {t("auth.signup")}
@@ -204,8 +206,9 @@ function LandingNavbar() {
               </Button>
             </>
           )}
+
           <button
-            className="lg:hidden rounded-10 border p-2 text-gray-600"
+            className="lg:hidden h-9 w-9 rounded-10 border p-0 flex items-center justify-center text-gray-600"
             onClick={() => setOpen((v) => !v)}
             aria-label="Menu"
           >
@@ -308,13 +311,21 @@ function LandingFooter() {
           <ul className="mt-3 space-y-2.5 text-sm">
             <li className="flex items-center gap-2.5">
               <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
-              <Link to="/auth" search={{ mode: "signup" }} className="hover:text-white transition-colors">
+              <Link
+                to="/auth"
+                search={{ mode: "signup" }}
+                className="hover:text-white transition-colors"
+              >
                 {t("auth.createAccount")}
               </Link>
             </li>
             <li className="flex items-center gap-2.5">
               <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
-              <Link to="/auth" search={{ mode: "signin" }} className="hover:text-white transition-colors">
+              <Link
+                to="/auth"
+                search={{ mode: "signin" }}
+                className="hover:text-white transition-colors"
+              >
                 {t("auth.login")}
               </Link>
             </li>
@@ -502,7 +513,9 @@ function HeritageLanding() {
             </p>
             <div className="mt-6 flex flex-wrap justify-center gap-3">
               <Button asChild size="lg" className="rounded-10 px-6">
-                <Link to="/auth" search={{ mode: "signup" }}>{t("auth.createAccount")}</Link>
+                <Link to="/auth" search={{ mode: "signup" }}>
+                  {t("auth.createAccount")}
+                </Link>
               </Button>
               <Button
                 asChild
@@ -510,7 +523,9 @@ function HeritageLanding() {
                 variant="outline"
                 className="rounded-10 px-6 border-2 border-white/50 bg-transparent text-white hover:bg-white hover:text-gray-900"
               >
-                <Link to="/auth" search={{ mode: "signin" }}>{t("auth.login")}</Link>
+                <Link to="/auth" search={{ mode: "signin" }}>
+                  {t("auth.login")}
+                </Link>
               </Button>
             </div>
           </div>
