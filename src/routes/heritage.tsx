@@ -349,7 +349,7 @@ function HeritageLanding() {
 
   const heritageOn = isVisible("heritage");
   useEffect(() => {
-    if (!isLoading && !heritageOn) navigate({ to: "/auth" });
+    if (!isLoading && !heritageOn) navigate({ to: "/auth", search: { mode: "signin" } });
   }, [isLoading, heritageOn, navigate]);
 
   return (
