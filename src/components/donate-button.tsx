@@ -111,7 +111,7 @@ export function DonateButton() {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <button
-          className="group inline-flex items-center gap-2 rounded-full border border-emerald-700/40 bg-emerald-600 px-3 sm:px-4 h-10 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 hover:shadow-md transition"
+          className="group inline-flex items-center gap-2 rounded-md border border-emerald-300 bg-emerald-100 px-2.5 sm:px-3 h-10 text-sm font-semibold text-emerald-800 shadow-sm hover:bg-emerald-200 hover:border-emerald-400 transition"
           aria-label={t("home.donate.aria")}
         >
           <Heart className="h-4 w-4 fill-current group-hover:scale-110 transition-transform" />
