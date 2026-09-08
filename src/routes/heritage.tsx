@@ -8,6 +8,7 @@ import {
   HeartHandshake,
   Globe2,
   Home,
+  Phone,
   Menu,
   X,
   ArrowRight,
@@ -157,7 +158,7 @@ function LandingNavbar() {
     <header className="sticky top-0 z-40 border-b bg-white/85 backdrop-blur supports-[backdrop-filter]:bg-white/70">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 h-16 flex items-center gap-4">
         <Link to="/heritage" className="flex items-center shrink-0">
-          <Logo variant="horizontal" className="h-10 w-auto max-w-[190px] object-contain" />
+          <Logo variant="horizontal" className="h-12 w-auto max-w-[190px] object-contain" />
         </Link>
 
         <nav className="hidden lg:flex items-center gap-1 ml-2">
@@ -249,7 +250,7 @@ function LandingFooter() {
         <div className="sm:col-span-2 lg:col-span-2">
           <Logo
             variant="horizontal"
-            className="h-11 w-auto max-w-[200px] object-contain bg-white/95 rounded-lg p-1.5"
+            className="h-15 w-auto max-w-[200px] object-contain bg-white/95 rounded-lg "
           />
           <p className="mt-4 text-sm leading-relaxed text-gray-400 max-w-sm">
             {t("auth.taglineSub")}
@@ -260,12 +261,26 @@ function LandingFooter() {
             {t("land.footer.modules", "Modules")}
           </h3>
           <ul className="mt-3 space-y-2 text-sm">
-            <li><Link to="/" className="hover:text-white">{t("nav.home")}</Link></li>
-            <li><Link to="/community" className="hover:text-white">{t("nav.community")}</Link></li>
-            <li><Link to="/marketplace" className="hover:text-white">{t("nav.marketplace")}</Link></li>
-            <li><Link to="/directory" className="hover:text-white">{t("nav.directory")}</Link></li>
-            <li><Link to="/museum" className="hover:text-white">{t("nav.museum")}</Link></li>
-            <li><Link to="/family-tree" className="hover:text-white">{t("nav.familyTree")}</Link></li>
+            <li>
+              <Link to="/" className="hover:text-white">
+                {t("nav.home")}
+              </Link>
+            </li>
+            <li>
+              <Link to="/community" className="hover:text-white">
+                {t("nav.community")}
+              </Link>
+            </li>
+            <li>
+              <Link to="/marketplace" className="hover:text-white">
+                {t("nav.marketplace")}
+              </Link>
+            </li>
+            <li>
+              <Link to="/museum" className="hover:text-white">
+                {t("nav.museum")}
+              </Link>
+            </li>
           </ul>
         </div>
         <div>
@@ -309,7 +324,12 @@ function LandingFooter() {
               </Link>
             </li>
             <li className="flex items-center gap-2 text-gray-400">
-              <Mail className="h-3.5 w-3.5" /> info@banyamulengehub.com
+              <Phone className="h-3.5 w-3.5" />
+              +1 (520) 736-1677
+            </li>
+            <li className="flex items-center gap-2 text-gray-400">
+              <Mail className="h-3.5 w-3.5" />
+              info@banyamulengehub.com
             </li>
           </ul>
         </div>
@@ -351,7 +371,7 @@ function HeritageLanding() {
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/45 to-black/20" />
           <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6 h-full flex flex-col justify-end pb-12 sm:pb-16 text-white">
-            <span className="inline-flex w-fit items-center gap-2 rounded-10 border border-white/30 bg-white/10 px-3 py-1 text-xs font-medium backdrop-blur">
+            <span className="inline-flex w-fit items-center gap-2 rounded-lg border border-white/30 bg-white/10 px-3 py-1 text-xs font-medium backdrop-blur">
               <Landmark className="h-3.5 w-3.5" /> {t("heritage.title")}
             </span>
             <h1 className="mt-4 text-3xl sm:text-5xl lg:text-6xl font-black leading-[1.05] max-w-3xl drop-shadow">
@@ -361,7 +381,7 @@ function HeritageLanding() {
               {t("heritage.subtitle")}
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
-              <Button asChild size="lg" className="rounded-10 px-6">
+              <Button asChild size="lg" className="rounded-10 px-5">
                 <Link to="/auth">
                   {t("land.cta.join", "Create your free account")}
                   <ArrowRight className="ml-2 h-4 w-4" />
