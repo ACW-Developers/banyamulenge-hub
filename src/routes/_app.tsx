@@ -277,7 +277,7 @@ function AppLayout() {
           <div className={`p-3 border-t ${sidebarOpen ? "" : "px-2"}`}>
             {sidebarOpen ? (
               <button
-                onClick={() => signOut().then(() => navigate({ to: "/auth" }))}
+                onClick={() => signOut().then(() => navigate({ to: "/auth", search: { mode: "signin" } }))}
                 className="w-full flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-100"
               >
                 <LogOut className="h-4 w-4" />
@@ -287,7 +287,7 @@ function AppLayout() {
               <Tooltip delayDuration={100}>
                 <TooltipTrigger asChild>
                   <button
-                    onClick={() => signOut().then(() => navigate({ to: "/auth" }))}
+                    onClick={() => signOut().then(() => navigate({ to: "/auth", search: { mode: "signin" } }))}
                     className="w-full flex items-center justify-center rounded-lg px-3 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-100"
                   >
                     <LogOut className="h-4 w-4" />
@@ -460,7 +460,7 @@ function AppLayout() {
                   )}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
-                    onClick={() => signOut().then(() => navigate({ to: "/auth" }))}
+                    onClick={() => signOut().then(() => navigate({ to: "/auth", search: { mode: "signin" } }))}
                     className="text-red-600"
                   >
                     <LogOut className="h-4 w-4 mr-2" /> {t("nav.signOut")}
