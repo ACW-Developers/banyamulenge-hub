@@ -49,10 +49,7 @@ type Backup = {
   tables: Record<string, Row[]>;
 };
 
-async function assertAdmin(
-  supabase: { from: (t: string) => any },
-  userId: string,
-): Promise<void> {
+async function assertAdmin(supabase: { from: (t: string) => any }, userId: string): Promise<void> {
   const { data, error } = await supabase
     .from("user_roles")
     .select("role")

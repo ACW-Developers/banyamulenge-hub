@@ -17,7 +17,9 @@ export function BackupSection() {
     setExporting(true);
     setReport(null);
     try {
-      const backup = await (runExport as unknown as () => Promise<{ tables: Record<string, unknown[]> }>)();
+      const backup = await (
+        runExport as unknown as () => Promise<{ tables: Record<string, unknown[]> }>
+      )();
       const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -73,9 +75,9 @@ export function BackupSection() {
       </div>
       <div className="p-6 space-y-4">
         <p className="text-sm text-gray-600">
-          Download a complete copy of everything on the platform - members, posts, messages,
-          groups, listings, heritage records, gallery photos and donations - as one standard JSON
-          file that any other system can read. You can bring the same file back here at any time.
+          Download a complete copy of everything on the platform - members, posts, messages, groups,
+          listings, heritage records, gallery photos and donations - as one standard JSON file that
+          any other system can read. You can bring the same file back here at any time.
         </p>
 
         <div className="flex flex-wrap gap-3">

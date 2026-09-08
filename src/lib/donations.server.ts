@@ -10,10 +10,7 @@ function stripeKey(): string {
   const env = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process
     ?.env;
   const key =
-    env?.["STRIPE_SECRET_KEY"] ||
-    env?.["STRIPE_API_KEY"] ||
-    env?.["VITE_STRIPE_SECRET_KEY"] ||
-    "";
+    env?.["STRIPE_SECRET_KEY"] || env?.["STRIPE_API_KEY"] || env?.["VITE_STRIPE_SECRET_KEY"] || "";
   if (!key.trim()) {
     throw new Error(
       "Stripe is not configured on the server: STRIPE_SECRET_KEY is missing in this deployment's environment. Add it to the hosting environment variables and redeploy.",
@@ -163,8 +160,7 @@ export async function verifyDonationSession(sessionId: string) {
     p_status: paid ? "paid" : (session.payment_status ?? "pending"),
     p_amount_cents: session.amount_total ?? null,
     p_donor_email: session.customer_details?.email ?? null,
-    p_donor_name:
-      session.metadata?.["donor_name"] || session.customer_details?.name || null,
+    p_donor_name: session.metadata?.["donor_name"] || session.customer_details?.name || null,
     p_payment_intent_id: pi,
   } as never);
   if (error) throw new Error(error.message);

@@ -18,42 +18,107 @@ type Rule = { match: RegExp; message: string };
  */
 const RULES: Rule[] = [
   // Network / connectivity
-  { match: /failed to fetch|network ?error|networkerror|load failed/i, message: "You appear to be offline. Check your internet connection and try again." },
-  { match: /timeout|timed out|aborted/i, message: "That took too long to respond. Please try again in a moment." },
+  {
+    match: /failed to fetch|network ?error|networkerror|load failed/i,
+    message: "You appear to be offline. Check your internet connection and try again.",
+  },
+  {
+    match: /timeout|timed out|aborted/i,
+    message: "That took too long to respond. Please try again in a moment.",
+  },
 
   // Auth
-  { match: /invalid login credentials/i, message: "That email or password is not correct. Please try again." },
-  { match: /email not confirmed/i, message: "Please confirm your email address first — check your inbox for the link." },
-  { match: /user already registered|already been registered|duplicate.*email/i, message: "An account with this email already exists. Try logging in instead." },
-  { match: /password should be at least|password.*too short|weak password/i, message: "Your password is too short. Use at least 6 characters." },
-  { match: /invalid email|unable to validate email/i, message: "That email address doesn't look right. Please check it." },
-  { match: /email rate limit|over_email_send_rate|too many requests|rate limit/i, message: "Too many attempts. Please wait a minute and try again." },
-  { match: /same as the old password|new password should be different/i, message: "Your new password must be different from the current one." },
-  { match: /auth session missing|jwt expired|invalid (jwt|token)|refresh token/i, message: "Your session has expired. Please log in again." },
+  {
+    match: /invalid login credentials/i,
+    message: "That email or password is not correct. Please try again.",
+  },
+  {
+    match: /email not confirmed/i,
+    message: "Please confirm your email address first — check your inbox for the link.",
+  },
+  {
+    match: /user already registered|already been registered|duplicate.*email/i,
+    message: "An account with this email already exists. Try logging in instead.",
+  },
+  {
+    match: /password should be at least|password.*too short|weak password/i,
+    message: "Your password is too short. Use at least 6 characters.",
+  },
+  {
+    match: /invalid email|unable to validate email/i,
+    message: "That email address doesn't look right. Please check it.",
+  },
+  {
+    match: /email rate limit|over_email_send_rate|too many requests|rate limit/i,
+    message: "Too many attempts. Please wait a minute and try again.",
+  },
+  {
+    match: /same as the old password|new password should be different/i,
+    message: "Your new password must be different from the current one.",
+  },
+  {
+    match: /auth session missing|jwt expired|invalid (jwt|token)|refresh token/i,
+    message: "Your session has expired. Please log in again.",
+  },
   { match: /unauthorized|401/, message: "Please log in to continue." },
 
   // Permissions / database
-  { match: /row-level security|violates row-level|permission denied|not authorized|forbidden|403/i, message: "You don't have permission to do that." },
-  { match: /duplicate key|already exists|unique constraint/i, message: "That already exists — no need to add it twice." },
-  { match: /foreign key|violates foreign key/i, message: "This item is linked to other content and can't be changed right now." },
-  { match: /not-null|null value in column|violates check constraint/i, message: "Some required details are missing. Please fill in every required field." },
-  { match: /no rows|pgrst116|not found|404/i, message: "We couldn't find that — it may have been removed." },
-  { match: /payload too large|413|exceeded the maximum|file size/i, message: "That file is too large. Please choose a smaller one." },
-  { match: /storage|bucket/i, message: "The file couldn't be uploaded. Please try again with a different file." },
+  {
+    match: /row-level security|violates row-level|permission denied|not authorized|forbidden|403/i,
+    message: "You don't have permission to do that.",
+  },
+  {
+    match: /duplicate key|already exists|unique constraint/i,
+    message: "That already exists — no need to add it twice.",
+  },
+  {
+    match: /foreign key|violates foreign key/i,
+    message: "This item is linked to other content and can't be changed right now.",
+  },
+  {
+    match: /not-null|null value in column|violates check constraint/i,
+    message: "Some required details are missing. Please fill in every required field.",
+  },
+  {
+    match: /no rows|pgrst116|not found|404/i,
+    message: "We couldn't find that — it may have been removed.",
+  },
+  {
+    match: /payload too large|413|exceeded the maximum|file size/i,
+    message: "That file is too large. Please choose a smaller one.",
+  },
+  {
+    match: /storage|bucket/i,
+    message: "The file couldn't be uploaded. Please try again with a different file.",
+  },
 
   // Payments
-  { match: /stripe|card declined|payment/i, message: "The payment couldn't be completed. Please check your card details and try again." },
+  {
+    match: /stripe|card declined|payment/i,
+    message: "The payment couldn't be completed. Please check your card details and try again.",
+  },
 
   // Server
-  { match: /internal server error|500|502|503|unexpected/i, message: "Something went wrong on our side. Please try again shortly." },
+  {
+    match: /internal server error|500|502|503|unexpected/i,
+    message: "Something went wrong on our side. Please try again shortly.",
+  },
 ];
 
 /** Convert anything thrown (Error, string, Supabase error object) into a clear sentence. */
-export function friendlyMessage(input: unknown, fallback = "Something didn't work. Please try again."): string {
+export function friendlyMessage(
+  input: unknown,
+  fallback = "Something didn't work. Please try again.",
+): string {
   let raw = "";
   if (typeof input === "string") raw = input;
   else if (input && typeof input === "object") {
-    const o = input as { message?: string; error_description?: string; details?: string; hint?: string };
+    const o = input as {
+      message?: string;
+      error_description?: string;
+      details?: string;
+      hint?: string;
+    };
     raw = o.message || o.error_description || o.details || o.hint || "";
   }
   raw = raw.trim();
@@ -63,8 +128,9 @@ export function friendlyMessage(input: unknown, fallback = "Something didn't wor
 
   // Already a friendly, human-written sentence? Keep it.
   const looksTechnical =
-    /[{}[\]<>]|https?:\/\/|\bnull\b|\berror code\b|\bexception\b|_[a-z]+_|\bat \w+\.\w+/i.test(raw) ||
-    raw.length > 160;
+    /[{}[\]<>]|https?:\/\/|\bnull\b|\berror code\b|\bexception\b|_[a-z]+_|\bat \w+\.\w+/i.test(
+      raw,
+    ) || raw.length > 160;
   if (looksTechnical) return fallback;
 
   const cleaned = raw.charAt(0).toUpperCase() + raw.slice(1);
@@ -92,7 +158,10 @@ export function notifyError(message: unknown, opts: NotifyOptions = {}) {
 }
 
 export function notifyInfo(message: string, opts: NotifyOptions = {}) {
-  sonnerToast(message, { description: opts.description, duration: opts.duration ?? TOAST_DURATION });
+  sonnerToast(message, {
+    description: opts.description,
+    duration: opts.duration ?? TOAST_DURATION,
+  });
   if (opts.push) pushNotification(message, opts.description);
 }
 
@@ -123,7 +192,8 @@ base.error = notifyError;
 base.info = notifyInfo;
 base.message = notifyInfo;
 base.loading = notifyLoading;
-base.dismiss = (id?: string | number) => (id === undefined ? sonnerToast.dismiss() : sonnerToast.dismiss(id));
+base.dismiss = (id?: string | number) =>
+  id === undefined ? sonnerToast.dismiss() : sonnerToast.dismiss(id);
 
 export const toast = base;
 

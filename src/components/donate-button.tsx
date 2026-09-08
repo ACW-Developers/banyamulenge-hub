@@ -65,7 +65,10 @@ export function DonateButton() {
     }
     confirmDonation({ data: { sessionId: sid } })
       .then((r) => {
-        if (r.paid) toast.success(t("home.donate.thankYou").replace("{amount}", (r.amountCents / 100).toFixed(2)));
+        if (r.paid)
+          toast.success(
+            t("home.donate.thankYou").replace("{amount}", (r.amountCents / 100).toFixed(2)),
+          );
         else toast.info(t("home.donate.processing"));
       })
       .catch(() => toast.error(t("home.donate.confirmFailed")));
@@ -114,7 +117,6 @@ export function DonateButton() {
           <Heart className="h-4 w-4 fill-current group-hover:scale-110 transition-transform" />
           <span className="hidden sm:inline">{t("home.donate.button")}</span>
         </button>
-
       </DialogTrigger>
       <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
@@ -223,7 +225,10 @@ export function DonateButton() {
             ) : (
               <>
                 <Heart className="h-4 w-4 mr-2 fill-current" />
-                {t("home.donate.donateAmount").replace("{amount}", (effectiveAmount / 100 || 0).toFixed(2))}
+                {t("home.donate.donateAmount").replace(
+                  "{amount}",
+                  (effectiveAmount / 100 || 0).toFixed(2),
+                )}
               </>
             )}
           </Button>

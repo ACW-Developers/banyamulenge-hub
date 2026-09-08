@@ -282,13 +282,13 @@ function GroupChatPage() {
           </AvatarFallback>
         </Avatar>
         <div className="flex-1 min-w-[180px]">
-          <h1 className="text-2xl font-bold text-gray-900 truncate">{group.title ?? t("community.defaultGroupName")}</h1>
+          <h1 className="text-2xl font-bold text-gray-900 truncate">
+            {group.title ?? t("community.defaultGroupName")}
+          </h1>
           <div className="text-xs text-gray-500 mt-1">
             {members.length} {members.length === 1 ? t("community.member") : t("community.members")}
           </div>
-          {group.description && (
-            <p className="text-sm text-gray-600 mt-2">{group.description}</p>
-          )}
+          {group.description && <p className="text-sm text-gray-600 mt-2">{group.description}</p>}
         </div>
         <div className="flex items-center gap-2">
           {isMember ? (
@@ -310,9 +310,13 @@ function GroupChatPage() {
               messages.map((m) => {
                 const mine = m.sender_id === user?.id;
                 const sender = members.find((p) => p.user_id === m.sender_id)?.profiles;
-                const name = sender?.display_name || sender?.username || t("community.memberFallback");
+                const name =
+                  sender?.display_name || sender?.username || t("community.memberFallback");
                 return (
-                  <div key={m.id} className={`flex gap-2 ${mine ? "justify-end" : "justify-start"}`}>
+                  <div
+                    key={m.id}
+                    className={`flex gap-2 ${mine ? "justify-end" : "justify-start"}`}
+                  >
                     {!mine && (
                       <Avatar className="h-8 w-8 shrink-0">
                         <AvatarImage src={sender?.avatar_url ?? undefined} />
@@ -321,7 +325,9 @@ function GroupChatPage() {
                         </AvatarFallback>
                       </Avatar>
                     )}
-                    <div className={`max-w-[75%] flex flex-col ${mine ? "items-end" : "items-start"}`}>
+                    <div
+                      className={`max-w-[75%] flex flex-col ${mine ? "items-end" : "items-start"}`}
+                    >
                       {!mine && <div className="text-xs text-gray-500 mb-0.5 px-1">{name}</div>}
                       <div
                         className={`px-3 py-2 rounded-2xl text-sm break-words ${
@@ -339,7 +345,6 @@ function GroupChatPage() {
                                 src={m.attachment_url}
                                 alt={m.attachment_name ?? t("community.sharedImage")}
                                 className="rounded-lg max-h-64 object-cover"
-                                
                               />
                             </a>
                           ) : (
@@ -411,7 +416,11 @@ function GroupChatPage() {
                 }
               }}
             />
-            <Button onClick={send} disabled={sending || uploading || !text.trim()} className="gap-2">
+            <Button
+              onClick={send}
+              disabled={sending || uploading || !text.trim()}
+              className="gap-2"
+            >
               {sending || uploading ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
@@ -568,9 +577,7 @@ function GroupInfoDialog({
               )}
             </div>
             <div className="text-sm text-gray-500">
-              {canManage
-                ? t("community.manageHintOwner")
-                : t("community.manageHintMember")}
+              {canManage ? t("community.manageHintOwner") : t("community.manageHintMember")}
             </div>
           </div>
 
@@ -589,7 +596,8 @@ function GroupInfoDialog({
                 />
               </div>
               <Button onClick={save} disabled={saving} className="gap-2">
-                {saving && <Loader2 className="h-4 w-4 animate-spin" />} {t("community.saveChanges")}
+                {saving && <Loader2 className="h-4 w-4 animate-spin" />}{" "}
+                {t("community.saveChanges")}
               </Button>
             </div>
           ) : null}
@@ -600,7 +608,8 @@ function GroupInfoDialog({
             </div>
             <div className="divide-y rounded-xl border">
               {members.map((m) => {
-                const name = m.profiles?.display_name || m.profiles?.username || t("community.memberFallback");
+                const name =
+                  m.profiles?.display_name || m.profiles?.username || t("community.memberFallback");
                 return (
                   <div key={m.user_id} className="flex items-center gap-3 p-3">
                     <Avatar className="h-9 w-9">
@@ -613,7 +622,10 @@ function GroupInfoDialog({
                       <div className="text-sm font-semibold truncate flex items-center gap-1.5">
                         {name}
                         {isOwnerOf(m.user_id) && (
-                          <Crown className="h-3.5 w-3.5 text-amber-500" aria-label={t("community.owner")} />
+                          <Crown
+                            className="h-3.5 w-3.5 text-amber-500"
+                            aria-label={t("community.owner")}
+                          />
                         )}
                       </div>
                       <div className="text-xs text-gray-500 truncate">

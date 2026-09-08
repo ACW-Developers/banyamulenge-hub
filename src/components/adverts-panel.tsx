@@ -232,7 +232,11 @@ function NewAdvertDialog() {
           </div>
           <div className="space-y-1.5">
             <Label>{t("home.adverts.linkLabel")}</Label>
-            <Input value={link} onChange={(e) => setLink(e.target.value)} placeholder={t("home.adverts.linkPlaceholder")} />
+            <Input
+              value={link}
+              onChange={(e) => setLink(e.target.value)}
+              placeholder={t("home.adverts.linkPlaceholder")}
+            />
           </div>
           <div className="space-y-1.5">
             <Label>{t("home.adverts.imageLabel")}</Label>

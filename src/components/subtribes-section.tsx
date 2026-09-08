@@ -378,11 +378,7 @@ function SubtribeDialog({
           </div>
           <div className="space-y-1.5">
             <Label>Display order</Label>
-            <Input
-              type="number"
-              value={sortOrder}
-              onChange={(e) => setSortOrder(e.target.value)}
-            />
+            <Input type="number" value={sortOrder} onChange={(e) => setSortOrder(e.target.value)} />
           </div>
           <div className="space-y-1.5">
             <Label>Photo (optional)</Label>

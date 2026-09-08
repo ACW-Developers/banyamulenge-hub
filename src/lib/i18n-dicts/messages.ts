@@ -142,7 +142,8 @@ export const messages: ModuleDict = {
     "messages.couldNotCreateGroup": "Imeshindwa kuunda kikundi",
     "messages.removeMemberConfirm": "Ondoa mwanachama huyu kwenye kikundi?",
     "messages.memberRemoved": "Mwanachama ameondolewa",
-    "messages.deleteGroupConfirm": "Futa kikundi hiki na ujumbe wake wote? Hatua hii haiwezi kutenduliwa.",
+    "messages.deleteGroupConfirm":
+      "Futa kikundi hiki na ujumbe wake wote? Hatua hii haiwezi kutenduliwa.",
     "messages.groupDeleted": "Kikundi kimefutwa",
     "messages.groupCreator": "Mwanzilishi wa kikundi",
     "messages.owner": "Mmiliki",
@@ -217,7 +218,8 @@ export const messages: ModuleDict = {
     "messages.couldNotCreateGroup": "Byanze gukora itsinda",
     "messages.removeMemberConfirm": "Wemeza gukura uyu munyamuryango mu itsinda?",
     "messages.memberRemoved": "Umunyamuryango yakuwe",
-    "messages.deleteGroupConfirm": "Siba iri tsinda n'ubutumwa bwaryo bwose? Iki gikorwa ntigishobora gusubizwa inyuma.",
+    "messages.deleteGroupConfirm":
+      "Siba iri tsinda n'ubutumwa bwaryo bwose? Iki gikorwa ntigishobora gusubizwa inyuma.",
     "messages.groupDeleted": "Itsinda ryasibwe",
     "messages.groupCreator": "Uwatangije itsinda",
     "messages.owner": "Nyir'itsinda",

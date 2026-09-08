@@ -46,9 +46,24 @@ function AdminDashboard() {
   });
 
   const cards = [
-    { label: t("admin.dashboard.card.totalUsers"), value: stats?.users, icon: Users, color: "text-blue-600 bg-blue-50" },
-    { label: t("admin.dashboard.card.posts"), value: stats?.posts, icon: FileText, color: "text-orange-600 bg-orange-50" },
-    { label: t("admin.dashboard.card.groups"), value: stats?.groups, icon: Users, color: "text-purple-600 bg-purple-50" },
+    {
+      label: t("admin.dashboard.card.totalUsers"),
+      value: stats?.users,
+      icon: Users,
+      color: "text-blue-600 bg-blue-50",
+    },
+    {
+      label: t("admin.dashboard.card.posts"),
+      value: stats?.posts,
+      icon: FileText,
+      color: "text-orange-600 bg-orange-50",
+    },
+    {
+      label: t("admin.dashboard.card.groups"),
+      value: stats?.groups,
+      icon: Users,
+      color: "text-purple-600 bg-purple-50",
+    },
     {
       label: t("admin.dashboard.card.messages"),
       value: stats?.msgs,
@@ -61,7 +76,12 @@ function AdminDashboard() {
       icon: Activity,
       color: "text-pink-600 bg-pink-50",
     },
-    { label: t("admin.dashboard.card.admins"), value: stats?.admins, icon: Shield, color: "text-amber-600 bg-amber-50" },
+    {
+      label: t("admin.dashboard.card.admins"),
+      value: stats?.admins,
+      icon: Shield,
+      color: "text-amber-600 bg-amber-50",
+    },
   ];
 
   const today = new Date();
@@ -71,9 +91,7 @@ function AdminDashboard() {
       <div className="flex items-end justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">{t("admin.dashboard.title")}</h1>
-          <p className="text-sm text-gray-500 mt-1">
-            {t("admin.dashboard.subtitle")}
-          </p>
+          <p className="text-sm text-gray-500 mt-1">{t("admin.dashboard.subtitle")}</p>
         </div>
         <div className="text-sm text-gray-500">{format(today, "EEEE, MMMM d, yyyy")}</div>
       </div>
@@ -120,7 +138,13 @@ function AdminDashboard() {
                 >
                   <div className="h-10 w-10 rounded-full bg-primary/10 text-primary font-bold flex items-center justify-center overflow-hidden">
                     {u.avatar_url ? (
-                      <img src={u.avatar_url} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover" />
+                      <img
+                        src={u.avatar_url}
+                        alt=""
+                        loading="lazy"
+                        decoding="async"
+                        className="h-full w-full object-cover"
+                      />
                     ) : (
                       initial
                     )}

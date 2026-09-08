@@ -151,9 +151,7 @@ function UsersAdmin() {
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">{t("admin.users.title")}</h1>
-          <p className="text-sm text-gray-500 mt-1">
-            {t("admin.users.subtitle")}
-          </p>
+          <p className="text-sm text-gray-500 mt-1">{t("admin.users.subtitle")}</p>
         </div>
         <Button
           variant="outline"
@@ -185,7 +183,9 @@ function UsersAdmin() {
           <thead className="bg-gray-50 text-xs uppercase tracking-wide text-gray-500">
             <tr>
               <th className="px-4 py-3 text-left">{t("admin.users.table.user")}</th>
-              <th className="px-4 py-3 text-left hidden md:table-cell">{t("admin.users.table.location")}</th>
+              <th className="px-4 py-3 text-left hidden md:table-cell">
+                {t("admin.users.table.location")}
+              </th>
               <th className="px-4 py-3 text-left">{t("admin.users.table.role")}</th>
               <th className="px-4 py-3 text-right">{t("admin.users.table.actions")}</th>
             </tr>
@@ -208,7 +208,13 @@ function UsersAdmin() {
                     <div className="flex items-center gap-3">
                       <div className="h-9 w-9 rounded-full bg-primary/10 text-primary font-bold flex items-center justify-center overflow-hidden">
                         {u.avatar_url ? (
-                          <img src={u.avatar_url} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover" />
+                          <img
+                            src={u.avatar_url}
+                            alt=""
+                            loading="lazy"
+                            decoding="async"
+                            className="h-full w-full object-cover"
+                          />
                         ) : (
                           initial
                         )}
@@ -325,7 +331,11 @@ function UsersAdmin() {
               onClick={() => editing && saveEdit.mutate(editing)}
               disabled={saveEdit.isPending}
             >
-              {saveEdit.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : t("admin.users.edit.save")}
+              {saveEdit.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                t("admin.users.edit.save")
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -336,9 +346,7 @@ function UsersAdmin() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>{t("admin.users.delete.title")}</DialogTitle>
-            <DialogDescription>
-              {t("admin.users.delete.description")}
-            </DialogDescription>
+            <DialogDescription>{t("admin.users.delete.description")}</DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setConfirmDel(null)}>
@@ -349,7 +357,11 @@ function UsersAdmin() {
               onClick={() => confirmDel && deleteUser.mutate(confirmDel)}
               disabled={deleteUser.isPending}
             >
-              {deleteUser.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : t("admin.users.delete.confirm")}
+              {deleteUser.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                t("admin.users.delete.confirm")
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>

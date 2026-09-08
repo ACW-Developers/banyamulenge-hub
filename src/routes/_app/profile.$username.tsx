@@ -147,7 +147,9 @@ function ProfilePage() {
     return (
       <div className="rounded-2xl border bg-white p-12 text-center">
         <h2 className="text-lg font-bold">{t("profile.notFound.title")}</h2>
-        <p className="text-sm text-gray-500 mt-1">@{username} {t("profile.notFound.desc")}</p>
+        <p className="text-sm text-gray-500 mt-1">
+          @{username} {t("profile.notFound.desc")}
+        </p>
         <Link to="/" className="text-primary text-sm font-semibold mt-4 inline-block">
           {t("profile.notFound.back")}
         </Link>

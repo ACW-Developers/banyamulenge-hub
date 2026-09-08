@@ -23,7 +23,8 @@ export const admin: ModuleDict = {
     "admin.dashboard.groupsLink": "Groups",
 
     "admin.users.title": "User Management",
-    "admin.users.subtitle": "View all members. Edit profiles, remove accounts, grant or revoke admin.",
+    "admin.users.subtitle":
+      "View all members. Edit profiles, remove accounts, grant or revoke admin.",
     "admin.users.syncAccounts": "Sync accounts",
     "admin.users.searchPlaceholder": "Search users...",
     "admin.users.table.user": "User",
@@ -45,7 +46,8 @@ export const admin: ModuleDict = {
     "admin.users.edit.cancel": "Cancel",
     "admin.users.edit.save": "Save",
     "admin.users.delete.title": "Delete user profile",
-    "admin.users.delete.description": "This removes the profile, posts, and related content. This action cannot be undone.",
+    "admin.users.delete.description":
+      "This removes the profile, posts, and related content. This action cannot be undone.",
     "admin.users.delete.cancel": "Cancel",
     "admin.users.delete.confirm": "Delete",
     "admin.users.toast.updated": "Updated",
@@ -62,7 +64,8 @@ export const admin: ModuleDict = {
     "admin.logs.entries": "entries",
 
     "admin.payments.title": "Payments",
-    "admin.payments.subtitle": "Donations received through Stripe, with donors and transaction codes.",
+    "admin.payments.subtitle":
+      "Donations received through Stripe, with donors and transaction codes.",
     "admin.payments.card.totalRaised": "Total raised",
     "admin.payments.card.donations": "Donations",
     "admin.payments.card.uniqueDonors": "Unique donors",
@@ -142,7 +145,8 @@ export const admin: ModuleDict = {
     "admin.dashboard.groupsLink": "Vikundi",
 
     "admin.users.title": "Usimamizi wa Watumiaji",
-    "admin.users.subtitle": "Angalia wanachama wote. Hariri wasifu, ondoa akaunti, toa au ondoa uwezo wa msimamizi.",
+    "admin.users.subtitle":
+      "Angalia wanachama wote. Hariri wasifu, ondoa akaunti, toa au ondoa uwezo wa msimamizi.",
     "admin.users.syncAccounts": "Sawazisha akaunti",
     "admin.users.searchPlaceholder": "Tafuta watumiaji...",
     "admin.users.table.user": "Mtumiaji",
@@ -164,7 +168,8 @@ export const admin: ModuleDict = {
     "admin.users.edit.cancel": "Ghairi",
     "admin.users.edit.save": "Hifadhi",
     "admin.users.delete.title": "Futa wasifu wa mtumiaji",
-    "admin.users.delete.description": "Hii itaondoa wasifu, machapisho, na maudhui yanayohusiana. Kitendo hiki hakiwezi kutenduliwa.",
+    "admin.users.delete.description":
+      "Hii itaondoa wasifu, machapisho, na maudhui yanayohusiana. Kitendo hiki hakiwezi kutenduliwa.",
     "admin.users.delete.cancel": "Ghairi",
     "admin.users.delete.confirm": "Futa",
     "admin.users.toast.updated": "Imesasishwa",
@@ -172,7 +177,8 @@ export const admin: ModuleDict = {
     "admin.users.toast.profileRemoved": "Wasifu wa mtumiaji umeondolewa",
 
     "admin.logs.title": "Kumbukumbu za Shughuli",
-    "admin.logs.subtitle": "Kila kitendo, mwonekano wa ukurasa, na mabadiliko ya msimamizi na muda wake.",
+    "admin.logs.subtitle":
+      "Kila kitendo, mwonekano wa ukurasa, na mabadiliko ya msimamizi na muda wake.",
     "admin.logs.system": "Mfumo",
     "admin.logs.on": "kwenye",
     "admin.logs.empty": "Hakuna shughuli iliyorekodiwa bado.",
@@ -181,7 +187,8 @@ export const admin: ModuleDict = {
     "admin.logs.entries": "kumbukumbu",
 
     "admin.payments.title": "Malipo",
-    "admin.payments.subtitle": "Michango iliyopokelewa kupitia Stripe, pamoja na wafadhili na misimbo ya miamala.",
+    "admin.payments.subtitle":
+      "Michango iliyopokelewa kupitia Stripe, pamoja na wafadhili na misimbo ya miamala.",
     "admin.payments.card.totalRaised": "Jumla iliyokusanywa",
     "admin.payments.card.donations": "Michango",
     "admin.payments.card.uniqueDonors": "Wafadhili wa kipekee",
@@ -261,7 +268,8 @@ export const admin: ModuleDict = {
     "admin.dashboard.groupsLink": "Amatsinda",
 
     "admin.users.title": "Gucunga Abakoresha",
-    "admin.users.subtitle": "Reba abanyamuryango bose. Hindura imyirondoro, kuraho konti, tanga cyangwa kuraho uburenganzira bw'umuyobozi.",
+    "admin.users.subtitle":
+      "Reba abanyamuryango bose. Hindura imyirondoro, kuraho konti, tanga cyangwa kuraho uburenganzira bw'umuyobozi.",
     "admin.users.syncAccounts": "Huza konti",
     "admin.users.searchPlaceholder": "Shakisha abakoresha...",
     "admin.users.table.user": "Umukoresha",
@@ -283,7 +291,8 @@ export const admin: ModuleDict = {
     "admin.users.edit.cancel": "Reka",
     "admin.users.edit.save": "Bika",
     "admin.users.delete.title": "Siba umwirondoro w'umukoresha",
-    "admin.users.delete.description": "Ibi bizakuraho umwirondoro, ubutumwa, n'ibindi bijyanye. Iki gikorwa ntikigaruka.",
+    "admin.users.delete.description":
+      "Ibi bizakuraho umwirondoro, ubutumwa, n'ibindi bijyanye. Iki gikorwa ntikigaruka.",
     "admin.users.delete.cancel": "Reka",
     "admin.users.delete.confirm": "Siba",
     "admin.users.toast.updated": "Byavuguruwe",
@@ -291,7 +300,8 @@ export const admin: ModuleDict = {
     "admin.users.toast.profileRemoved": "Umwirondoro w'umukoresha wakuweho",
 
     "admin.logs.title": "Raporo z'Ibikorwa",
-    "admin.logs.subtitle": "Buri gikorwa, kureba urupapuro, n'impinduka z'umuyobozi hamwe n'igihe byabereye.",
+    "admin.logs.subtitle":
+      "Buri gikorwa, kureba urupapuro, n'impinduka z'umuyobozi hamwe n'igihe byabereye.",
     "admin.logs.system": "Sisitemu",
     "admin.logs.on": "kuri",
     "admin.logs.empty": "Nta gikorwa cyanditswe kugeza ubu.",
@@ -300,7 +310,8 @@ export const admin: ModuleDict = {
     "admin.logs.entries": "ibyanditswe",
 
     "admin.payments.title": "Amafaranga yishyuwe",
-    "admin.payments.subtitle": "Impano zakiriwe binyuze kuri Stripe, n'abaterankunga na kode z'imiamala.",
+    "admin.payments.subtitle":
+      "Impano zakiriwe binyuze kuri Stripe, n'abaterankunga na kode z'imiamala.",
     "admin.payments.card.totalRaised": "Igiteranyo cyakusanyijwe",
     "admin.payments.card.donations": "Impano",
     "admin.payments.card.uniqueDonors": "Abaterankunga bwite",

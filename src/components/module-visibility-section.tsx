@@ -15,10 +15,7 @@ export function ModuleVisibilitySection() {
 
   const toggle = useMutation({
     mutationFn: async ({ key, visible }: { key: string; visible: boolean }) => {
-      const { error } = await supabase
-        .from("module_settings")
-        .update({ visible })
-        .eq("key", key);
+      const { error } = await supabase.from("module_settings").update({ visible }).eq("key", key);
       if (error) throw error;
     },
     onSuccess: () => {

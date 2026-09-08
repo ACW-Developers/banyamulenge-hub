@@ -88,7 +88,6 @@ type ConversationRow = {
   messages: MessageRow[];
 };
 
-
 function MessagesPage() {
   const { user } = useAuth();
   const { t } = useI18n();
@@ -154,7 +153,6 @@ function MessagesPage() {
     },
   });
 
-
   // Mark incoming messages as delivered/read as soon as they're on-screen.
   useEffect(() => {
     if (!user || !activeId || !messages) return;
@@ -197,7 +195,11 @@ function MessagesPage() {
           row.conversation_id !== activeId
         ) {
           notifyInfo(t("messages.newMessageToast"), {
-            description: (row.content || row.attachment_name || t("messages.attachmentFallback"))?.slice(0, 80),
+            description: (
+              row.content ||
+              row.attachment_name ||
+              t("messages.attachmentFallback")
+            )?.slice(0, 80),
             push: true,
           });
         }
@@ -264,9 +266,7 @@ function MessagesPage() {
       <div className="flex items-center justify-between mb-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">{t("messages.title")}</h1>
-          <p className="text-sm text-gray-500 mt-1">
-            {t("messages.subtitle")}
-          </p>
+          <p className="text-sm text-gray-500 mt-1">{t("messages.subtitle")}</p>
         </div>
         <div className="flex items-center gap-2">
           <NewGroupDialog onOpened={setActiveId} />
@@ -280,7 +280,10 @@ function MessagesPage() {
           <div className="p-3 border-b">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <Input placeholder={t("messages.searchPlaceholder")} className="pl-9 bg-gray-50 border-gray-200" />
+              <Input
+                placeholder={t("messages.searchPlaceholder")}
+                className="pl-9 bg-gray-50 border-gray-200"
+              />
             </div>
           </div>
           <div className="flex-1 overflow-y-auto">
@@ -370,7 +373,10 @@ function MessagesPage() {
                                   aria-label={t("messages.deliveredAria")}
                                 />
                               ) : (
-                                <Check className="h-3.5 w-3.5 text-gray-400" aria-label={t("messages.sentAria")} />
+                                <Check
+                                  className="h-3.5 w-3.5 text-gray-400"
+                                  aria-label={t("messages.sentAria")}
+                                />
                               )}
                             </>
                           )}
@@ -386,7 +392,9 @@ function MessagesPage() {
                 );
               })
             ) : (
-              <div className="p-6 text-center text-sm text-gray-500">{t("messages.noConversations")}</div>
+              <div className="p-6 text-center text-sm text-gray-500">
+                {t("messages.noConversations")}
+              </div>
             )}
           </div>
         </div>
@@ -434,14 +442,11 @@ function MessagesPage() {
               onGroupDeleted={() => setActiveId(null)}
               onClose={() => setActiveId(null)}
             />
-
           ) : (
             <div className="flex-1 flex flex-col items-center justify-center text-center p-6">
               <MessageCircle className="h-12 w-12 text-primary mb-3" />
               <h3 className="font-bold">{t("messages.selectConversation")}</h3>
-              <p className="text-sm text-gray-500 mt-1">
-                {t("messages.selectConversationSub")}
-              </p>
+              <p className="text-sm text-gray-500 mt-1">{t("messages.selectConversationSub")}</p>
             </div>
           )}
         </div>
@@ -578,9 +583,6 @@ function ChatPane({
     refreshChat();
   }
 
-
-
-
   useEffect(() => {
     if (!userId || isGroup) return;
     const s = new CallSession(convoId, userId, {
@@ -605,7 +607,9 @@ function ChatPane({
   const acceptCall = () => sessionRef.current?.accept();
   const hangup = () => sessionRef.current?.hangup();
 
-  const headerName = isGroup ? groupTitle : other?.display_name || other?.username || t("messages.unknown");
+  const headerName = isGroup
+    ? groupTitle
+    : other?.display_name || other?.username || t("messages.unknown");
   const headerSub = isGroup
     ? t("messages.membersCount").replace("{count}", String(participants.length))
     : other?.username
@@ -661,7 +665,12 @@ function ChatPane({
           </Button>
         )}
         {!isGroup && inCall && (
-          <Button variant="destructive" size="icon" onClick={hangup} aria-label={t("messages.endCall")}>
+          <Button
+            variant="destructive"
+            size="icon"
+            onClick={hangup}
+            aria-label={t("messages.endCall")}
+          >
             <PhoneOff className="h-4 w-4" />
           </Button>
         )}
@@ -697,7 +706,10 @@ function ChatPane({
           const canModify = mine && !m.read_at;
           const isEditing = editingId === m.id;
           return (
-            <div key={m.id} className={`group flex items-end gap-1 ${mine ? "justify-end" : "justify-start"}`}>
+            <div
+              key={m.id}
+              className={`group flex items-end gap-1 ${mine ? "justify-end" : "justify-start"}`}
+            >
               {canModify && !isEditing && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -818,9 +830,15 @@ function ChatPane({
                   <span>{formatDistanceToNow(new Date(m.created_at), { addSuffix: true })}</span>
                   {mine &&
                     (m.read_at ? (
-                      <CheckCheck className="h-3.5 w-3.5 text-sky-300" aria-label={t("messages.readAria")} />
+                      <CheckCheck
+                        className="h-3.5 w-3.5 text-sky-300"
+                        aria-label={t("messages.readAria")}
+                      />
                     ) : m.delivered_at ? (
-                      <CheckCheck className="h-3.5 w-3.5" aria-label={t("messages.deliveredAria")} />
+                      <CheckCheck
+                        className="h-3.5 w-3.5"
+                        aria-label={t("messages.deliveredAria")}
+                      />
                     ) : (
                       <Check className="h-3.5 w-3.5" aria-label={t("messages.sentAria")} />
                     ))}
@@ -831,7 +849,9 @@ function ChatPane({
         })}
 
         {messages.length === 0 && (
-          <div className="text-center text-xs text-gray-400 py-8">{t("messages.sendFirstMessage")}</div>
+          <div className="text-center text-xs text-gray-400 py-8">
+            {t("messages.sendFirstMessage")}
+          </div>
         )}
       </div>
 
@@ -891,7 +911,6 @@ function ChatPane({
     </>
   );
 }
-
 
 function AttachmentBubble({
   url,
@@ -1273,7 +1292,9 @@ function GroupMembersDialog({
                       </span>
                     )}
                     {isMe && (
-                      <span className="text-[10px] font-medium text-gray-500">{t("messages.you.short")}</span>
+                      <span className="text-[10px] font-medium text-gray-500">
+                        {t("messages.you.short")}
+                      </span>
                     )}
                   </div>
                   {p.profile?.username && (

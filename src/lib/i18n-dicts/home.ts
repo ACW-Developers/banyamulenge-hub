@@ -66,11 +66,14 @@ export const home: ModuleDict = {
     "home.donate.aria": "Donate",
     "home.donate.button": "Donate",
     "home.donate.reason1Title": "Keep the platform running",
-    "home.donate.reason1Text": "Hosting, storage and continuous development of new modules for the community.",
+    "home.donate.reason1Text":
+      "Hosting, storage and continuous development of new modules for the community.",
     "home.donate.reason2Title": "Preserve our heritage",
-    "home.donate.reason2Text": "Digitising artifacts, photographs, oral histories and archival documents.",
+    "home.donate.reason2Text":
+      "Digitising artifacts, photographs, oral histories and archival documents.",
     "home.donate.reason3Title": "Gather history worldwide",
-    "home.donate.reason3Text": "Funding researchers and elders across the diaspora to collect Banyamulenge history.",
+    "home.donate.reason3Text":
+      "Funding researchers and elders across the diaspora to collect Banyamulenge history.",
     "home.donate.cancelled": "Donation cancelled — no charge was made.",
     "home.donate.thankYou": "Thank you! Your ${amount} donation was received.",
     "home.donate.processing": "Your donation is still processing.",
@@ -79,7 +82,8 @@ export const home: ModuleDict = {
     "home.donate.maxAmount": "Maximum online donation is $10,000. Contact us for larger gifts.",
     "home.donate.checkoutFailed": "Could not start checkout.",
     "home.donate.dialogTitle": "Support Banyamulenge Hub",
-    "home.donate.dialogDescription": "Every contribution keeps this platform free for the community and funds the worldwide effort to gather and safeguard our history.",
+    "home.donate.dialogDescription":
+      "Every contribution keeps this platform free for the community and funds the worldwide effort to gather and safeguard our history.",
     "home.donate.chooseAmount": "Choose an amount (USD)",
     "home.donate.ownAmount": "Or enter your own amount",
     "home.donate.amountPlaceholder": "Any amount",
@@ -89,7 +93,8 @@ export const home: ModuleDict = {
     "home.donate.messageLabel": "Message (optional)",
     "home.donate.messagePlaceholder": "Say something to the community…",
     "home.donate.donateAmount": "Donate ${amount}",
-    "home.donate.disclaimer": "Payments are processed securely by Stripe. You'll return here once complete.",
+    "home.donate.disclaimer":
+      "Payments are processed securely by Stripe. You'll return here once complete.",
   },
   sw: {
     "title.community": "Mlisho wa Jamii",
@@ -155,20 +160,25 @@ export const home: ModuleDict = {
     "home.donate.aria": "Changia",
     "home.donate.button": "Changia",
     "home.donate.reason1Title": "Kuendesha jukwaa",
-    "home.donate.reason1Text": "Uhifadhi, hosting na uendelezaji endelevu wa moduli mpya kwa ajili ya jamii.",
+    "home.donate.reason1Text":
+      "Uhifadhi, hosting na uendelezaji endelevu wa moduli mpya kwa ajili ya jamii.",
     "home.donate.reason2Title": "Kuhifadhi urithi wetu",
-    "home.donate.reason2Text": "Kubadilisha kidijitali vitu vya kale, picha, historia simulizi na hati za kumbukumbu.",
+    "home.donate.reason2Text":
+      "Kubadilisha kidijitali vitu vya kale, picha, historia simulizi na hati za kumbukumbu.",
     "home.donate.reason3Title": "Kukusanya historia duniani kote",
-    "home.donate.reason3Text": "Kufadhili watafiti na wazee katika ughaibuni kukusanya historia ya Wabanyamulenge.",
+    "home.donate.reason3Text":
+      "Kufadhili watafiti na wazee katika ughaibuni kukusanya historia ya Wabanyamulenge.",
     "home.donate.cancelled": "Mchango umeghairiwa — hakuna malipo yaliyofanyika.",
     "home.donate.thankYou": "Asante! Mchango wako wa ${amount} umepokelewa.",
     "home.donate.processing": "Mchango wako bado unashughulikiwa.",
     "home.donate.confirmFailed": "Hatukuweza kuthibitisha hali ya mchango.",
     "home.donate.minAmount": "Tafadhali weka kiasi cha angalau $1.",
-    "home.donate.maxAmount": "Mchango wa juu zaidi mtandaoni ni $10,000. Wasiliana nasi kwa michango mikubwa zaidi.",
+    "home.donate.maxAmount":
+      "Mchango wa juu zaidi mtandaoni ni $10,000. Wasiliana nasi kwa michango mikubwa zaidi.",
     "home.donate.checkoutFailed": "Imeshindwa kuanzisha malipo.",
     "home.donate.dialogTitle": "Saidia Banyamulenge Hub",
-    "home.donate.dialogDescription": "Kila mchango unasaidia jukwaa hili libaki huru kwa jamii na kufadhili juhudi za kimataifa za kukusanya na kulinda historia yetu.",
+    "home.donate.dialogDescription":
+      "Kila mchango unasaidia jukwaa hili libaki huru kwa jamii na kufadhili juhudi za kimataifa za kukusanya na kulinda historia yetu.",
     "home.donate.chooseAmount": "Chagua kiasi (USD)",
     "home.donate.ownAmount": "Au weka kiasi chako mwenyewe",
     "home.donate.amountPlaceholder": "Kiasi chochote",
@@ -178,7 +188,8 @@ export const home: ModuleDict = {
     "home.donate.messageLabel": "Ujumbe (si lazima)",
     "home.donate.messagePlaceholder": "Sema kitu kwa jamii…",
     "home.donate.donateAmount": "Changia ${amount}",
-    "home.donate.disclaimer": "Malipo yanachakatwa kwa usalama na Stripe. Utarudi hapa mara baada ya kukamilika.",
+    "home.donate.disclaimer":
+      "Malipo yanachakatwa kwa usalama na Stripe. Utarudi hapa mara baada ya kukamilika.",
   },
   rw: {
     "title.community": "Amakuru y'Umuryango",
@@ -244,20 +255,25 @@ export const home: ModuleDict = {
     "home.donate.aria": "Tanga inkunga",
     "home.donate.button": "Tanga inkunga",
     "home.donate.reason1Title": "Gukomeza gukoresha urubuga",
-    "home.donate.reason1Text": "Kubika amakuru, serveri n'iterambere rihoraho ry'ibice bishya bigenewe umuryango.",
+    "home.donate.reason1Text":
+      "Kubika amakuru, serveri n'iterambere rihoraho ry'ibice bishya bigenewe umuryango.",
     "home.donate.reason2Title": "Kubungabunga umurage wacu",
-    "home.donate.reason2Text": "Guhindura mu buryo bwa digitale ibintu bya kera, amafoto, amateka avugwa n'inyandiko z'ububiko.",
+    "home.donate.reason2Text":
+      "Guhindura mu buryo bwa digitale ibintu bya kera, amafoto, amateka avugwa n'inyandiko z'ububiko.",
     "home.donate.reason3Title": "Gukusanya amateka ku isi hose",
-    "home.donate.reason3Text": "Gutera inkunga abashakashatsi n'abakuru mu bihugu bitandukanye kugira ngo bakusanye amateka y'Abanyamulenge.",
+    "home.donate.reason3Text":
+      "Gutera inkunga abashakashatsi n'abakuru mu bihugu bitandukanye kugira ngo bakusanye amateka y'Abanyamulenge.",
     "home.donate.cancelled": "Inkunga yahagaritswe — nta wishyuye.",
     "home.donate.thankYou": "Murakoze! Inkunga yawe ya ${amount} yakiriwe.",
     "home.donate.processing": "Inkunga yawe iracyakorwaho.",
     "home.donate.confirmFailed": "Ntitwabashije kwemeza uko inkunga yawe ihagaze.",
     "home.donate.minAmount": "Nyamuneka andika amafaranga nibura $1.",
-    "home.donate.maxAmount": "Inkunga ntarengwa ku rubuga ni $10,000. Tuvugishe kubw'inkunga nini kurushaho.",
+    "home.donate.maxAmount":
+      "Inkunga ntarengwa ku rubuga ni $10,000. Tuvugishe kubw'inkunga nini kurushaho.",
     "home.donate.checkoutFailed": "Ntibyashobotse gutangira kwishyura.",
     "home.donate.dialogTitle": "Fasha Banyamulenge Hub",
-    "home.donate.dialogDescription": "Buri nkunga ituma urubuga rukomeza kuba ku buntu ku muryango kandi igafasha imirimo yo ku isi yose yo gukusanya no kubungabunga amateka yacu.",
+    "home.donate.dialogDescription":
+      "Buri nkunga ituma urubuga rukomeza kuba ku buntu ku muryango kandi igafasha imirimo yo ku isi yose yo gukusanya no kubungabunga amateka yacu.",
     "home.donate.chooseAmount": "Hitamo amafaranga (USD)",
     "home.donate.ownAmount": "Cyangwa andika amafaranga wifuza",
     "home.donate.amountPlaceholder": "Amafaranga ayo ari yo yose",
@@ -267,6 +283,7 @@ export const home: ModuleDict = {
     "home.donate.messageLabel": "Ubutumwa (si ngombwa)",
     "home.donate.messagePlaceholder": "Vuga ikintu ku muryango…",
     "home.donate.donateAmount": "Tanga inkunga ${amount}",
-    "home.donate.disclaimer": "Kwishyura bikorwa mu mutekano na Stripe. Uzasubira hano nyuma yo kurangiza.",
+    "home.donate.disclaimer":
+      "Kwishyura bikorwa mu mutekano na Stripe. Uzasubira hano nyuma yo kurangiza.",
   },
 };

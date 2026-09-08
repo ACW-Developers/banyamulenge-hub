@@ -56,7 +56,8 @@ export const community: ModuleDict = {
     "community.delete": "Delete",
     "community.sharedImage": "Shared image",
     "community.attachment": "Attachment",
-    "community.privateChatNotice": "This group's chat is private. Join the group to read and send messages.",
+    "community.privateChatNotice":
+      "This group's chat is private. Join the group to read and send messages.",
     "community.memberFallback": "Member",
     "community.memberFallbackAt": "member",
     "community.memberRemoved": "Member removed",
@@ -103,7 +104,8 @@ export const community: ModuleDict = {
     "community.groupIconUpdated": "Picha ya kikundi imesasishwa",
     "community.changeGroupIcon": "Badilisha picha ya kikundi",
     "community.manageHintOwner": "Gusa kamera kupakia picha ya kikundi kutoka kifaa chako.",
-    "community.manageHintMember": "Mmiliki wa kikundi pekee ndiye anaweza kubadilisha maelezo haya.",
+    "community.manageHintMember":
+      "Mmiliki wa kikundi pekee ndiye anaweza kubadilisha maelezo haya.",
     "community.membersCount": "Wanachama",
     "community.remove": "Ondoa",
     "community.exitGroup": "Ondoka kwenye kikundi",
@@ -117,7 +119,8 @@ export const community: ModuleDict = {
     "community.delete": "Futa",
     "community.sharedImage": "Picha iliyoshirikiwa",
     "community.attachment": "Kiambatisho",
-    "community.privateChatNotice": "Mazungumzo ya kikundi hiki ni ya faragha. Jiunge na kikundi ili kusoma na kutuma ujumbe.",
+    "community.privateChatNotice":
+      "Mazungumzo ya kikundi hiki ni ya faragha. Jiunge na kikundi ili kusoma na kutuma ujumbe.",
     "community.memberFallback": "Mwanachama",
     "community.memberFallbackAt": "mwanachama",
     "community.memberRemoved": "Mwanachama ameondolewa",
@@ -163,7 +166,8 @@ export const community: ModuleDict = {
     "community.groupUpdated": "Itsinda ryahinduwe",
     "community.groupIconUpdated": "Ifoto y'itsinda yahinduwe",
     "community.changeGroupIcon": "Hindura ifoto y'itsinda",
-    "community.manageHintOwner": "Kanda kamera kugira ngo wohereze ifoto y'itsinda uvuye ku gikoresho cyawe.",
+    "community.manageHintOwner":
+      "Kanda kamera kugira ngo wohereze ifoto y'itsinda uvuye ku gikoresho cyawe.",
     "community.manageHintMember": "Ni nyir'itsinda gusa ushobora guhindura ibi bisobanuro.",
     "community.membersCount": "Abanyamuryango",
     "community.remove": "Kuraho",
@@ -178,7 +182,8 @@ export const community: ModuleDict = {
     "community.delete": "Siba",
     "community.sharedImage": "Ifoto yasangiwe",
     "community.attachment": "Icyometse",
-    "community.privateChatNotice": "Ikiganiro cy'iri tsinda ni ibanga. Injira mu itsinda kugira ngo usome kandi wohereze ubutumwa.",
+    "community.privateChatNotice":
+      "Ikiganiro cy'iri tsinda ni ibanga. Injira mu itsinda kugira ngo usome kandi wohereze ubutumwa.",
     "community.memberFallback": "Umunyamuryango",
     "community.memberFallbackAt": "umunyamuryango",
     "community.memberRemoved": "Umunyamuryango yakuweho",

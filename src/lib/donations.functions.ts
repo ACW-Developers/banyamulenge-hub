@@ -20,7 +20,9 @@ export const createDonationCheckout = createServerFn({ method: "POST" })
   });
 
 export const verifyDonation = createServerFn({ method: "POST" })
-  .inputValidator((data: unknown) => z.object({ sessionId: z.string().min(5).max(300) }).parse(data))
+  .inputValidator((data: unknown) =>
+    z.object({ sessionId: z.string().min(5).max(300) }).parse(data),
+  )
   .handler(async ({ data }) => {
     const { verifyDonationSession } = await import("./donations.server");
     return verifyDonationSession(data.sessionId);

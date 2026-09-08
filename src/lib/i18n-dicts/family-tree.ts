@@ -67,7 +67,8 @@ export const familyTree: ModuleDict = {
     "familyTree.searchName": "Shakisha izina",
     "familyTree.searchPlaceholder": "urugero, Rukundo",
     "familyTree.addMember": "Ongeraho umunyamuryango",
-    "familyTree.hoverHint": "Shyira imbeba kuri umunyamuryango wese kugira ngo wongereho umuvandimwe",
+    "familyTree.hoverHint":
+      "Shyira imbeba kuri umunyamuryango wese kugira ngo wongereho umuvandimwe",
     "familyTree.membersCount": "abanyamuryango",
     "familyTree.emptyPrefix": "Nta muntu waherewe kongerwa muri",
     "familyTree.emptySuffix": "ubu. Ba uwa mbere gutera imizi.",

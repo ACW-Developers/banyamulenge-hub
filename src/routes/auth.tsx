@@ -101,12 +101,8 @@ function AuthPage() {
       >
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
         <div className="relative z-10 p-10 text-white max-w-xl">
-          <h1 className="text-3xl font-bold leading-tight drop-shadow-lg">
-            {t("auth.tagline")}
-          </h1>
-          <p className="mt-3 text-white/90 drop-shadow">
-            {t("auth.taglineSub")}
-          </p>
+          <h1 className="text-3xl font-bold leading-tight drop-shadow-lg">{t("auth.tagline")}</h1>
+          <p className="mt-3 text-white/90 drop-shadow">{t("auth.taglineSub")}</p>
         </div>
       </div>
 
@@ -153,9 +149,7 @@ function AuthPage() {
             {isForgot && (
               <div className="mb-6 text-center">
                 <h2 className="text-lg font-bold">{t("auth.forgotTitle")}</h2>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {t("auth.forgotSub")}
-                </p>
+                <p className="text-xs text-muted-foreground mt-1">{t("auth.forgotSub")}</p>
               </div>
             )}
 
@@ -309,4 +303,3 @@ function AuthPage() {
     </div>
   );
 }
-

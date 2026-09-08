@@ -290,13 +290,7 @@ function Pill({
   );
 }
 
-function ArtifactDetail({
-  artifact,
-  onClose,
-}: {
-  artifact: Artifact | null;
-  onClose: () => void;
-}) {
+function ArtifactDetail({ artifact, onClose }: { artifact: Artifact | null; onClose: () => void }) {
   return (
     <Dialog open={!!artifact} onOpenChange={(v) => !v && onClose()}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-0">

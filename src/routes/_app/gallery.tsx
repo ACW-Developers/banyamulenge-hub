@@ -1,17 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import {
-  Images,
-  Loader2,
-  Plus,
-  Search,
-  Pencil,
-  Trash2,
-  X,
-  Calendar,
-  Upload,
-} from "lucide-react";
+import { Images, Loader2, Plus, Search, Pencil, Trash2, X, Calendar, Upload } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
@@ -352,10 +342,7 @@ function GalleryDialog({
         image_url,
       };
       if (editing) {
-        const { error } = await supabase
-          .from("gallery_items")
-          .update(payload)
-          .eq("id", editing.id);
+        const { error } = await supabase.from("gallery_items").update(payload).eq("id", editing.id);
         if (error) throw error;
         toast.success("Photo updated");
       } else {
@@ -424,11 +411,7 @@ function GalleryDialog({
           </div>
           <div className="space-y-1.5">
             <Label>Display order</Label>
-            <Input
-              type="number"
-              value={sortOrder}
-              onChange={(e) => setSortOrder(e.target.value)}
-            />
+            <Input type="number" value={sortOrder} onChange={(e) => setSortOrder(e.target.value)} />
           </div>
           <div className="space-y-1.5">
             <Label>Image</Label>

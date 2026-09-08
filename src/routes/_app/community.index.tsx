@@ -164,7 +164,9 @@ function CommunityPage() {
     );
   }, [groups, q]);
 
-  const mine = filtered.filter((g) => g.conversation_participants.some((p) => p.user_id === user?.id));
+  const mine = filtered.filter((g) =>
+    g.conversation_participants.some((p) => p.user_id === user?.id),
+  );
   const others = filtered.filter(
     (g) => !g.conversation_participants.some((p) => p.user_id === user?.id),
   );
@@ -174,9 +176,7 @@ function CommunityPage() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">{t("community.title")}</h1>
-          <p className="text-sm text-gray-500 mt-1">
-            {t("community.subtitle")}
-          </p>
+          <p className="text-sm text-gray-500 mt-1">{t("community.subtitle")}</p>
         </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
@@ -206,9 +206,7 @@ function CommunityPage() {
                   placeholder={t("community.descriptionPlaceholder")}
                 />
               </div>
-              <p className="text-xs text-gray-500">
-                {t("community.ownerHint")}
-              </p>
+              <p className="text-xs text-gray-500">{t("community.ownerHint")}</p>
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setOpen(false)}>
@@ -318,11 +316,16 @@ function GroupCard({
         <div className="min-w-0">
           <div className="font-bold truncate flex items-center gap-1.5">
             {group.title ?? t("community.defaultGroupName")}
-            {isOwner && <Crown className="h-3.5 w-3.5 text-amber-500" aria-label={t("community.youOwnThis")} />}
+            {isOwner && (
+              <Crown
+                className="h-3.5 w-3.5 text-amber-500"
+                aria-label={t("community.youOwnThis")}
+              />
+            )}
           </div>
           <div className="text-xs text-gray-500">
-            {members.length} {members.length === 1 ? t("community.member") : t("community.members")} ·{" "}
-            {formatDistanceToNow(new Date(group.last_message_at), { addSuffix: true })}
+            {members.length} {members.length === 1 ? t("community.member") : t("community.members")}{" "}
+            · {formatDistanceToNow(new Date(group.last_message_at), { addSuffix: true })}
           </div>
         </div>
       </div>

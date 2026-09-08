@@ -86,11 +86,36 @@ const KINDS: {
   icon: typeof Briefcase;
   color: string;
 }[] = [
-  { value: "professional", labelKey: "directory.kind.professional", icon: Briefcase, color: "from-blue-500 to-indigo-500" },
-  { value: "church", labelKey: "directory.kind.church", icon: Church, color: "from-amber-500 to-orange-500" },
-  { value: "organization", labelKey: "directory.kind.organization", icon: Landmark, color: "from-emerald-500 to-teal-500" },
-  { value: "business", labelKey: "directory.kind.business", icon: Building2, color: "from-rose-500 to-pink-500" },
-  { value: "mentor", labelKey: "directory.kind.mentor", icon: GraduationCap, color: "from-fuchsia-500 to-purple-500" },
+  {
+    value: "professional",
+    labelKey: "directory.kind.professional",
+    icon: Briefcase,
+    color: "from-blue-500 to-indigo-500",
+  },
+  {
+    value: "church",
+    labelKey: "directory.kind.church",
+    icon: Church,
+    color: "from-amber-500 to-orange-500",
+  },
+  {
+    value: "organization",
+    labelKey: "directory.kind.organization",
+    icon: Landmark,
+    color: "from-emerald-500 to-teal-500",
+  },
+  {
+    value: "business",
+    labelKey: "directory.kind.business",
+    icon: Building2,
+    color: "from-rose-500 to-pink-500",
+  },
+  {
+    value: "mentor",
+    labelKey: "directory.kind.mentor",
+    icon: GraduationCap,
+    color: "from-fuchsia-500 to-purple-500",
+  },
 ];
 
 const key = ["directory"] as const;
@@ -111,13 +136,18 @@ function DirectoryPage() {
     queryFn: async () => {
       // Signed-out visitors read a public view that never exposes email/phone.
       const { data, error } = user
-        ? await supabase.from("directory_entries").select("*").order("created_at", { ascending: false })
-        : await supabase.from("directory_public").select("*").order("created_at", { ascending: false });
+        ? await supabase
+            .from("directory_entries")
+            .select("*")
+            .order("created_at", { ascending: false })
+        : await supabase
+            .from("directory_public")
+            .select("*")
+            .order("created_at", { ascending: false });
       if (error) throw error;
       return (data ?? []) as unknown as Entry[];
     },
   });
-
 
   const filtered = useMemo(() => {
     const list = data ?? [];
@@ -157,9 +187,7 @@ function DirectoryPage() {
             <h1 className="mt-3 text-3xl md:text-4xl font-bold tracking-tight text-gray-900">
               {t("directory.title")}
             </h1>
-            <p className="mt-2 text-gray-600 text-sm md:text-base">
-              {t("directory.subtitle")}
-            </p>
+            <p className="mt-2 text-gray-600 text-sm md:text-base">{t("directory.subtitle")}</p>
           </div>
           {user && (
             <Button
@@ -256,7 +284,6 @@ function DirectoryPage() {
                 <div
                   className={`h-44 bg-gradient-to-br ${meta?.color ?? "from-gray-500 to-gray-700"} relative`}
                 >
-
                   {e.image_url ? (
                     <img
                       loading="lazy"
@@ -321,20 +348,12 @@ function DirectoryPage() {
 
                   <div className="mt-3 pt-3 border-t flex items-center justify-end gap-5 text-gray-500">
                     {e.email && (
-                      <a
-                        href={`mailto:${e.email}`}
-                        className="hover:text-primary"
-                        title={e.email}
-                      >
+                      <a href={`mailto:${e.email}`} className="hover:text-primary" title={e.email}>
                         <Mail className="h-3.5 w-3.5" />
                       </a>
                     )}
                     {e.phone && (
-                      <a
-                        href={`tel:${e.phone}`}
-                        className="hover:text-primary"
-                        title={e.phone}
-                      >
+                      <a href={`tel:${e.phone}`} className="hover:text-primary" title={e.phone}>
                         <Phone className="h-3.5 w-3.5" />
                       </a>
                     )}
@@ -468,14 +487,18 @@ function EntryDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{editing ? t("directory.dialog.editTitle") : t("directory.dialog.newTitle")}</DialogTitle>
+          <DialogTitle>
+            {editing ? t("directory.dialog.editTitle") : t("directory.dialog.newTitle")}
+          </DialogTitle>
         </DialogHeader>
         <div className="space-y-3">
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <Label>{t("directory.field.type")}</Label>
               <Select value={kind} onValueChange={(v) => setKind(v as Kind)}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
                   {KINDS.map((k) => (
                     <SelectItem key={k.value} value={k.value}>
@@ -556,7 +579,13 @@ function EntryDialog({
             {t("directory.cancel")}
           </Button>
           <Button onClick={submit} disabled={busy}>
-            {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : editing ? t("directory.save") : t("directory.add")}
+            {busy ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : editing ? (
+              t("directory.save")
+            ) : (
+              t("directory.add")
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>

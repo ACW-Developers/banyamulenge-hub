@@ -139,13 +139,18 @@ function MarketplacePage() {
     queryFn: async () => {
       // Signed-out visitors read a public view that never exposes contact details.
       const { data, error } = user
-        ? await supabase.from("marketplace_listings").select("*").order("created_at", { ascending: false })
-        : await supabase.from("marketplace_public").select("*").order("created_at", { ascending: false });
+        ? await supabase
+            .from("marketplace_listings")
+            .select("*")
+            .order("created_at", { ascending: false })
+        : await supabase
+            .from("marketplace_public")
+            .select("*")
+            .order("created_at", { ascending: false });
       if (error) throw error;
       return (data ?? []) as unknown as Listing[];
     },
   });
-
 
   const filtered = useMemo(() => {
     const list = data ?? [];
@@ -186,9 +191,7 @@ function MarketplacePage() {
             <h1 className="mt-3 text-3xl md:text-4xl font-bold tracking-tight text-gray-900">
               {t("marketplace.title")}
             </h1>
-            <p className="mt-2 text-gray-600 text-sm md:text-base">
-              {t("marketplace.subtitle")}
-            </p>
+            <p className="mt-2 text-gray-600 text-sm md:text-base">{t("marketplace.subtitle")}</p>
           </div>
           {user && (
             <Button
@@ -294,7 +297,6 @@ function MarketplacePage() {
                       src={l.image_url}
                       alt={l.title}
                       className="w-full h-full object-cover group-hover:scale-[1.03] transition duration-500"
-                      
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
@@ -331,7 +333,9 @@ function MarketplacePage() {
                           <Pencil className="h-3.5 w-3.5" />
                         </button>
                         <button
-                          onClick={() => confirm(t("marketplace.confirmDelete")) && del.mutate(l.id)}
+                          onClick={() =>
+                            confirm(t("marketplace.confirmDelete")) && del.mutate(l.id)
+                          }
                           className="text-gray-400 hover:text-red-500 p-1"
                           aria-label={t("marketplace.delete")}
                         >
@@ -356,9 +360,7 @@ function MarketplacePage() {
                   </p>
 
                   <div className="mt-3 pt-3 border-t flex items-center justify-between text-[11px] text-gray-500">
-                    <span>
-                      {formatDistanceToNow(new Date(l.created_at), { addSuffix: true })}
-                    </span>
+                    <span>{formatDistanceToNow(new Date(l.created_at), { addSuffix: true })}</span>
                     <div className="flex items-center gap-2">
                       {l.contact_email && (
                         <a
@@ -517,14 +519,18 @@ function ListingDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{editing ? t("marketplace.dialog.editTitle") : t("marketplace.dialog.newTitle")}</DialogTitle>
+          <DialogTitle>
+            {editing ? t("marketplace.dialog.editTitle") : t("marketplace.dialog.newTitle")}
+          </DialogTitle>
         </DialogHeader>
         <div className="space-y-3">
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <Label>{t("marketplace.field.type")}</Label>
               <Select value={kind} onValueChange={(v) => setKind(v as Kind)}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
                   {KINDS.map((k) => (
                     <SelectItem key={k.value} value={k.value}>
@@ -621,7 +627,13 @@ function ListingDialog({
             {t("marketplace.cancel")}
           </Button>
           <Button onClick={submit} disabled={busy}>
-            {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : editing ? t("marketplace.save") : t("marketplace.publish")}
+            {busy ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : editing ? (
+              t("marketplace.save")
+            ) : (
+              t("marketplace.publish")
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -92,7 +92,8 @@ export const heritage: ModuleDict = {
     "heritage.hero.title": "Historia hai ya Wabanyamulenge",
 
     "heritage.intro.title": "Utangulizi",
-    "heritage.intro.imageAlt": "Wanawake wakiwa na mavazi ya jadi ya Kibanyamulenge na maboga ya sherehe",
+    "heritage.intro.imageAlt":
+      "Wanawake wakiwa na mavazi ya jadi ya Kibanyamulenge na maboga ya sherehe",
     "heritage.intro.p1":
       '<strong>Wabanyamulenge</strong> ni jamii inayozungumza Kinyarwanda, wanaoishi zaidi katika <strong>Nyanda za Juu za Mulenge</strong> za Mkoa wa Kivu Kusini, mashariki mwa Jamhuri ya Kidemokrasia ya Kongo (DRC). Jina Banyamulenge lina maana halisi ya <em>"watu wa Mulenge."</em>',
     "heritage.intro.p2":
@@ -175,7 +176,8 @@ export const heritage: ModuleDict = {
     "heritage.hero.title": "Amateka azima y'Abanyamulenge",
 
     "heritage.intro.title": "Intangiriro",
-    "heritage.intro.imageAlt": "Abagore bambaye imyambaro gakondo y'Abanyamulenge bafite ibyanzu by'imihango",
+    "heritage.intro.imageAlt":
+      "Abagore bambaye imyambaro gakondo y'Abanyamulenge bafite ibyanzu by'imihango",
     "heritage.intro.p1":
       '<strong>Abanyamulenge</strong> ni umuryango uvuga Ikinyarwanda, utuye ahanini ku <strong>Misozi Miremire ya Mulenge</strong> mu Ntara ya Kivu y\'Amajyepfo, mu burasirazuba bwa Repubulika Iharanira Demokarasi ya Kongo (DRC). Izina Banyamulenge risobanura mu buryo butaziguye <em>"abantu ba Mulenge."</em>',
     "heritage.intro.p2":

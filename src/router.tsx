@@ -12,7 +12,6 @@ export const getRouter = () => {
         refetchOnWindowFocus: false,
         refetchOnReconnect: true,
         retry: 1,
-
       },
     },
   });

@@ -55,9 +55,7 @@ function SettingsAdmin() {
     <div className="space-y-8 max-w-6xl">
       <div>
         <h1 className="text-2xl font-bold text-gray-900">{t("admin.settings.title")}</h1>
-        <p className="text-sm text-gray-500 mt-1">
-          {t("admin.settings.subtitle")}
-        </p>
+        <p className="text-sm text-gray-500 mt-1">{t("admin.settings.subtitle")}</p>
       </div>
 
       <ModuleVisibilitySection />
@@ -335,10 +333,11 @@ function TrafficSection() {
               })}
             </div>
 
-
             <div className="grid lg:grid-cols-2 gap-6">
               <div className="rounded-xl border p-4">
-                <h3 className="text-sm font-semibold mb-3">{t("admin.settings.traffic.visitsOverTime")}</h3>
+                <h3 className="text-sm font-semibold mb-3">
+                  {t("admin.settings.traffic.visitsOverTime")}
+                </h3>
                 <div className="h-56">
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={stats.timeline}>
@@ -359,7 +358,9 @@ function TrafficSection() {
               </div>
 
               <div className="rounded-xl border p-4">
-                <h3 className="text-sm font-semibold mb-3">{t("admin.settings.traffic.devices")}</h3>
+                <h3 className="text-sm font-semibold mb-3">
+                  {t("admin.settings.traffic.devices")}
+                </h3>
                 <div className="h-56">
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
@@ -384,7 +385,9 @@ function TrafficSection() {
               </div>
 
               <div className="rounded-xl border p-4">
-                <h3 className="text-sm font-semibold mb-3">{t("admin.settings.traffic.browsers")}</h3>
+                <h3 className="text-sm font-semibold mb-3">
+                  {t("admin.settings.traffic.browsers")}
+                </h3>
                 <div className="h-56">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={stats.browsers}>
@@ -399,7 +402,9 @@ function TrafficSection() {
               </div>
 
               <div className="rounded-xl border p-4">
-                <h3 className="text-sm font-semibold mb-3">{t("admin.settings.traffic.topCountries")}</h3>
+                <h3 className="text-sm font-semibold mb-3">
+                  {t("admin.settings.traffic.topCountries")}
+                </h3>
                 <ul className="space-y-2">
                   {stats.countries.map((c, i) => {
                     const pct = stats.total ? Math.round((c.value / stats.total) * 100) : 0;
@@ -424,7 +429,9 @@ function TrafficSection() {
                     );
                   })}
                   {stats.countries.length === 0 && (
-                    <li className="text-xs text-gray-500">{t("admin.settings.traffic.noVisits")}</li>
+                    <li className="text-xs text-gray-500">
+                      {t("admin.settings.traffic.noVisits")}
+                    </li>
                   )}
                 </ul>
               </div>
@@ -439,7 +446,11 @@ function TrafficSection() {
 function PlatformInfo() {
   const { t } = useI18n();
   const info = [
-    { label: t("admin.settings.platform"), value: "Banyamulenge Community Heritage", icon: Palette },
+    {
+      label: t("admin.settings.platform"),
+      value: "Banyamulenge Community Heritage",
+      icon: Palette,
+    },
     { label: t("admin.settings.version"), value: "1.0.0", icon: Settings },
     { label: t("admin.settings.security"), value: t("admin.settings.securityValue"), icon: Shield },
   ];

@@ -275,9 +275,7 @@ function ExplorePage() {
           <div className="flex items-center gap-1">
             {Array.from({ length: totalPages })
               .map((_, i) => i + 1)
-              .filter(
-                (n) => n === 1 || n === totalPages || Math.abs(n - current) <= 1,
-              )
+              .filter((n) => n === 1 || n === totalPages || Math.abs(n - current) <= 1)
               .map((n, i, arr) => (
                 <span key={n} className="flex items-center gap-1">
                   {i > 0 && arr[i - 1] !== n - 1 && <span className="text-gray-400 px-1">…</span>}

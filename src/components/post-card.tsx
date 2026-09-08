@@ -113,7 +113,6 @@ export function PostCard({ post, queryKey }: { post: FeedPost; queryKey: readonl
     },
   });
 
-
   const del = useMutation({
     mutationFn: async () => {
       const { error } = await supabase.from("posts").delete().eq("id", post.id);
@@ -135,7 +134,11 @@ export function PostCard({ post, queryKey }: { post: FeedPost; queryKey: readonl
       if (error) throw error;
     },
     onSuccess: () => {
-      notifySuccess(post.is_announcement ? t("home.post.unmarkedAnnouncement") : t("home.post.markedAnnouncement"));
+      notifySuccess(
+        post.is_announcement
+          ? t("home.post.unmarkedAnnouncement")
+          : t("home.post.markedAnnouncement"),
+      );
       qc.invalidateQueries({ queryKey });
     },
     onError: (e: Error) => notifyError(e.message),
@@ -172,7 +175,11 @@ export function PostCard({ post, queryKey }: { post: FeedPost; queryKey: readonl
     const url = `${window.location.origin}/?post=${post.id}`;
     try {
       if (navigator.share) {
-        await navigator.share({ title: t("home.post.shareTitle"), text: post.content.slice(0, 80), url });
+        await navigator.share({
+          title: t("home.post.shareTitle"),
+          text: post.content.slice(0, 80),
+          url,
+        });
       } else {
         await navigator.clipboard.writeText(url);
         notifySuccess(t("home.post.linkCopied"));
@@ -229,7 +236,9 @@ export function PostCard({ post, queryKey }: { post: FeedPost; queryKey: readonl
               {isAdmin && (
                 <DropdownMenuItem onClick={() => toggleAnnouncement.mutate()}>
                   <Megaphone className="h-4 w-4 mr-2" />
-                  {post.is_announcement ? t("home.post.unmarkAnnouncement") : t("home.post.markAnnouncement")}
+                  {post.is_announcement
+                    ? t("home.post.unmarkAnnouncement")
+                    : t("home.post.markAnnouncement")}
                 </DropdownMenuItem>
               )}
               {(canDelete || isAdmin) && (
@@ -242,9 +251,7 @@ export function PostCard({ post, queryKey }: { post: FeedPost; queryKey: readonl
         )}
       </header>
       <p className="text-[15px] leading-relaxed whitespace-pre-wrap">{post.content}</p>
-      {images.length > 0 && (
-        <PostGallery images={images} onOpen={(src) => setLightbox(src)} />
-      )}
+      {images.length > 0 && <PostGallery images={images} onOpen={(src) => setLightbox(src)} />}
       {lightbox && (
         <div
           className="fixed inset-0 z-50 bg-black/85 flex items-center justify-center p-4"
@@ -480,7 +487,10 @@ export function PostComposer({
           <Textarea
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            placeholder={t("home.composer.placeholder").replace("{name}", profile?.display_name || t("home.composer.friend"))}
+            placeholder={t("home.composer.placeholder").replace(
+              "{name}",
+              profile?.display_name || t("home.composer.friend"),
+            )}
             className="min-h-[80px] resize-none border-0 bg-gray-50 focus-visible:ring-1"
           />
           {previews.length > 0 && (

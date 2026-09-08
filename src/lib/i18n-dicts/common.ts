@@ -46,9 +46,12 @@ export const common: ModuleDict = {
     "auth.createAccount": "Create Account",
     "auth.subtitle": "Community Heritage Platform",
     "auth.tagline": "One community. One heritage. Everywhere in the world.",
-    "auth.taglineSub": "Preserve our stories, connect across continents, and celebrate Banyamulenge culture.",
-    "auth.terms": "I agree to the Terms and Conditions and the Privacy Policy of Banyamulenge Heritage Hub.",
-    "auth.checkInbox": "Email sent. Open the link in your inbox to set a new password, then log in again.",
+    "auth.taglineSub":
+      "Preserve our stories, connect across continents, and celebrate Banyamulenge culture.",
+    "auth.terms":
+      "I agree to the Terms and Conditions and the Privacy Policy of Banyamulenge Heritage Hub.",
+    "auth.checkInbox":
+      "Email sent. Open the link in your inbox to set a new password, then log in again.",
 
     "land.nav.story": "Story",
     "land.nav.origins": "Origins",
@@ -140,9 +143,12 @@ export const common: ModuleDict = {
     "auth.createAccount": "Fungua Akaunti",
     "auth.subtitle": "Jukwaa la Urithi wa Jumuiya",
     "auth.tagline": "Jumuiya moja. Urithi mmoja. Kila mahali duniani.",
-    "auth.taglineSub": "Tuhifadhi hadithi zetu, tuungane kote duniani, na tusherehekee utamaduni wa Banyamulenge.",
-    "auth.terms": "Nakubali Sheria na Masharti pamoja na Sera ya Faragha ya Banyamulenge Heritage Hub.",
-    "auth.checkInbox": "Barua pepe imetumwa. Fungua kiungo kwenye kikasha chako uweke nenosiri jipya, kisha uingie tena.",
+    "auth.taglineSub":
+      "Tuhifadhi hadithi zetu, tuungane kote duniani, na tusherehekee utamaduni wa Banyamulenge.",
+    "auth.terms":
+      "Nakubali Sheria na Masharti pamoja na Sera ya Faragha ya Banyamulenge Heritage Hub.",
+    "auth.checkInbox":
+      "Barua pepe imetumwa. Fungua kiungo kwenye kikasha chako uweke nenosiri jipya, kisha uingie tena.",
 
     "land.nav.story": "Historia",
     "land.nav.origins": "Asili",
@@ -226,7 +232,8 @@ export const common: ModuleDict = {
     "auth.yourName": "Amazina yawe",
     "auth.forgot": "Wibagiwe ijambobanga?",
     "auth.forgotTitle": "Wibagiwe ijambobanga ryawe?",
-    "auth.forgotSub": "Andika imeyili yawe tukwoherereze umurongo wo gushyiraho ijambobanga rishya.",
+    "auth.forgotSub":
+      "Andika imeyili yawe tukwoherereze umurongo wo gushyiraho ijambobanga rishya.",
     "auth.sendReset": "Ohereza umurongo",
     "auth.resetSent": "Umurongo woherejwe",
     "auth.backToLogin": "Subira aho winjirira",
@@ -234,9 +241,12 @@ export const common: ModuleDict = {
     "auth.createAccount": "Fungura konti",
     "auth.subtitle": "Urubuga rw\u2019Umurage w\u2019Umuryango",
     "auth.tagline": "Umuryango umwe. Umurage umwe. Hose ku isi.",
-    "auth.taglineSub": "Turinde inkuru zacu, twiyunge ku migabane yose, kandi twubahirize umuco w\u2019Abanyamulenge.",
-    "auth.terms": "Nemeye Amabwiriza n\u2019Amasezerano ndetse na Politiki y\u2019Ibanga bya Banyamulenge Heritage Hub.",
-    "auth.checkInbox": "Imeyili yoherejwe. Fungura umurongo uri muri imeyili yawe ushyireho ijambobanga rishya, hanyuma wongere winjire.",
+    "auth.taglineSub":
+      "Turinde inkuru zacu, twiyunge ku migabane yose, kandi twubahirize umuco w\u2019Abanyamulenge.",
+    "auth.terms":
+      "Nemeye Amabwiriza n\u2019Amasezerano ndetse na Politiki y\u2019Ibanga bya Banyamulenge Heritage Hub.",
+    "auth.checkInbox":
+      "Imeyili yoherejwe. Fungura umurongo uri muri imeyili yawe ushyireho ijambobanga rishya, hanyuma wongere winjire.",
 
     "land.nav.story": "Inkuru yacu",
     "land.nav.origins": "Inkomoko",

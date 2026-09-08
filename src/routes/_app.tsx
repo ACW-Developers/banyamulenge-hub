@@ -24,7 +24,6 @@ import {
   Gem,
   Images,
   DollarSign,
-
 } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "@/lib/notify";
@@ -51,7 +50,6 @@ import { trackVisit, logActivity } from "@/lib/tracking";
 import { moduleKeyForPath, useModuleSettings } from "@/lib/module-visibility";
 import { useNotifications } from "@/lib/notifications";
 import { DonateButton } from "@/components/donate-button";
-
 
 export const Route = createFileRoute("/_app")({
   component: AppLayout,
@@ -113,7 +111,6 @@ function AppLayout() {
     if (key && key !== "home" && !isVisible(key)) navigate({ to: "/" });
   }, [pathname, modulesLoading, isVisible, navigate]);
 
-
   useEffect(() => {
     if (!user) return;
     void ensurePushPermission();
@@ -139,11 +136,23 @@ function AppLayout() {
 
   const nav = [
     { key: "home", to: "/", label: t("nav.home"), icon: Home, badge: notif.newPosts },
-    { key: "explore", to: "/explore", label: t("nav.explore"), icon: Compass, badge: notif.newFollowers },
+    {
+      key: "explore",
+      to: "/explore",
+      label: t("nav.explore"),
+      icon: Compass,
+      badge: notif.newFollowers,
+    },
     { key: "community", to: "/community", label: t("nav.community"), icon: Users, badge: 0 },
     { key: "marketplace", to: "/marketplace", label: t("nav.marketplace"), icon: Store, badge: 0 },
     { key: "directory", to: "/directory", label: t("nav.directory"), icon: BookUser, badge: 0 },
-    { key: "messages", to: "/messages", label: t("nav.messages"), icon: MessageCircle, badge: notif.unreadMessages },
+    {
+      key: "messages",
+      to: "/messages",
+      label: t("nav.messages"),
+      icon: MessageCircle,
+      badge: notif.unreadMessages,
+    },
     { key: "heritage", to: "/heritage", label: t("nav.heritage"), icon: Landmark, badge: 0 },
     { key: "museum", to: "/museum", label: t("nav.museum"), icon: Gem, badge: 0 },
     { key: "gallery", to: "/gallery", label: t("nav.gallery"), icon: Images, badge: 0 },
@@ -157,7 +166,6 @@ function AppLayout() {
     },
   ].filter((item) => isVisible(item.key));
 
-
   const adminNav = [
     { to: "/admin", label: t("nav.admin"), icon: Shield, badge: 0 },
     { to: "/admin/users", label: t("nav.users"), icon: Users, badge: 0 },
@@ -165,7 +173,6 @@ function AppLayout() {
     { to: "/admin/payments", label: t("nav.payments"), icon: DollarSign, badge: 0 },
     { to: "/admin/settings", label: t("nav.settings"), icon: Settings, badge: 0 },
   ];
-
 
   const initial = (profile?.display_name || profile?.username || "U").slice(0, 1).toUpperCase();
 
@@ -365,7 +372,10 @@ function AppLayout() {
 
             <div className="hidden md:flex flex-1 max-w-md relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <Input placeholder={t("nav.search")} className="pl-9 h-10 bg-gray-50 border-gray-200" />
+              <Input
+                placeholder={t("nav.search")}
+                className="pl-9 h-10 bg-gray-50 border-gray-200"
+              />
             </div>
             <div className="ml-auto flex items-center gap-2">
               <DonateButton />

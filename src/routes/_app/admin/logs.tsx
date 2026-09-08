@@ -54,9 +54,7 @@ function LogsAdmin() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-gray-900">{t("admin.logs.title")}</h1>
-        <p className="text-sm text-gray-500 mt-1">
-          {t("admin.logs.subtitle")}
-        </p>
+        <p className="text-sm text-gray-500 mt-1">{t("admin.logs.subtitle")}</p>
       </div>
 
       <div className="rounded-2xl border bg-white shadow-sm">
@@ -74,7 +72,13 @@ function LogsAdmin() {
                 <li key={l.id} className="p-4 flex items-start gap-3">
                   <div className="h-9 w-9 rounded-full bg-primary/10 text-primary font-bold flex items-center justify-center overflow-hidden shrink-0">
                     {l.actor?.avatar_url ? (
-                      <img src={l.actor.avatar_url} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover" />
+                      <img
+                        src={l.actor.avatar_url}
+                        alt=""
+                        loading="lazy"
+                        decoding="async"
+                        className="h-full w-full object-cover"
+                      />
                     ) : (
                       initial
                     )}
@@ -87,8 +91,8 @@ function LogsAdmin() {
                       <span className="font-mono text-primary">{l.action}</span>
                       {l.target_type && (
                         <span className="text-gray-500">
-                          {" "}{t("admin.logs.on")}{" "}
-                          {l.target_type}{" "}
+                          {" "}
+                          {t("admin.logs.on")} {l.target_type}{" "}
                           <span className="font-mono text-xs">
                             {typeof l.target_id === "string" ? l.target_id.slice(0, 40) : ""}
                           </span>
@@ -112,7 +116,8 @@ function LogsAdmin() {
         )}
         <div className="flex items-center justify-between p-3 border-t bg-gray-50/50">
           <div className="text-xs text-gray-500">
-            {t("admin.logs.page")} {page + 1} {t("admin.logs.of")} {pages} · {total} {t("admin.logs.entries")}
+            {t("admin.logs.page")} {page + 1} {t("admin.logs.of")} {pages} · {total}{" "}
+            {t("admin.logs.entries")}
           </div>
           <div className="flex gap-1">
             <Button

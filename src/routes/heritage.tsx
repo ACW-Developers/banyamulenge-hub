@@ -51,10 +51,34 @@ export const Route = createFileRoute("/heritage")({
 });
 
 const LINEAGE_NAMES = [
-  "Abagorora","Abasinzira","Abega","Abasita","Abasegege","Abanyabzinshi","Abasama","Abitira",
-  "Abahondogo","Abazigaba","Abadasomera","Abahima","Abadahugwa","Abazoza","Abasinga","Abapfurika",
-  "Abashonga","Abahinda","Abatura","Abatakure","Abahiga","Ababano","Abagabika","Abadinzi",
-  "Abongera","Abanyakarama","Abaheto","Abatwari",
+  "Abagorora",
+  "Abasinzira",
+  "Abega",
+  "Abasita",
+  "Abasegege",
+  "Abanyabzinshi",
+  "Abasama",
+  "Abitira",
+  "Abahondogo",
+  "Abazigaba",
+  "Abadasomera",
+  "Abahima",
+  "Abadahugwa",
+  "Abazoza",
+  "Abasinga",
+  "Abapfurika",
+  "Abashonga",
+  "Abahinda",
+  "Abatura",
+  "Abatakure",
+  "Abahiga",
+  "Ababano",
+  "Abagabika",
+  "Abadinzi",
+  "Abongera",
+  "Abanyakarama",
+  "Abaheto",
+  "Abatwari",
 ];
 
 function Section({
@@ -119,7 +143,7 @@ function LandingNavbar() {
   const [open, setOpen] = useState(false);
 
   const links = [
-    { href: "#story", label: t("land.nav.story", "Story") },
+    { href: "#story", label: t("land.nav.story", "Our Story") },
     { href: "#origins", label: t("land.nav.origins", "Origins") },
     { href: "#culture", label: t("land.nav.culture", "Culture") },
     { href: "#lineages", label: t("land.nav.lineages", "Lineages") },
@@ -148,7 +172,7 @@ function LandingNavbar() {
         <div className="ml-auto flex items-center gap-2">
           <LanguageSelector />
           {session ? (
-            <Button asChild size="sm" className="rounded-full px-4">
+            <Button asChild size="sm" className="rounded-10 px-4">
               <Link to="/">
                 {t("land.enterApp", "Enter the hub")}
                 <ArrowRight className="ml-1.5 h-4 w-4" />
@@ -160,17 +184,17 @@ function LandingNavbar() {
                 asChild
                 size="sm"
                 variant="outline"
-                className="hidden sm:inline-flex rounded-full px-4 border-2"
+                className="hidden sm:inline-flex rounded-10 px-4 border-2"
               >
                 <Link to="/auth">{t("auth.login")}</Link>
               </Button>
-              <Button asChild size="sm" className="rounded-full px-4">
+              <Button asChild size="sm" className="rounded-10 px-4">
                 <Link to="/auth">{t("auth.signup")}</Link>
               </Button>
             </>
           )}
           <button
-            className="lg:hidden rounded-lg border p-2 text-gray-600"
+            className="lg:hidden rounded-10 border p-2 text-gray-600"
             onClick={() => setOpen((v) => !v)}
             aria-label="Menu"
           >
@@ -186,7 +210,7 @@ function LandingNavbar() {
               key={l.href}
               href={l.href}
               onClick={() => setOpen(false)}
-              className="block rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100"
+              className="block rounded-10 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100"
             >
               {l.label}
             </a>
@@ -211,7 +235,7 @@ function LandingFooter() {
   const year = new Date().getFullYear();
   return (
     <footer className="mt-16 border-t bg-gray-900 text-gray-300">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6 py-12 grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 py-12 grid gap-10 sm:grid-cols-3 lg:grid-cols-4">
         <div className="sm:col-span-2">
           <Logo
             variant="horizontal"
@@ -222,22 +246,44 @@ function LandingFooter() {
           </p>
         </div>
         <div>
-          <h3 className="text-sm font-semibold text-white">{t("land.footer.explore", "Explore")}</h3>
+          <h3 className="text-sm font-semibold text-white">
+            {t("land.footer.explore", "Explore")}
+          </h3>
           <ul className="mt-3 space-y-2 text-sm">
-            <li><a href="#story" className="hover:text-white">{t("land.nav.story", "Story")}</a></li>
-            <li><a href="#origins" className="hover:text-white">{t("land.nav.origins", "Origins")}</a></li>
-            <li><a href="#lineages" className="hover:text-white">{t("land.nav.lineages", "Lineages")}</a></li>
-            <li><a href="#subtribes" className="hover:text-white">{t("land.nav.subtribes", "Subtribes")}</a></li>
+            <li>
+              <a href="#story" className="hover:text-white">
+                {t("land.nav.story", "Our Story")}
+              </a>
+            </li>
+            <li>
+              <a href="#origins" className="hover:text-white">
+                {t("land.nav.origins", "Origins")}
+              </a>
+            </li>
+            <li>
+              <a href="#lineages" className="hover:text-white">
+                {t("land.nav.lineages", "Lineages")}
+              </a>
+            </li>
+            <li>
+              <a href="#subtribes" className="hover:text-white">
+                {t("land.nav.subtribes", "Subtribes")}
+              </a>
+            </li>
           </ul>
         </div>
         <div>
           <h3 className="text-sm font-semibold text-white">{t("land.footer.join", "Join us")}</h3>
           <ul className="mt-3 space-y-2 text-sm">
             <li>
-              <Link to="/auth" className="hover:text-white">{t("auth.createAccount")}</Link>
+              <Link to="/auth" className="hover:text-white">
+                {t("auth.createAccount")}
+              </Link>
             </li>
             <li>
-              <Link to="/auth" className="hover:text-white">{t("auth.login")}</Link>
+              <Link to="/auth" className="hover:text-white">
+                {t("auth.login")}
+              </Link>
             </li>
             <li className="flex items-center gap-2 text-gray-400">
               <Mail className="h-3.5 w-3.5" /> info@banyamulengehub.com
@@ -247,7 +293,9 @@ function LandingFooter() {
       </div>
       <div className="border-t border-white/10">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 py-5 text-xs text-gray-500 flex flex-col sm:flex-row gap-2 sm:items-center sm:justify-between">
-          <span>© {year} Banyamulenge Heritage Hub. {t("land.footer.rights", "All rights reserved.")}</span>
+          <span>
+            © {year} Banyamulenge Heritage Hub. {t("land.footer.rights", "All rights reserved.")}
+          </span>
           <span>{t("auth.tagline")}</span>
         </div>
       </div>
@@ -280,7 +328,7 @@ function HeritageLanding() {
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/45 to-black/20" />
           <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6 h-full flex flex-col justify-end pb-12 sm:pb-16 text-white">
-            <span className="inline-flex w-fit items-center gap-2 rounded-full border border-white/30 bg-white/10 px-3 py-1 text-xs font-medium backdrop-blur">
+            <span className="inline-flex w-fit items-center gap-2 rounded-10 border border-white/30 bg-white/10 px-3 py-1 text-xs font-medium backdrop-blur">
               <Landmark className="h-3.5 w-3.5" /> {t("heritage.title")}
             </span>
             <h1 className="mt-4 text-3xl sm:text-5xl lg:text-6xl font-black leading-[1.05] max-w-3xl drop-shadow">
@@ -290,7 +338,7 @@ function HeritageLanding() {
               {t("heritage.subtitle")}
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
-              <Button asChild size="lg" className="rounded-full px-6">
+              <Button asChild size="lg" className="rounded-10 px-6">
                 <Link to="/auth">
                   {t("land.cta.join", "Create your free account")}
                   <ArrowRight className="ml-2 h-4 w-4" />
@@ -300,7 +348,7 @@ function HeritageLanding() {
                 asChild
                 size="lg"
                 variant="outline"
-                className="rounded-full px-6 border-2 border-white/60 bg-white/10 text-white hover:bg-white hover:text-gray-900"
+                className="rounded-10 px-6 border-2 border-white/60 bg-white/10 text-white hover:bg-white hover:text-gray-900"
               >
                 <a href="#story">{t("land.cta.read", "Read our story")}</a>
               </Button>
@@ -415,14 +463,14 @@ function HeritageLanding() {
               )}
             </p>
             <div className="mt-6 flex flex-wrap justify-center gap-3">
-              <Button asChild size="lg" className="rounded-full px-6">
+              <Button asChild size="lg" className="rounded-10 px-6">
                 <Link to="/auth">{t("auth.createAccount")}</Link>
               </Button>
               <Button
                 asChild
                 size="lg"
                 variant="outline"
-                className="rounded-full px-6 border-2 border-white/50 bg-transparent text-white hover:bg-white hover:text-gray-900"
+                className="rounded-10 px-6 border-2 border-white/50 bg-transparent text-white hover:bg-white hover:text-gray-900"
               >
                 <Link to="/auth">{t("auth.login")}</Link>
               </Button>

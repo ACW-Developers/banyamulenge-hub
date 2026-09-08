@@ -125,19 +125,39 @@ function PaymentsDashboard() {
   }
 
   const cards = [
-    { label: t("admin.payments.card.totalRaised"), value: money(stats.total), icon: DollarSign, tint: "from-emerald-500 to-emerald-600" },
-    { label: t("admin.payments.card.donations"), value: String(stats.count), icon: Receipt, tint: "from-blue-500 to-blue-600" },
-    { label: t("admin.payments.card.uniqueDonors"), value: String(stats.donors), icon: Users, tint: "from-violet-500 to-violet-600" },
-    { label: t("admin.payments.card.averageGift"), value: money(stats.avg), icon: TrendingUp, tint: "from-amber-500 to-orange-600" },
+    {
+      label: t("admin.payments.card.totalRaised"),
+      value: money(stats.total),
+      icon: DollarSign,
+      tint: "from-emerald-500 to-emerald-600",
+    },
+    {
+      label: t("admin.payments.card.donations"),
+      value: String(stats.count),
+      icon: Receipt,
+      tint: "from-blue-500 to-blue-600",
+    },
+    {
+      label: t("admin.payments.card.uniqueDonors"),
+      value: String(stats.donors),
+      icon: Users,
+      tint: "from-violet-500 to-violet-600",
+    },
+    {
+      label: t("admin.payments.card.averageGift"),
+      value: money(stats.avg),
+      icon: TrendingUp,
+      tint: "from-amber-500 to-orange-600",
+    },
   ];
 
   return (
     <div className="max-w-7xl mx-auto space-y-6">
       <div>
-        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">{t("admin.payments.title")}</h1>
-        <p className="text-muted-foreground text-sm">
-          {t("admin.payments.subtitle")}
-        </p>
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
+          {t("admin.payments.title")}
+        </h1>
+        <p className="text-muted-foreground text-sm">{t("admin.payments.subtitle")}</p>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -229,12 +249,24 @@ function PaymentsDashboard() {
             <table className="w-full text-sm">
               <thead className="bg-muted/50 text-xs uppercase tracking-wide text-muted-foreground">
                 <tr>
-                  <th className="text-left font-semibold px-4 py-3">{t("admin.payments.table.donor")}</th>
-                  <th className="text-left font-semibold px-4 py-3">{t("admin.payments.table.email")}</th>
-                  <th className="text-right font-semibold px-4 py-3">{t("admin.payments.table.amount")}</th>
-                  <th className="text-left font-semibold px-4 py-3">{t("admin.payments.table.status")}</th>
-                  <th className="text-left font-semibold px-4 py-3">{t("admin.payments.table.transactionCode")}</th>
-                  <th className="text-left font-semibold px-4 py-3">{t("admin.payments.table.date")}</th>
+                  <th className="text-left font-semibold px-4 py-3">
+                    {t("admin.payments.table.donor")}
+                  </th>
+                  <th className="text-left font-semibold px-4 py-3">
+                    {t("admin.payments.table.email")}
+                  </th>
+                  <th className="text-right font-semibold px-4 py-3">
+                    {t("admin.payments.table.amount")}
+                  </th>
+                  <th className="text-left font-semibold px-4 py-3">
+                    {t("admin.payments.table.status")}
+                  </th>
+                  <th className="text-left font-semibold px-4 py-3">
+                    {t("admin.payments.table.transactionCode")}
+                  </th>
+                  <th className="text-left font-semibold px-4 py-3">
+                    {t("admin.payments.table.date")}
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -247,7 +279,9 @@ function PaymentsDashboard() {
                 )}
                 {filtered.map((r) => (
                   <tr key={r.id} className="border-t hover:bg-muted/30">
-                    <td className="px-4 py-3 font-medium">{r.donor_name || t("admin.payments.anonymous")}</td>
+                    <td className="px-4 py-3 font-medium">
+                      {r.donor_name || t("admin.payments.anonymous")}
+                    </td>
                     <td className="px-4 py-3 text-muted-foreground">{r.donor_email || "—"}</td>
                     <td className="px-4 py-3 text-right font-semibold tabular-nums">
                       {money(r.amount_cents ?? 0)}
@@ -279,7 +313,10 @@ function PaymentsDashboard() {
 
       {stats.pending > 0 && (
         <p className="text-xs text-muted-foreground">
-          {stats.pending} {stats.pending > 1 ? t("admin.payments.pendingNote") : t("admin.payments.pendingNoteSingular")}
+          {stats.pending}{" "}
+          {stats.pending > 1
+            ? t("admin.payments.pendingNote")
+            : t("admin.payments.pendingNoteSingular")}
         </p>
       )}
     </div>
