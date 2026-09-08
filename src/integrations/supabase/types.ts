@@ -670,6 +670,30 @@ export type Database = {
           },
         ]
       }
+      module_settings: {
+        Row: {
+          key: string
+          label: string
+          sort_order: number
+          updated_at: string
+          visible: boolean
+        }
+        Insert: {
+          key: string
+          label: string
+          sort_order?: number
+          updated_at?: string
+          visible?: boolean
+        }
+        Update: {
+          key?: string
+          label?: string
+          sort_order?: number
+          updated_at?: string
+          visible?: boolean
+        }
+        Relationships: []
+      }
       museum_artifacts: {
         Row: {
           category: string
@@ -1024,6 +1048,7 @@ export type Database = {
         Args: { _convo: string; _user: string }
         Returns: boolean
       }
+      is_super_admin: { Args: { _user_id: string }; Returns: boolean }
       mark_donation_result: {
         Args: {
           p_amount_cents: number
