@@ -174,7 +174,7 @@ function LandingNavbar() {
         </nav>
 
         <div className="ml-auto flex items-center gap-2">
-          <LanguageSelector />
+          <LanguageSelector className="h-9 rounded-10 px-3 border-2" />
           {session ? (
             <Button asChild size="sm" className="rounded-10 px-4">
               <Link to="/">
@@ -191,13 +191,13 @@ function LandingNavbar() {
                 variant="outline"
                 className="hidden sm:inline-flex rounded-10 px-4 border-2"
               >
-                <Link to="/auth">
+                <Link to="/auth" search={{ mode: "signin" }}>
                   <LogIn className="h-4 w-4" />
                   {t("auth.login")}
                 </Link>
               </Button>
               <Button asChild size="sm" className="rounded-10 px-4">
-                <Link to="/auth">
+                <Link to="/auth" search={{ mode: "signup" }}>
                   <UserPlus className="h-4 w-4" />
                   {t("auth.signup")}
                 </Link>
@@ -227,13 +227,20 @@ function LandingNavbar() {
             </a>
           ))}
           {!session && (
-            <Link
-              to="/auth"
-              onClick={() => setOpen(false)}
-              className="block rounded-lg px-3 py-2 text-sm font-semibold text-primary hover:bg-primary/5"
-            >
-              {t("auth.login")}
-            </Link>
+            <div className="pt-2 grid gap-2">
+              <Button asChild variant="outline" className="w-full rounded-10 border-2">
+                <Link to="/auth" search={{ mode: "signin" }} onClick={() => setOpen(false)}>
+                  <LogIn className="h-4 w-4" />
+                  {t("auth.login")}
+                </Link>
+              </Button>
+              <Button asChild className="w-full rounded-10">
+                <Link to="/auth" search={{ mode: "signup" }} onClick={() => setOpen(false)}>
+                  <UserPlus className="h-4 w-4" />
+                  {t("auth.signup")}
+                </Link>
+              </Button>
+            </div>
           )}
         </div>
       )}
@@ -370,7 +377,7 @@ function HeritageLanding() {
             className="absolute inset-0 h-full w-full object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/45 to-black/20" />
-          <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6 h-full flex flex-col justify-end pb-12 sm:pb-16 text-white">
+          <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6 h-full flex flex-col justify-center sm:justify-end items-center sm:items-start text-center sm:text-left pb-12 sm:pb-16 text-white">
             <span className="inline-flex w-fit items-center gap-2 rounded-lg border border-white/30 bg-white/10 px-3 py-1 text-xs font-medium backdrop-blur">
               <Landmark className="h-3.5 w-3.5" /> {t("heritage.title")}
             </span>
@@ -380,9 +387,9 @@ function HeritageLanding() {
             <p className="mt-4 max-w-2xl text-sm sm:text-lg text-white/90 leading-relaxed drop-shadow">
               {t("heritage.subtitle")}
             </p>
-            <div className="mt-7 flex flex-wrap gap-3">
+            <div className="mt-7 flex flex-wrap justify-center sm:justify-start gap-3">
               <Button asChild size="lg" className="rounded-10 px-5">
-                <Link to="/auth">
+                <Link to="/auth" search={{ mode: "signup" }}>
                   {t("land.cta.join", "Create your free account")}
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
