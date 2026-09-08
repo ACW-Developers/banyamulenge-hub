@@ -48,6 +48,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { trackVisit, logActivity } from "@/lib/tracking";
+import { moduleKeyForPath, useModuleSettings } from "@/lib/module-visibility";
 import { useNotifications } from "@/lib/notifications";
 import { DonateButton } from "@/components/donate-button";
 
@@ -67,6 +68,7 @@ function AppLayout() {
   const { t } = useI18n();
   const qc = useQueryClient();
   const [refreshing, setRefreshing] = useState(false);
+  const { isVisible, isLoading: modulesLoading } = useModuleSettings();
 
   const handleHardRefresh = async () => {
     if (refreshing) return;
