@@ -14,6 +14,9 @@ import authHero from "@/assets/auth-bg.jpg";
 import logoStacked from "@/assets/logo-stacked.png";
 
 export const Route = createFileRoute("/auth")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    mode: search.mode === "signup" ? ("signup" as const) : ("signin" as const),
+  }),
   head: () => ({
     meta: [
       { title: "Login - Banyamulenge Community Heritage" },
@@ -32,9 +35,14 @@ type Mode = "signin" | "signup" | "forgot";
 
 function AuthPage() {
   const navigate = useNavigate();
+  const { mode: initialMode } = Route.useSearch();
   const { session, loading } = useAuth();
   const { t } = useI18n();
-  const [mode, setMode] = useState<Mode>("signin");
+  const [mode, setMode] = useState<Mode>(initialMode);
+
+  useEffect(() => {
+    setMode(initialMode);
+  }, [initialMode]);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPw, setShowPw] = useState(false);
