@@ -484,7 +484,13 @@ function AppLayout() {
         {/* Mobile bottom nav */}
         <nav className="lg:hidden fixed bottom-0 inset-x-0 z-30 border-t bg-white">
           <div className="grid grid-cols-5">
-            {[nav[0], nav[1], nav[2], nav[3], nav[nav.length - 1]].map((item) => {
+            {[
+              nav.find((n) => n.key === "home") ?? nav[0],
+              nav.find((n) => n.key === "explore") ?? nav[1],
+              nav.find((n) => n.key === "community") ?? nav[2],
+              nav.find((n) => n.key === "messages") ?? nav[3],
+              nav[nav.length - 1],
+            ].map((item) => {
               const active = isActive(item.to);
               const Icon = item.icon;
               return (
