@@ -12,6 +12,8 @@ import {
   Menu,
   X,
   ArrowRight,
+  ChevronDown,
+  ChevronUp,
   Mail,
   LogIn,
   UserPlus,
@@ -360,6 +362,7 @@ function HeritageLanding() {
   const { t } = useI18n();
   const navigate = useNavigate();
   const { isVisible, isLoading } = useModuleSettings();
+  const [showAllLineages, setShowAllLineages] = useState(false);
   const LINEAGES = LINEAGE_NAMES.map((name, i) => [name, t(`heritage.lineage.${i + 1}`)] as const);
 
   const heritageOn = isVisible("heritage");
@@ -483,7 +486,7 @@ function HeritageLanding() {
         <Section id="lineages" icon={Users} title={t("heritage.lineages.title")}>
           <p dangerouslySetInnerHTML={{ __html: t("heritage.lineages.p1") }} />
           <div className="grid sm:grid-cols-2 gap-3 not-prose mt-4">
-            {LINEAGES.map(([name, note], i) => (
+            {(showAllLineages ? LINEAGES : LINEAGES.slice(0, 4)).map(([name, note], i) => (
               <div key={name} className="rounded-xl border bg-gray-50/50 p-3 flex gap-3">
                 <div className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-primary text-primary-foreground text-xs font-bold">
                   {i + 1}
@@ -495,6 +498,25 @@ function HeritageLanding() {
               </div>
             ))}
           </div>
+          {LINEAGES.length > 4 && (
+            <div className="mt-4">
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-1.5"
+                onClick={() => setShowAllLineages((v) => !v)}
+              >
+                {showAllLineages
+                  ? t("heritage.lineages.seeLess", "See fewer lineages")
+                  : t("heritage.lineages.seeMore", "See more lineages")}
+                {showAllLineages ? (
+                  <ChevronUp className="h-4 w-4" />
+                ) : (
+                  <ChevronDown className="h-4 w-4" />
+                )}
+              </Button>
+            </div>
+          )}
         </Section>
 
         <div id="subtribes" className="scroll-mt-24">
