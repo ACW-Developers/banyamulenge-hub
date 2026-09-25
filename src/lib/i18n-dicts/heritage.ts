@@ -48,6 +48,8 @@ export const heritage: ModuleDict = {
     "heritage.lineages.title": "The Banyamulenge Lineages (Imirara)",
     "heritage.lineages.p1":
       "Twenty-eight recognized Banyamulenge lineages are remembered in oral tradition. These are <em>lineages or clans</em>, not separate tribes.",
+    "heritage.lineages.seeMore": "See more lineages",
+    "heritage.lineages.seeLess": "See fewer lineages",
 
     "heritage.hospitality.title": "Hospitality & Modern Banyamulenge",
     "heritage.hospitality.p1":
@@ -132,6 +134,8 @@ export const heritage: ModuleDict = {
     "heritage.lineages.title": "Koo za Wabanyamulenge (Imirara)",
     "heritage.lineages.p1":
       "Koo ishirini na nane zinazotambulika za Wabanyamulenge zinakumbukwa katika mapokeo ya mdomo. Hizi ni <em>koo au mirara</em>, si makabila tofauti.",
+    "heritage.lineages.seeMore": "Onyesha koo zaidi",
+    "heritage.lineages.seeLess": "Onyesha koo chache",
 
     "heritage.hospitality.title": "Ukarimu na Wabanyamulenge wa Sasa",
     "heritage.hospitality.p1":
@@ -216,6 +220,8 @@ export const heritage: ModuleDict = {
     "heritage.lineages.title": "Imirara y'Abanyamulenge",
     "heritage.lineages.p1":
       "Imirara mirongo ibiri n'umunani izwi y'Abanyamulenge iribukwa mu migani. Iyi ni <em>imirara cyangwa amoko</em>, ntabwo ari amoko atandukanye.",
+    "heritage.lineages.seeMore": "Erega imirara myinshi",
+    "heritage.lineages.seeLess": "Erega imirara mike",
 
     "heritage.hospitality.title": "Ubwakira n'Abanyamulenge b'Ubu",
     "heritage.hospitality.p1":
