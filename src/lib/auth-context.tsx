@@ -89,9 +89,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setIsAdmin(false);
       }
     });
-    supabase.auth.getSession().then(({ data }) => {
+    supabase.auth.getSession().then(async ({ data }) => {
       setSession(data.session);
-      if (data.session?.user) loadProfile(data.session.user);
+      if (data.session?.user) await loadProfile(data.session.user);
       setLoading(false);
     });
     return () => sub.subscription.unsubscribe();
