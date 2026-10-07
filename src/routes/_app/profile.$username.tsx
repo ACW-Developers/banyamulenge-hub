@@ -34,6 +34,51 @@ import { Textarea } from "@/components/ui/textarea";
 import { openConversationWith } from "@/lib/messaging";
 import { useNavigate } from "@tanstack/react-router";
 import { useI18n } from "@/lib/i18n";
+import { PostCard, type FeedPost } from "@/components/post-card";
+
+const POST_SELECT = `id, user_id, content, image_url, image_urls, video_url, created_at, is_announcement,
+  author:profiles!posts_author_profile_fkey(username, display_name, avatar_url),
+  likes(user_id), comments(id), reposts(user_id)`;
+
+async function fetchReposts(userId: string): Promise<FeedPost[]> {
+  const { data: rows, error } = await supabase
+    .from("reposts")
+    .select("post_id, created_at")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  if (!rows?.length) return [];
+  const { data, error: e2 } = await supabase
+    .from("posts")
+    .select(POST_SELECT)
+    .in("id", rows.map((r) => r.post_id));
+  if (e2) throw e2;
+  const byId = new Map(((data ?? []) as unknown as FeedPost[]).map((p) => [p.id, p]));
+  return rows
+    .map((r) => {
+      const p = byId.get(r.post_id);
+      return p ? { ...p, repostedAt: r.created_at } : null;
+    })
+    .filter(Boolean) as FeedPost[];
+}
+
+async function fetchLiked(userId: string): Promise<FeedPost[]> {
+  const { data: rows, error } = await supabase
+    .from("likes")
+    .select("post_id, created_at")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false })
+    .limit(60);
+  if (error) throw error;
+  if (!rows?.length) return [];
+  const { data, error: e2 } = await supabase
+    .from("posts")
+    .select(POST_SELECT)
+    .in("id", rows.map((r) => r.post_id));
+  if (e2) throw e2;
+  const byId = new Map(((data ?? []) as unknown as FeedPost[]).map((p) => [p.id, p]));
+  return rows.map((r) => byId.get(r.post_id)).filter(Boolean) as FeedPost[];
+}
 
 export const Route = createFileRoute("/_app/profile/$username")({
   component: ProfilePage,
@@ -63,11 +108,12 @@ async function fetchProfile(username: string) {
 async function fetchUserPosts(userId: string) {
   const { data, error } = await supabase
     .from("posts")
-    .select("id, content, image_url, created_at, likes(user_id), comments(id)")
+    .select(POST_SELECT)
     .eq("user_id", userId)
+    .is("group_id", null)
     .order("created_at", { ascending: false });
   if (error) throw error;
-  return data ?? [];
+  return (data ?? []) as unknown as FeedPost[];
 }
 
 async function fetchFollowStats(userId: string) {
@@ -255,16 +301,7 @@ function ProfilePage() {
         </div>
       </div>
 
-      <div className="rounded-2xl border bg-white p-8 text-center shadow-sm">
-        <h2 className="text-lg font-bold mb-1">{t("profile.postsFeed.title")}</h2>
-        <p className="text-sm text-gray-500">
-          {profile.display_name || profile.username} has {posts?.length ?? 0} post
-          {(posts?.length ?? 0) === 1 ? "" : "s"} - visit the home feed to like and comment.
-        </p>
-        <Link to="/" className="inline-block mt-4 text-primary font-semibold text-sm">
-          {t("profile.postsFeed.openFeed")}
-        </Link>
-      </div>
+      <ProfileActivity userId={profile.id} isSelf={user?.id === profile.id} posts={posts} />
     </div>
   );
 }
@@ -577,5 +614,90 @@ function FollowersDialog({
         </div>
       </DialogContent>
     </Dialog>
+  );
+}
+
+function ProfileActivity({
+  userId,
+  isSelf,
+  posts,
+}: {
+  userId: string;
+  isSelf: boolean;
+  posts: FeedPost[] | undefined;
+}) {
+  const { t } = useI18n();
+  const [tab, setTab] = useState<"posts" | "reposts" | "liked">("posts");
+  const { data: reposts, isLoading: rLoading } = useQuery({
+    queryKey: ["profile-reposts", userId],
+    queryFn: () => fetchReposts(userId),
+    enabled: tab === "reposts",
+  });
+  const { data: liked, isLoading: lLoading } = useQuery({
+    queryKey: ["profile-liked", userId],
+    queryFn: () => fetchLiked(userId),
+    enabled: isSelf && tab === "liked",
+  });
+
+  const tabs = [
+    { key: "posts" as const, label: t("profile.tabs.posts") },
+    { key: "reposts" as const, label: t("profile.tabs.reposts") },
+    ...(isSelf ? [{ key: "liked" as const, label: t("profile.tabs.liked") }] : []),
+  ];
+  const list = tab === "posts" ? posts : tab === "reposts" ? reposts : liked;
+  const loading = tab === "posts" ? !posts : tab === "reposts" ? rLoading : lLoading;
+  const queryKey =
+    tab === "posts"
+      ? ["profile-posts", userId]
+      : tab === "reposts"
+        ? ["profile-reposts", userId]
+        : ["profile-liked", userId];
+  const empty =
+    tab === "posts"
+      ? t("profile.postsEmpty")
+      : tab === "reposts"
+        ? t("profile.repostsEmpty")
+        : t("profile.likedEmpty");
+
+  return (
+    <div className="max-w-2xl mx-auto space-y-4">
+      <div className="rounded-2xl border bg-white shadow-sm p-1 flex">
+        {tabs.map((x) => (
+          <button
+            key={x.key}
+            type="button"
+            onClick={() => setTab(x.key)}
+            className={`flex-1 rounded-10 py-2 text-sm font-semibold transition-colors ${
+              tab === x.key ? "bg-primary text-primary-foreground" : "text-gray-500 hover:text-gray-900"
+            }`}
+          >
+            {x.label}
+          </button>
+        ))}
+      </div>
+      {loading ? (
+        <div className="flex justify-center py-10">
+          <Loader2 className="h-6 w-6 animate-spin text-primary" />
+        </div>
+      ) : list && list.length > 0 ? (
+        <div className="space-y-4">
+          {list.map((p) => (
+            <PostCard key={`${tab}-${p.id}`} post={p} queryKey={queryKey} />
+          ))}
+        </div>
+      ) : (
+        <div className="rounded-2xl border bg-white p-8 text-center shadow-sm text-sm text-gray-500">
+          {empty}
+        </div>
+      )}
+      <div className="text-center pb-2">
+        <Link
+          to="/"
+          className="inline-flex items-center rounded-10 border px-4 py-2 text-sm font-semibold text-primary hover:bg-primary/5"
+        >
+          {t("profile.postsFeed.openFeed")}
+        </Link>
+      </div>
+    </div>
   );
 }
