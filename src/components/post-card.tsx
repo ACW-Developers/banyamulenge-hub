@@ -262,6 +262,12 @@ export function PostCard({ post, queryKey }: { post: FeedPost; queryKey: readonl
         post.is_announcement ? "border-amber-300 bg-amber-50/40" : ""
       }`}
     >
+      {post.repostedAt && (
+        <div className="flex items-center gap-2 mb-3 text-emerald-700 text-xs font-semibold">
+          <Repeat2 className="h-4 w-4" /> {t("home.post.repostedLabel")} ·{" "}
+          {formatDistanceToNow(new Date(post.repostedAt), { addSuffix: true })}
+        </div>
+      )}
       {post.is_announcement && (
         <div className="flex items-center gap-2 mb-3 text-amber-700 text-xs font-bold uppercase tracking-wider">
           <Megaphone className="h-4 w-4" /> {t("home.post.announcement")}
