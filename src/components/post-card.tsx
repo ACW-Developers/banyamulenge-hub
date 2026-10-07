@@ -14,6 +14,9 @@ import {
   ChevronLeft,
   ChevronRight,
   Images,
+  Repeat2,
+  CornerDownRight,
+  X,
 } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -30,6 +33,12 @@ import {
 import { logActivity } from "@/lib/tracking";
 import { notifyError, notifySuccess } from "@/lib/notify";
 import { useI18n } from "@/lib/i18n";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 export type FeedPost = {
   id: string;
@@ -47,6 +56,9 @@ export type FeedPost = {
   } | null;
   likes: { user_id: string }[];
   comments: { id: string }[];
+  reposts?: { user_id: string }[];
+  /** Set when this card is shown as someone's repost. */
+  repostedAt?: string;
 };
 
 /** All photos on a post: the legacy single column plus the multi-photo list. */
@@ -63,6 +75,52 @@ export function PostCard({ post, queryKey }: { post: FeedPost; queryKey: readonl
   const [showComments, setShowComments] = useState(false);
   const [commentText, setCommentText] = useState("");
   const [lightbox, setLightbox] = useState<string | null>(null);
+  const [replyTo, setReplyTo] = useState<{ id: string; name: string } | null>(null);
+  const [showLikers, setShowLikers] = useState(false);
+  const reposts = post.reposts ?? [];
+  const reposted = user ? reposts.some((r) => r.user_id === user.id) : false;
+  const isOwner = user?.id === post.user_id;
+
+  const toggleRepost = useMutation({
+    mutationFn: async () => {
+      if (!user) throw new Error(t("home.post.signInFirst"));
+      if (isOwner) throw new Error(t("home.post.cantRepostOwn"));
+      if (reposted) {
+        const { error } = await supabase
+          .from("reposts")
+          .delete()
+          .eq("post_id", post.id)
+          .eq("user_id", user.id);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase
+          .from("reposts")
+          .insert({ post_id: post.id, user_id: user.id });
+        if (error) throw error;
+        logActivity(user.id, "post.repost", "post", post.id);
+      }
+    },
+    onSuccess: () => {
+      notifySuccess(reposted ? t("home.post.repostRemoved") : t("home.post.reposted"));
+      qc.invalidateQueries({ queryKey });
+      qc.invalidateQueries({ queryKey: ["profile-reposts"] });
+    },
+    onError: (e: Error) => notifyError(e.message),
+  });
+
+  const { data: likers, isLoading: likersLoading } = useQuery({
+    queryKey: ["likers", post.id, post.likes.length],
+    enabled: showLikers && isOwner,
+    queryFn: async () => {
+      const ids = post.likes.map((l) => l.user_id);
+      if (!ids.length) return [];
+      const { data } = await supabase
+        .from("profiles")
+        .select("id, username, display_name, avatar_url")
+        .in("id", ids);
+      return data ?? [];
+    },
+  });
   const images = postImages(post);
 
   const liked = user ? post.likes.some((l) => l.user_id === user.id) : false;
@@ -151,7 +209,7 @@ export function PostCard({ post, queryKey }: { post: FeedPost; queryKey: readonl
       const { data } = await supabase
         .from("comments")
         .select(
-          "id, content, created_at, user_id, profiles!comments_author_profile_fkey(username, display_name, avatar_url)",
+          "id, content, created_at, user_id, parent_id, profiles!comments_author_profile_fkey(username, display_name, avatar_url)",
         )
         .eq("post_id", post.id)
         .order("created_at", { ascending: true });
@@ -163,9 +221,15 @@ export function PostCard({ post, queryKey }: { post: FeedPost; queryKey: readonl
     if (!user || !commentText.trim()) return;
     const { error } = await supabase
       .from("comments")
-      .insert({ post_id: post.id, user_id: user.id, content: commentText.trim() });
+      .insert({
+        post_id: post.id,
+        user_id: user.id,
+        content: commentText.trim(),
+        parent_id: replyTo?.id ?? null,
+      });
     if (error) return notifyError(error.message);
     setCommentText("");
+    setReplyTo(null);
     logActivity(user.id, "post.comment", "post", post.id);
     refetchComments();
     qc.invalidateQueries({ queryKey });
@@ -198,6 +262,12 @@ export function PostCard({ post, queryKey }: { post: FeedPost; queryKey: readonl
         post.is_announcement ? "border-amber-300 bg-amber-50/40" : ""
       }`}
     >
+      {post.repostedAt && (
+        <div className="flex items-center gap-2 mb-3 text-emerald-700 text-xs font-semibold">
+          <Repeat2 className="h-4 w-4" /> {t("home.post.repostedLabel")} ·{" "}
+          {formatDistanceToNow(new Date(post.repostedAt), { addSuffix: true })}
+        </div>
+      )}
       {post.is_announcement && (
         <div className="flex items-center gap-2 mb-3 text-amber-700 text-xs font-bold uppercase tracking-wider">
           <Megaphone className="h-4 w-4" /> {t("home.post.announcement")}
@@ -290,37 +360,114 @@ export function PostCard({ post, queryKey }: { post: FeedPost; queryKey: readonl
           <MessageCircle className="h-4 w-4" />
           {post.comments.length}
         </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          className={`gap-2 ${reposted ? "text-emerald-600" : ""}`}
+          onClick={() => toggleRepost.mutate()}
+          disabled={isOwner || toggleRepost.isPending}
+          title={t("home.post.repost")}
+        >
+          <Repeat2 className="h-4 w-4" />
+          {reposts.length}
+        </Button>
         <Button variant="ghost" size="sm" className="gap-2" onClick={share}>
-          <Share2 className="h-4 w-4" /> {t("home.post.share")}
+          <Share2 className="h-4 w-4" />
+          <span className="hidden sm:inline">{t("home.post.share")}</span>
         </Button>
       </footer>
+      {isOwner && post.likes.length > 0 && (
+        <button
+          type="button"
+          onClick={() => setShowLikers(true)}
+          className="mt-1 text-xs text-gray-500 hover:text-primary hover:underline"
+        >
+          {t("home.post.viewLikes")}
+        </button>
+      )}
+      <Dialog open={showLikers} onOpenChange={setShowLikers}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>{t("home.post.likedBy")}</DialogTitle>
+          </DialogHeader>
+          {likersLoading ? (
+            <div className="flex justify-center py-6">
+              <Loader2 className="h-5 w-5 animate-spin text-primary" />
+            </div>
+          ) : (
+            <ul className="max-h-80 overflow-y-auto divide-y">
+              {(likers ?? []).map((p) => (
+                <li key={p.id}>
+                  <Link
+                    to="/profile/$username"
+                    params={{ username: p.username }}
+                    onClick={() => setShowLikers(false)}
+                    className="flex items-center gap-3 py-2"
+                  >
+                    <Avatar className="h-9 w-9">
+                      <AvatarImage src={p.avatar_url ?? undefined} />
+                      <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">
+                        {(p.display_name || p.username).slice(0, 1).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="min-w-0">
+                      <div className="text-sm font-semibold truncate">
+                        {p.display_name || p.username}
+                      </div>
+                      <div className="text-xs text-gray-500 truncate">@{p.username}</div>
+                    </div>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
+        </DialogContent>
+      </Dialog>
 
       {showComments && (
         <div className="mt-4 pt-4 border-t space-y-3">
-          {(comments ?? []).map((c) => {
-            const ci = (c.profiles?.display_name || c.profiles?.username || "?")
-              .slice(0, 1)
-              .toUpperCase();
-            return (
-              <div key={c.id} className="flex gap-2">
-                <Avatar className="h-8 w-8">
-                  <AvatarImage src={c.profiles?.avatar_url ?? undefined} />
-                  <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">
-                    {ci}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="flex-1 rounded-xl bg-gray-50 px-3 py-2">
-                  <div className="text-xs font-semibold">
-                    {c.profiles?.display_name || c.profiles?.username}
-                    <span className="text-gray-400 font-normal ml-2">
-                      {formatDistanceToNow(new Date(c.created_at), { addSuffix: true })}
-                    </span>
-                  </div>
-                  <div className="text-sm whitespace-pre-wrap">{c.content}</div>
-                </div>
+          {(comments ?? [])
+            .filter((c) => !c.parent_id)
+            .map((c) => (
+              <div key={c.id} className="space-y-2">
+                <CommentItem
+                  c={c}
+                  isCreator={c.user_id === post.user_id}
+                  creatorLabel={t("home.post.creator")}
+                  replyLabel={user ? t("home.post.reply") : null}
+                  onReply={() =>
+                    setReplyTo({ id: c.id, name: c.profiles?.display_name || c.profiles?.username || "" })
+                  }
+                />
+                {(comments ?? [])
+                  .filter((r) => r.parent_id === c.id)
+                  .map((r) => (
+                    <div key={r.id} className="ml-10 flex gap-1">
+                      <CornerDownRight className="h-4 w-4 text-gray-300 mt-2 shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <CommentItem
+                          c={r}
+                          small
+                          isCreator={r.user_id === post.user_id}
+                          creatorLabel={t("home.post.creator")}
+                          replyLabel={null}
+                          onReply={() => {}}
+                        />
+                      </div>
+                    </div>
+                  ))}
               </div>
-            );
-          })}
+            ))}
+          {replyTo && (
+            <div className="flex items-center justify-between rounded-lg bg-primary/5 px-3 py-1.5 text-xs text-primary">
+              <span>
+                {t("home.post.replyingTo")} <strong>{replyTo.name}</strong>
+              </span>
+              <button type="button" onClick={() => setReplyTo(null)} aria-label="Cancel reply">
+                <X className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          )}
           {user && (
             <div className="flex gap-2">
               <Textarea
@@ -346,7 +493,61 @@ export function PostCard({ post, queryKey }: { post: FeedPost; queryKey: readonl
   );
 }
 
+function CommentItem({
+  c,
+  isCreator,
+  creatorLabel,
+  replyLabel,
+  onReply,
+  small,
+}: {
+  c: CommentRow;
+  isCreator: boolean;
+  creatorLabel: string;
+  replyLabel: string | null;
+  onReply: () => void;
+  small?: boolean;
+}) {
+  const ci = (c.profiles?.display_name || c.profiles?.username || "?").slice(0, 1).toUpperCase();
+  return (
+    <div className="flex gap-2">
+      <Avatar className={small ? "h-7 w-7" : "h-8 w-8"}>
+        <AvatarImage src={c.profiles?.avatar_url ?? undefined} />
+        <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">
+          {ci}
+        </AvatarFallback>
+      </Avatar>
+      <div className="flex-1 min-w-0">
+        <div className="rounded-xl bg-gray-50 px-3 py-2">
+          <div className="text-xs font-semibold flex flex-wrap items-center gap-x-2 gap-y-0.5">
+            <span>{c.profiles?.display_name || c.profiles?.username}</span>
+            {isCreator && (
+              <span className="rounded-full bg-primary/10 text-primary px-1.5 py-px text-[10px] font-bold uppercase tracking-wide">
+                {creatorLabel}
+              </span>
+            )}
+            <span className="text-gray-400 font-normal">
+              {formatDistanceToNow(new Date(c.created_at), { addSuffix: true })}
+            </span>
+          </div>
+          <div className="text-sm whitespace-pre-wrap break-words">{c.content}</div>
+        </div>
+        {replyLabel && (
+          <button
+            type="button"
+            onClick={onReply}
+            className="ml-3 mt-0.5 text-xs font-semibold text-gray-500 hover:text-primary"
+          >
+            {replyLabel}
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
 type CommentRow = {
+  parent_id: string | null;
   id: string;
   content: string;
   created_at: string;

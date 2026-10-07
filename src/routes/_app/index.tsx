@@ -63,7 +63,8 @@ async function fetchFeed(): Promise<FeedPost[]> {
       `id, user_id, content, image_url, image_urls, video_url, created_at, is_announcement,
        author:profiles!posts_author_profile_fkey(username, display_name, avatar_url),
        likes(user_id),
-       comments(id)`,
+       comments(id),
+       reposts(user_id)`,
     )
     .is("group_id", null)
     .order("is_announcement", { ascending: false })
