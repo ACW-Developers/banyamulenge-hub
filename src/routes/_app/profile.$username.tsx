@@ -667,7 +667,7 @@ function ProfileActivity({
             key={x.key}
             type="button"
             onClick={() => setTab(x.key)}
-            className={`flex-1 rounded-10 py-2 text-sm font-semibold transition-colors ${
+            className={`flex-1 rounded-lg py-2 text-sm font-semibold transition-colors ${
               tab === x.key ? "bg-primary text-primary-foreground" : "text-gray-500 hover:text-gray-900"
             }`}
           >
@@ -693,7 +693,7 @@ function ProfileActivity({
       <div className="text-center pb-2">
         <Link
           to="/"
-          className="inline-flex items-center rounded-10 border px-4 py-2 text-sm font-semibold text-primary hover:bg-primary/5"
+          className="inline-flex items-center rounded-lg border px-4 py-2 text-sm font-semibold text-primary hover:bg-primary/5"
         >
           {t("profile.postsFeed.openFeed")}
         </Link>
