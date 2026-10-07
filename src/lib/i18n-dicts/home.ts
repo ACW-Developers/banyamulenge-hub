@@ -19,7 +19,7 @@ export const home: ModuleDict = {
     "home.post.repost": "Repost",
     "home.post.reposted": "Reposted to your profile",
     "home.post.repostRemoved": "Repost removed",
-    "home.post.cantRepostOwn": "You can"t repost your own post",
+    "home.post.cantRepostOwn": "You cannot repost your own post",
     "home.post.repostedLabel": "Reposted",
     "home.post.viewLikes": "See who liked this",
     "home.post.likedBy": "Liked by",
