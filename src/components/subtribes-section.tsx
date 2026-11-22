@@ -4,6 +4,7 @@ import { Users2, Plus, Pencil, Trash2, Loader2, Search, Upload, X } from "lucide
 
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
+import { useI18n } from "@/lib/i18n";
 import { uploadPostImage } from "@/lib/upload";
 import { toast } from "@/lib/notify";
 import { Button } from "@/components/ui/button";
@@ -35,6 +36,7 @@ const KEY = ["subtribes"] as const;
 
 export function SubtribesSection() {
   const { isAdmin } = useAuth();
+  const { t } = useI18n();
   const qc = useQueryClient();
   const [q, setQ] = useState("");
   const [open, setOpen] = useState(false);
@@ -78,17 +80,24 @@ export function SubtribesSection() {
   });
 
   return (
-    <section className="rounded-2xl border bg-white overflow-hidden shadow-sm">
-      <div className="p-6 sm:p-8">
-        <div className="flex flex-wrap items-center gap-3 mb-4">
-          <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary border border-primary/20">
+    <section className="overflow-hidden rounded-[30px] border border-heritage/10 bg-card shadow-sm">
+      <div className="p-6 sm:p-9 lg:p-12">
+        <div className="flex flex-wrap items-center gap-4">
+          <div className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-heritage-soft text-heritage">
             <Users2 className="h-5 w-5" />
           </div>
-          <h2 className="text-xl sm:text-2xl font-bold">Subtribes of the Banyamulenge</h2>
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-heritage">
+              {t("land.nav.subtribes", "Subtribes")}
+            </p>
+            <h2 className="mt-1 text-2xl font-semibold tracking-tight text-heritage-ink sm:text-3xl">
+              Subtribes of the Banyamulenge
+            </h2>
+          </div>
           {isAdmin && (
             <Button
               size="sm"
-              className="ml-auto gap-2"
+              className="ml-auto gap-2 rounded-full bg-heritage px-5 text-heritage-foreground hover:bg-heritage-deep"
               onClick={() => {
                 setEditing(null);
                 setOpen(true);
@@ -99,63 +108,64 @@ export function SubtribesSection() {
           )}
         </div>
 
-        <p className="text-gray-700 leading-relaxed">
+        <p className="mt-5 max-w-3xl text-sm leading-7 text-heritage-muted">
           Each subtribe carries its own identity, memories and way of life. These records are kept
           by the community so the history is preserved accurately for the generations to come.
         </p>
 
         {(data ?? []).length > 4 && (
-          <div className="relative mt-5 max-w-sm">
-            <Search className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+          <div className="relative mt-7 max-w-sm">
+            <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-heritage-muted" />
             <Input
               value={q}
               onChange={(e) => setQ(e.target.value)}
               placeholder="Search subtribes…"
-              className="pl-9"
+              className="h-11 rounded-full border-heritage/15 bg-heritage-soft/40 pl-11"
             />
           </div>
         )}
 
         {isLoading ? (
           <div className="flex justify-center py-10">
-            <Loader2 className="h-6 w-6 animate-spin text-primary" />
+            <Loader2 className="h-6 w-6 animate-spin text-heritage" />
           </div>
         ) : filtered.length === 0 ? (
-          <div className="mt-5 rounded-xl border border-dashed p-8 text-center text-sm text-gray-500">
+          <div className="mt-7 rounded-[22px] border border-dashed border-heritage/20 bg-heritage-soft/40 p-8 text-center text-sm text-heritage-muted">
             {isAdmin
               ? "No subtribe records yet - use “Add subtribe” to capture the first one."
               : "Subtribe records are being gathered and will appear here soon."}
           </div>
         ) : (
-          <div className="grid sm:grid-cols-2 gap-4 mt-5">
+          <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {filtered.map((s) => (
               <article
                 key={s.id}
-                className="group rounded-2xl border bg-gray-50/40 overflow-hidden hover:border-primary/40 hover:shadow-md transition flex flex-col"
+                className="group flex flex-col overflow-hidden rounded-[24px] border border-heritage/10 bg-card transition duration-300 hover:-translate-y-1 hover:border-heritage/30 hover:shadow-xl hover:shadow-heritage/10"
               >
                 {s.image_url && (
-                  <button onClick={() => setViewing(s)} className="relative h-40 w-full">
+                  <button onClick={() => setViewing(s)} className="relative h-52 w-full overflow-hidden">
                     <img
                       loading="lazy"
                       src={s.image_url}
                       alt={s.name}
-                      className="absolute inset-0 h-full w-full object-cover"
+                      className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-105"
                     />
+                    <span className="absolute inset-0 bg-gradient-to-t from-heritage-ink/35 to-transparent" />
                   </button>
                 )}
-                <div className="p-4 flex-1 flex flex-col">
-                  <h3 className="font-bold text-gray-900">{s.name}</h3>
-                  <p className="mt-1.5 text-sm text-gray-600 line-clamp-3">{s.description}</p>
+                <div className="flex flex-1 flex-col p-5">
+                  <h3 className="text-lg font-semibold text-heritage-ink">{s.name}</h3>
+                  <p className="mt-2 line-clamp-3 text-sm leading-6 text-heritage-muted">{s.description}</p>
                   {s.identity && (
-                    <p className="mt-2 text-xs text-gray-500">
-                      <span className="font-semibold text-gray-700">Identity: </span>
+                    <p className="mt-3 rounded-2xl bg-heritage-soft/60 p-3 text-xs leading-5 text-heritage-muted">
+                      <span className="font-semibold text-heritage-ink">Identity: </span>
                       <span className="line-clamp-2">{s.identity}</span>
                     </p>
                   )}
-                  <div className="mt-auto pt-3 flex items-center justify-between">
+                  <div className="mt-auto flex items-center justify-between pt-5">
                     <button
                       onClick={() => setViewing(s)}
-                      className="text-xs font-semibold text-primary hover:underline"
+                      className="text-xs font-semibold text-heritage hover:underline"
                     >
                       Read full record
                     </button>
@@ -166,14 +176,14 @@ export function SubtribesSection() {
                             setEditing(s);
                             setOpen(true);
                           }}
-                          className="text-gray-400 hover:text-primary p-1"
+                          className="p-1 text-heritage-muted transition hover:text-heritage"
                           aria-label="Edit subtribe"
                         >
                           <Pencil className="h-3.5 w-3.5" />
                         </button>
                         <button
                           onClick={() => confirm(`Delete ${s.name}?`) && del.mutate(s.id)}
-                          className="text-gray-400 hover:text-red-500 p-1"
+                          className="p-1 text-heritage-muted transition hover:text-destructive"
                           aria-label="Delete subtribe"
                         >
                           <Trash2 className="h-3.5 w-3.5" />

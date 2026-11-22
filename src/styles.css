@@ -7,6 +7,8 @@
 @theme inline {
   --font-sans: "Quicksand", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Quicksand", ui-sans-serif, system-ui, sans-serif;
+  --font-heritage: "Poppins", ui-sans-serif, system-ui, sans-serif;
+  --font-heritage-script: "Allura", cursive;
 
   --radius-sm: 10px;
   --radius-md: 10px;
@@ -23,6 +25,13 @@
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
   --color-primary-glow: var(--primary-glow);
+  --color-heritage: var(--heritage);
+  --color-heritage-foreground: var(--heritage-foreground);
+  --color-heritage-glow: var(--heritage-glow);
+  --color-heritage-deep: var(--heritage-deep);
+  --color-heritage-soft: var(--heritage-soft);
+  --color-heritage-ink: var(--heritage-ink);
+  --color-heritage-muted: var(--heritage-muted);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
@@ -65,6 +74,13 @@
   --primary: oklch(0.68 0.2 45);
   --primary-foreground: oklch(0.99 0 0);
   --primary-glow: oklch(0.78 0.19 55);
+  --heritage: oklch(0.55 0.19 250);
+  --heritage-foreground: oklch(0.99 0 0);
+  --heritage-glow: oklch(0.72 0.15 235);
+  --heritage-deep: oklch(0.4 0.15 255);
+  --heritage-soft: oklch(0.95 0.025 240);
+  --heritage-ink: oklch(0.23 0.045 250);
+  --heritage-muted: oklch(0.48 0.04 250);
   --secondary: oklch(0.965 0.02 60);
   --secondary-foreground: oklch(0.3 0.05 40);
   --muted: oklch(0.965 0.015 60);
@@ -96,6 +112,13 @@
   --primary: oklch(0.72 0.2 50);
   --primary-foreground: oklch(0.15 0.02 40);
   --primary-glow: oklch(0.8 0.18 55);
+  --heritage: oklch(0.68 0.16 245);
+  --heritage-foreground: oklch(0.99 0 0);
+  --heritage-glow: oklch(0.78 0.13 235);
+  --heritage-deep: oklch(0.55 0.17 250);
+  --heritage-soft: oklch(0.25 0.045 250);
+  --heritage-ink: oklch(0.96 0.01 240);
+  --heritage-muted: oklch(0.75 0.025 245);
   --secondary: oklch(0.26 0.03 40);
   --secondary-foreground: oklch(0.97 0.01 60);
   --muted: oklch(0.24 0.02 40);
