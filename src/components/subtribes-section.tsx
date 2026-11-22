@@ -97,7 +97,7 @@ export function SubtribesSection() {
           {isAdmin && (
             <Button
               size="sm"
-              className="ml-auto gap-2 rounded-full bg-heritage px-5 text-heritage-foreground hover:bg-heritage-deep"
+              className="ml-auto gap-2 rounded-md bg-heritage px-5 text-heritage-foreground hover:bg-heritage-deep"
               onClick={() => {
                 setEditing(null);
                 setOpen(true);
@@ -120,7 +120,7 @@ export function SubtribesSection() {
               value={q}
               onChange={(e) => setQ(e.target.value)}
               placeholder="Search subtribes…"
-              className="h-11 rounded-full border-heritage/15 bg-heritage-soft/40 pl-11"
+              className="h-11 rounded-md border-heritage/15 bg-heritage-soft/40 pl-11"
             />
           </div>
         )}
@@ -212,7 +212,7 @@ export function SubtribesSection() {
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
                   <button
                     onClick={() => setViewing(null)}
-                    className="absolute top-3 right-3 rounded-full bg-black/40 text-white p-1.5"
+                    className="absolute top-3 right-3 rounded-md bg-black/40 text-white p-1.5"
                     aria-label="Close"
                   >
                     <X className="h-4 w-4" />

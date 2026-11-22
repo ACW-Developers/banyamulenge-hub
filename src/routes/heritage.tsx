@@ -90,9 +90,9 @@ const LINEAGE_NAMES = [
 ];
 
 const primaryButton =
-  "rounded-full border-0 bg-heritage px-6 text-heritage-foreground shadow-lg shadow-heritage/20 hover:bg-heritage-deep";
+  "rounded-md border-0 bg-heritage px-6 text-heritage-foreground shadow-lg shadow-heritage/20 hover:bg-heritage-deep";
 const secondaryButton =
-  "rounded-full border-heritage/20 bg-card/85 px-6 text-heritage shadow-none backdrop-blur hover:border-heritage/40 hover:bg-card hover:text-heritage-deep";
+  "rounded-md border-heritage/20 bg-card/85 px-6 text-heritage shadow-none backdrop-blur hover:border-heritage/40 hover:bg-card hover:text-heritage-deep";
 
 function splitHeroTitle(title: string) {
   const words = title.trim().split(" ");
@@ -166,11 +166,11 @@ function LandingNavbar() {
           <a
             href="tel:+15207361677"
             aria-label="+1 (520) 736-1677"
-            className="mr-1 hidden h-10 w-10 place-items-center rounded-full bg-heritage-soft text-heritage transition hover:bg-heritage hover:text-heritage-foreground min-[1700px]:grid"
+            className="mr-1 hidden h-10 w-10 place-items-center rounded-md bg-heritage-soft text-heritage transition hover:bg-heritage hover:text-heritage-foreground min-[1700px]:grid"
           >
             <Phone className="h-4 w-4" />
           </a>
-          <LanguageSelector className="h-10 rounded-full border-heritage/15 px-3 text-heritage-ink hover:border-heritage/35 hover:bg-heritage-soft" />
+          <LanguageSelector className="h-10 rounded-md border-heritage/15 px-3 text-heritage-ink hover:border-heritage/35 hover:bg-heritage-soft" />
 
           {session ? (
             <Button asChild size="sm" className={`hidden h-10 sm:inline-flex ${primaryButton}`}>
@@ -186,7 +186,7 @@ function LandingNavbar() {
                 asChild
                 size="sm"
                 variant="ghost"
-                className="hidden h-10 rounded-full px-3 text-heritage-ink hover:bg-heritage-soft hover:text-heritage sm:inline-flex"
+                className="hidden h-10 rounded-md px-3 text-heritage-ink hover:bg-heritage-soft hover:text-heritage sm:inline-flex"
               >
                 <Link to="/auth" search={{ mode: "signin" }}>
                   <LogIn className="h-4 w-4" />
@@ -203,7 +203,7 @@ function LandingNavbar() {
           )}
 
           <button
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-heritage/15 p-0 text-heritage-ink transition hover:bg-heritage-soft xl:hidden"
+            className="flex h-10 w-10 items-center justify-center rounded-md border border-heritage/15 p-0 text-heritage-ink transition hover:bg-heritage-soft xl:hidden"
             onClick={() => setOpen((value) => !value)}
             aria-label="Menu"
             aria-expanded={open}
@@ -702,7 +702,7 @@ function HeritageLanding() {
                 <h2 className="mt-4 max-w-md text-3xl font-semibold tracking-tight">
                   {t("land.cta.title", "Be part of the story")}
                 </h2>
-                <Button asChild className="mt-6 rounded-full bg-card px-6 text-heritage hover:bg-heritage-soft">
+                <Button asChild className="mt-6 rounded-md bg-card px-6 text-heritage hover:bg-heritage-soft">
                   <Link to="/auth" search={{ mode: "signup" }}>
                     {t("auth.createAccount")}
                     <ArrowRight className="h-4 w-4" />
@@ -730,7 +730,7 @@ function HeritageLanding() {
                 </p>
               </div>
               <div className="flex flex-wrap gap-3">
-                <Button asChild size="lg" className="rounded-full bg-card px-6 text-heritage hover:bg-heritage-soft">
+                <Button asChild size="lg" className="rounded-md bg-card px-6 text-heritage hover:bg-heritage-soft">
                   <Link to="/auth" search={{ mode: "signup" }}>
                     {t("auth.createAccount")}
                     <ArrowRight className="h-4 w-4" />
@@ -740,7 +740,7 @@ function HeritageLanding() {
                   asChild
                   size="lg"
                   variant="outline"
-                  className="rounded-full border-card/35 bg-transparent px-6 text-card hover:bg-card/10 hover:text-card"
+                  className="rounded-md border-card/35 bg-transparent px-6 text-card hover:bg-card/10 hover:text-card"
                 >
                   <Link to="/auth" search={{ mode: "signin" }}>
                     {t("auth.login")}
