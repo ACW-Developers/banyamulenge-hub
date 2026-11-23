@@ -33,12 +33,7 @@ import {
 import { logActivity } from "@/lib/tracking";
 import { notifyError, notifySuccess } from "@/lib/notify";
 import { useI18n } from "@/lib/i18n";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 export type FeedPost = {
   id: string;
@@ -219,14 +214,12 @@ export function PostCard({ post, queryKey }: { post: FeedPost; queryKey: readonl
 
   async function submitComment() {
     if (!user || !commentText.trim()) return;
-    const { error } = await supabase
-      .from("comments")
-      .insert({
-        post_id: post.id,
-        user_id: user.id,
-        content: commentText.trim(),
-        parent_id: replyTo?.id ?? null,
-      });
+    const { error } = await supabase.from("comments").insert({
+      post_id: post.id,
+      user_id: user.id,
+      content: commentText.trim(),
+      parent_id: replyTo?.id ?? null,
+    });
     if (error) return notifyError(error.message);
     setCommentText("");
     setReplyTo(null);
@@ -436,7 +429,10 @@ export function PostCard({ post, queryKey }: { post: FeedPost; queryKey: readonl
                   creatorLabel={t("home.post.creator")}
                   replyLabel={user ? t("home.post.reply") : null}
                   onReply={() =>
-                    setReplyTo({ id: c.id, name: c.profiles?.display_name || c.profiles?.username || "" })
+                    setReplyTo({
+                      id: c.id,
+                      name: c.profiles?.display_name || c.profiles?.username || "",
+                    })
                   }
                 />
                 {(comments ?? [])

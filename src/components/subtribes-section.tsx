@@ -143,7 +143,10 @@ export function SubtribesSection() {
                 className="group flex flex-col overflow-hidden rounded-[24px] border border-heritage/10 bg-card transition duration-300 hover:-translate-y-1 hover:border-heritage/30 hover:shadow-xl hover:shadow-heritage/10"
               >
                 {s.image_url && (
-                  <button onClick={() => setViewing(s)} className="relative h-52 w-full overflow-hidden">
+                  <button
+                    onClick={() => setViewing(s)}
+                    className="relative h-52 w-full overflow-hidden"
+                  >
                     <img
                       loading="lazy"
                       src={s.image_url}
@@ -155,7 +158,9 @@ export function SubtribesSection() {
                 )}
                 <div className="flex flex-1 flex-col p-5">
                   <h3 className="text-lg font-semibold text-heritage-ink">{s.name}</h3>
-                  <p className="mt-2 line-clamp-3 text-sm leading-6 text-heritage-muted">{s.description}</p>
+                  <p className="mt-2 line-clamp-3 text-sm leading-6 text-heritage-muted">
+                    {s.description}
+                  </p>
                   {s.identity && (
                     <p className="mt-3 rounded-2xl bg-heritage-soft/60 p-3 text-xs leading-5 text-heritage-muted">
                       <span className="font-semibold text-heritage-ink">Identity: </span>

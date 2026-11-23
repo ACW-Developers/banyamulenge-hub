@@ -146,7 +146,11 @@ function LandingNavbar() {
   return (
     <header className="sticky top-0 z-40 border-b border-heritage/10 bg-card/95 backdrop-blur-xl">
       <div className="relative mx-auto flex h-[76px] max-w-7xl items-center gap-4 px-4 sm:px-6 lg:px-8">
-        <Link to="/heritage" className="flex shrink-0 items-center" aria-label="Banyamulenge Heritage Hub">
+        <Link
+          to="/heritage"
+          className="flex shrink-0 items-center"
+          aria-label="Banyamulenge Heritage Hub"
+        >
           <Logo variant="horizontal" className="h-14 w-auto max-w-[190px] object-contain" />
         </Link>
 
@@ -371,7 +375,9 @@ function ChapterCard({
         </span>
       </div>
       <div className="p-6 sm:p-7">
-        <h3 className="text-xl font-semibold tracking-tight text-heritage-ink sm:text-2xl">{title}</h3>
+        <h3 className="text-xl font-semibold tracking-tight text-heritage-ink sm:text-2xl">
+          {title}
+        </h3>
         <div className="mt-4 space-y-4 text-sm leading-7 text-heritage-muted [&_em]:text-heritage [&_strong]:font-semibold [&_strong]:text-heritage-ink">
           {children}
         </div>
@@ -384,7 +390,7 @@ function LandingFooter() {
   const { t } = useI18n();
   const year = new Date().getFullYear();
   return (
-    <footer className="mt-20 bg-heritage-ink text-card/70">
+    <footer className="mt-20 bg-black text-card/70">
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:grid-cols-2 sm:px-6 lg:grid-cols-6 lg:px-8">
         <div className="sm:col-span-2 lg:col-span-2">
           <Logo
@@ -434,18 +440,29 @@ function LandingFooter() {
           <ul className="mt-4 space-y-3 text-sm">
             <li className="flex items-center gap-2.5">
               <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-heritage-glow" />
-              <Link to="/auth" search={{ mode: "signup" }} className="transition-colors hover:text-card">
+              <Link
+                to="/auth"
+                search={{ mode: "signup" }}
+                className="transition-colors hover:text-card"
+              >
                 {t("auth.createAccount")}
               </Link>
             </li>
             <li className="flex items-center gap-2.5">
               <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-heritage-glow" />
-              <Link to="/auth" search={{ mode: "signin" }} className="transition-colors hover:text-card">
+              <Link
+                to="/auth"
+                search={{ mode: "signin" }}
+                className="transition-colors hover:text-card"
+              >
                 {t("auth.login")}
               </Link>
             </li>
             <li>
-              <a href="tel:+15207361677" className="flex items-center gap-2 transition-colors hover:text-card">
+              <a
+                href="tel:+15207361677"
+                className="flex items-center gap-2 transition-colors hover:text-card"
+              >
                 <Phone className="h-3.5 w-3.5" />
                 +1 (520) 736-1677
               </a>
@@ -479,7 +496,9 @@ function HeritageLanding() {
   const navigate = useNavigate();
   const { isVisible, isLoading } = useModuleSettings();
   const [showAllLineages, setShowAllLineages] = useState(false);
-  const lineages = LINEAGE_NAMES.map((name, index) => [name, t(`heritage.lineage.${index + 1}`)] as const);
+  const lineages = LINEAGE_NAMES.map(
+    (name, index) => [name, t(`heritage.lineage.${index + 1}`)] as const,
+  );
   const heroTitle = splitHeroTitle(t("heritage.hero.title"));
 
   const heritageOn = isVisible("heritage");
@@ -491,41 +510,65 @@ function HeritageLanding() {
     <div className="flex min-h-screen flex-col bg-background font-heritage text-heritage-ink">
       <LandingNavbar />
 
-      <section className="relative isolate overflow-hidden bg-heritage-soft">
+      <section className="relative isolate overflow-hidden bg-[#071A33]">
+        {/* Full-width heritage background image */}
         <img
           src={groupImg}
           alt={t("heritage.hero.imageAlt")}
           className="absolute inset-0 h-full w-full object-cover object-[62%_center]"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-card via-card/90 to-card/10" />
-        <div className="absolute inset-0 bg-gradient-to-t from-heritage-soft/35 via-transparent to-card/10" />
 
+        {/* Subtle navy overlay for contrast without hiding the photograph */}
+        <div className="absolute inset-0 bg-[#071A33]/45" />
+
+        {/* Gentle directional navy gradient for text readability */}
+        <div className="absolute inset-0 bg-gradient-to-r from-[#071A33]/80 via-[#071A33]/45 to-transparent" />
+
+        {/* Subtle bottom gradient for visual depth */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#071A33]/35 via-transparent to-[#071A33]/10" />
+
+        {/* Hero content */}
         <div className="relative z-10 mx-auto flex min-h-[610px] max-w-7xl items-center px-4 pb-32 pt-16 sm:min-h-[650px] sm:px-6 sm:pb-36 lg:px-8">
           <div className="max-w-3xl">
-            <span className="inline-flex items-center gap-2 rounded-full border border-heritage/15 bg-card/85 px-4 py-2 text-xs font-semibold text-heritage shadow-sm backdrop-blur">
-              <MapPin className="h-3.5 w-3.5" />
+            {/* Heritage label */}
+            <span className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-[#071A33]/40 px-4 py-2 text-xs font-semibold text-white shadow-sm backdrop-blur-sm">
+              <MapPin className="h-3.5 w-3.5 text-white" />
               {t("heritage.title")}
             </span>
 
-            <h1 className="mt-6 text-4xl font-semibold leading-[1.08] tracking-[-0.045em] text-heritage-ink sm:text-6xl lg:text-7xl">
+            {/* Main heading */}
+            <h1 className="mt-6 text-4xl font-semibold leading-[1.08] tracking-[-0.045em] text-white sm:text-6xl lg:text-7xl">
               {heroTitle.lead && <span className="block">{heroTitle.lead}</span>}
-              <span className="mt-1 block font-heritage-script text-[1.45em] font-normal leading-[0.95] tracking-normal text-heritage">
+
+              <span className="mt-1 block font-heritage-script text-[1.45em] font-semibold leading-[0.95] tracking-normal text-heritage">
                 {heroTitle.accent}
               </span>
             </h1>
 
-            <p className="mt-6 max-w-xl text-sm leading-7 text-heritage-muted sm:text-base">
+            {/* Hero description */}
+            <p className="mt-6 max-w-xl text-sm leading-7 text-white/90 sm:text-base">
               {t("heritage.subtitle")}
             </p>
 
+            {/* CTA buttons */}
             <div className="mt-8 flex flex-wrap gap-3">
-              <Button asChild size="lg" className={primaryButton}>
+              <Button
+                asChild
+                size="lg"
+                className="rounded-md border border-white bg-white px-6 font-semibold text-[#071A33] shadow-lg transition hover:bg-white/90 hover:text-[#071A33]"
+              >
                 <Link to="/auth" search={{ mode: "signup" }}>
                   {t("land.cta.join", "Create your free account")}
                   <ArrowRight className="h-4 w-4" />
                 </Link>
               </Button>
-              <Button asChild size="lg" variant="outline" className={secondaryButton}>
+
+              <Button
+                asChild
+                size="lg"
+                variant="outline"
+                className="rounded-md border border-white/50 bg-[#071A33]/25 px-6 font-semibold text-white backdrop-blur-sm transition hover:border-white hover:bg-white/15 hover:text-white"
+              >
                 <a href="#story">
                   {t("land.cta.read", "Read our story")}
                   <ArrowUpRight className="h-4 w-4" />
@@ -540,8 +583,14 @@ function HeritageLanding() {
       <HeritageHighlights />
 
       <main className="flex-1">
-        <section id="story" className="mx-auto max-w-7xl scroll-mt-28 px-4 py-10 sm:px-6 sm:py-16 lg:px-8">
-          <SectionHeading eyebrow={t("land.nav.story", "Our Story")} title={t("heritage.intro.title")} />
+        <section
+          id="story"
+          className="mx-auto max-w-7xl scroll-mt-28 px-4 py-10 sm:px-6 sm:py-16 lg:px-8"
+        >
+          <SectionHeading
+            eyebrow={t("land.nav.story", "Our Story")}
+            title={t("heritage.intro.title")}
+          />
           <div className="mt-9 grid items-stretch gap-6 lg:grid-cols-[0.9fr_1.1fr]">
             <div className="flex flex-col justify-center rounded-[28px] border border-heritage/10 bg-card p-7 shadow-sm sm:p-10">
               <div className="space-y-5 text-sm leading-8 text-heritage-muted sm:text-base [&_em]:text-heritage [&_strong]:font-semibold [&_strong]:text-heritage-ink">
@@ -594,7 +643,10 @@ function HeritageLanding() {
                   t("heritage.origins.list3"),
                   t("heritage.origins.list4"),
                 ].map((item) => (
-                  <li key={item} className="flex items-start gap-2 rounded-2xl bg-heritage-soft/70 p-3 text-xs leading-5">
+                  <li
+                    key={item}
+                    className="flex items-start gap-2 rounded-2xl bg-heritage-soft/70 p-3 text-xs leading-5"
+                  >
                     <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-heritage" />
                     {item}
                   </li>
@@ -640,9 +692,15 @@ function HeritageLanding() {
           </div>
         </section>
 
-        <section id="lineages" className="mx-auto max-w-7xl scroll-mt-28 px-4 py-10 sm:px-6 sm:py-16 lg:px-8">
+        <section
+          id="lineages"
+          className="mx-auto max-w-7xl scroll-mt-28 px-4 py-10 sm:px-6 sm:py-16 lg:px-8"
+        >
           <div className="rounded-[32px] border border-heritage/10 bg-heritage-soft/65 p-6 sm:p-9 lg:p-12">
-            <SectionHeading eyebrow={t("land.nav.lineages", "Lineages")} title={t("heritage.lineages.title")} />
+            <SectionHeading
+              eyebrow={t("land.nav.lineages", "Lineages")}
+              title={t("heritage.lineages.title")}
+            />
             <div
               className="mt-4 max-w-3xl text-sm leading-7 text-heritage-muted [&_em]:text-heritage [&_strong]:font-semibold"
               dangerouslySetInnerHTML={{ __html: t("heritage.lineages.p1") }}
@@ -674,35 +732,56 @@ function HeritageLanding() {
                   {showAllLineages
                     ? t("heritage.lineages.seeLess", "See fewer lineages")
                     : t("heritage.lineages.seeMore", "See more lineages")}
-                  {showAllLineages ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                  {showAllLineages ? (
+                    <ChevronUp className="h-4 w-4" />
+                  ) : (
+                    <ChevronDown className="h-4 w-4" />
+                  )}
                 </Button>
               </div>
             )}
           </div>
         </section>
 
-        <section id="subtribes" className="mx-auto max-w-7xl scroll-mt-28 px-4 py-10 sm:px-6 sm:py-16 lg:px-8">
+        <section
+          id="subtribes"
+          className="mx-auto max-w-7xl scroll-mt-28 px-4 py-10 sm:px-6 sm:py-16 lg:px-8"
+        >
           <SubtribesSection />
         </section>
 
-        <section id="hospitality" className="mx-auto max-w-7xl scroll-mt-28 px-4 py-10 sm:px-6 sm:py-16 lg:px-8">
+        <section
+          id="hospitality"
+          className="mx-auto max-w-7xl scroll-mt-28 px-4 py-10 sm:px-6 sm:py-16 lg:px-8"
+        >
           <div className="grid items-center gap-8 lg:grid-cols-2 lg:gap-14">
             <div>
-              <SectionHeading eyebrow={t("heritage.title")} title={t("heritage.hospitality.title")} />
+              <SectionHeading
+                eyebrow={t("heritage.title")}
+                title={t("heritage.hospitality.title")}
+              />
               <div className="mt-6 space-y-5 text-sm leading-8 text-heritage-muted sm:text-base [&_strong]:font-semibold [&_strong]:text-heritage-ink">
                 <p dangerouslySetInnerHTML={{ __html: t("heritage.hospitality.p1") }} />
                 <p dangerouslySetInnerHTML={{ __html: t("heritage.hospitality.p2") }} />
               </div>
             </div>
             <div className="relative min-h-[390px] overflow-hidden rounded-[30px] shadow-2xl shadow-heritage-ink/15">
-              <img src={groupImg} alt={t("heritage.hero.imageAlt")} loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
+              <img
+                src={groupImg}
+                alt={t("heritage.hero.imageAlt")}
+                loading="lazy"
+                className="absolute inset-0 h-full w-full object-cover"
+              />
               <div className="absolute inset-0 bg-gradient-to-t from-heritage-ink/85 via-heritage-ink/20 to-transparent" />
               <div className="absolute inset-x-0 bottom-0 p-7 text-card sm:p-9">
                 <HeartHandshake className="h-8 w-8 text-heritage-glow" />
                 <h2 className="mt-4 max-w-md text-3xl font-semibold tracking-tight">
                   {t("land.cta.title", "Be part of the story")}
                 </h2>
-                <Button asChild className="mt-6 rounded-md bg-card px-6 text-heritage hover:bg-heritage-soft">
+                <Button
+                  asChild
+                  className="mt-6 rounded-md bg-card px-6 text-heritage hover:bg-heritage-soft"
+                >
                   <Link to="/auth" search={{ mode: "signup" }}>
                     {t("auth.createAccount")}
                     <ArrowRight className="h-4 w-4" />
@@ -730,7 +809,11 @@ function HeritageLanding() {
                 </p>
               </div>
               <div className="flex flex-wrap gap-3">
-                <Button asChild size="lg" className="rounded-md bg-card px-6 text-heritage hover:bg-heritage-soft">
+                <Button
+                  asChild
+                  size="lg"
+                  className="rounded-md bg-card px-6 text-heritage hover:bg-heritage-soft"
+                >
                   <Link to="/auth" search={{ mode: "signup" }}>
                     {t("auth.createAccount")}
                     <ArrowRight className="h-4 w-4" />

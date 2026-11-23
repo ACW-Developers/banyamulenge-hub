@@ -51,7 +51,10 @@ async function fetchReposts(userId: string): Promise<FeedPost[]> {
   const { data, error: e2 } = await supabase
     .from("posts")
     .select(POST_SELECT)
-    .in("id", rows.map((r) => r.post_id));
+    .in(
+      "id",
+      rows.map((r) => r.post_id),
+    );
   if (e2) throw e2;
   const byId = new Map(((data ?? []) as unknown as FeedPost[]).map((p) => [p.id, p]));
   return rows
@@ -74,7 +77,10 @@ async function fetchLiked(userId: string): Promise<FeedPost[]> {
   const { data, error: e2 } = await supabase
     .from("posts")
     .select(POST_SELECT)
-    .in("id", rows.map((r) => r.post_id));
+    .in(
+      "id",
+      rows.map((r) => r.post_id),
+    );
   if (e2) throw e2;
   const byId = new Map(((data ?? []) as unknown as FeedPost[]).map((p) => [p.id, p]));
   return rows.map((r) => byId.get(r.post_id)).filter(Boolean) as FeedPost[];
@@ -668,7 +674,9 @@ function ProfileActivity({
             type="button"
             onClick={() => setTab(x.key)}
             className={`flex-1 rounded-lg py-2 text-sm font-semibold transition-colors ${
-              tab === x.key ? "bg-primary text-primary-foreground" : "text-gray-500 hover:text-gray-900"
+              tab === x.key
+                ? "bg-primary text-primary-foreground"
+                : "text-gray-500 hover:text-gray-900"
             }`}
           >
             {x.label}
