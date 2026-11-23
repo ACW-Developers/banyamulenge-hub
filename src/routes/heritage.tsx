@@ -510,7 +510,7 @@ function HeritageLanding() {
     <div className="flex min-h-screen flex-col bg-background font-heritage text-heritage-ink">
       <LandingNavbar />
 
-      <section className="relative isolate overflow-hidden bg-[#071A33]">
+      <section className="relative isolate overflow-hidden bg-heritage">
         {/* Full-width heritage background image */}
         <img
           src={groupImg}
@@ -519,19 +519,19 @@ function HeritageLanding() {
         />
 
         {/* Subtle navy overlay for contrast without hiding the photograph */}
-        <div className="absolute inset-0 bg-[#071A33]/45" />
+        <div className="absolute inset-0 bg-heritage/45" />
 
         {/* Gentle directional navy gradient for text readability */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#071A33]/80 via-[#071A33]/45 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-heritage-deep/80 via-heritage-deep/45 to-transparent" />
 
         {/* Subtle bottom gradient for visual depth */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#071A33]/35 via-transparent to-[#071A33]/10" />
+        <div className="absolute inset-0 bg-gradient-to-t from-heritage-deep/35 via-transparent to-heritage-deep/10" />
 
         {/* Hero content */}
         <div className="relative z-10 mx-auto flex min-h-[610px] max-w-7xl items-center px-4 pb-32 pt-16 sm:min-h-[650px] sm:px-6 sm:pb-36 lg:px-8">
           <div className="max-w-3xl">
             {/* Heritage label */}
-            <span className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-[#071A33]/40 px-4 py-2 text-xs font-semibold text-white shadow-sm backdrop-blur-sm">
+            <span className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-heritage/40 px-4 py-2 text-xs font-semibold text-white shadow-sm backdrop-blur-sm">
               <MapPin className="h-3.5 w-3.5 text-white" />
               {t("heritage.title")}
             </span>
@@ -555,10 +555,10 @@ function HeritageLanding() {
               <Button
                 asChild
                 size="lg"
-                className="rounded-md border border-white bg-white px-6 font-semibold text-[#071A33] shadow-lg transition hover:bg-white/90 hover:text-[#071A33]"
+                className="rounded-md border border-white bg-heritage px-6 font-semibold text-white shadow-lg transition hover:bg-heritage-deep hover:text-white"
               >
                 <Link to="/auth" search={{ mode: "signup" }}>
-                  {t("land.cta.join", "Create your free account")}
+                  {t("land.cta.join", "Create account")}
                   <ArrowRight className="h-4 w-4" />
                 </Link>
               </Button>
@@ -567,7 +567,7 @@ function HeritageLanding() {
                 asChild
                 size="lg"
                 variant="outline"
-                className="rounded-md border border-white/50 bg-[#071A33]/25 px-6 font-semibold text-white backdrop-blur-sm transition hover:border-white hover:bg-white/15 hover:text-white"
+                className="rounded-md border border-white/50 bg-heritage/25 px-6 font-semibold text-white backdrop-blur-sm transition hover:border-white hover:bg-white/15 hover:text-white"
               >
                 <a href="#story">
                   {t("land.cta.read", "Read our story")}

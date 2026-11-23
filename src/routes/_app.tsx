@@ -243,7 +243,7 @@ function AppLayout() {
           <div
             className={`h-16 flex items-center border-b ${sidebarOpen ? "px-5" : "justify-center px-2"}`}
           >
-            <Link to="/" className="flex items-center gap-2 min-w-0">
+            <Link to="/heritage" className="flex items-center gap-2 min-w-0">
               {sidebarOpen ? (
                 <Logo variant="horizontal" className="h-12 w-auto max-w-[220px] object-contain" />
               ) : (
@@ -316,7 +316,7 @@ function AppLayout() {
           }`}
         >
           <div className="h-16 flex items-center justify-between px-5 border-b">
-            <Link to="/" className="flex items-center gap-2" onClick={() => setMobileOpen(false)}>
+            <Link to="/heritage" className="flex items-center gap-2" onClick={() => setMobileOpen(false)}>
               <Logo variant="horizontal" className="h-12 w-auto max-w-[220px] object-contain" />
             </Link>
             <button onClick={() => setMobileOpen(false)} className="text-gray-500">

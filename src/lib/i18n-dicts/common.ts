@@ -59,7 +59,7 @@ export const common: ModuleDict = {
     "land.nav.lineages": "Lineages",
     "land.nav.subtribes": "Subtribes",
     "land.enterApp": "Enter the hub",
-    "land.cta.join": "Create your free account",
+    "land.cta.join": "Create account",
     "land.cta.read": "Read our story",
     "land.cta.title": "Be part of the story",
     "land.cta.sub":
@@ -157,7 +157,7 @@ export const common: ModuleDict = {
     "land.nav.lineages": "Koo",
     "land.nav.subtribes": "Makabila madogo",
     "land.enterApp": "Ingia kwenye jukwaa",
-    "land.cta.join": "Fungua akaunti bila malipo",
+    "land.cta.join": "Fungua akaunti",
     "land.cta.read": "Soma historia yetu",
     "land.cta.title": "Kuwa sehemu ya historia",
     "land.cta.sub":
@@ -256,7 +256,7 @@ export const common: ModuleDict = {
     "land.nav.lineages": "Imiryango",
     "land.nav.subtribes": "Amashyanga",
     "land.enterApp": "Injira mu rubuga",
-    "land.cta.join": "Fungura konti ku buntu",
+    "land.cta.join": "Fungura konti",
     "land.cta.read": "Soma inkuru yacu",
     "land.cta.title": "Ba umwe mu nkuru yacu",
     "land.cta.sub":
