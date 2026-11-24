@@ -518,20 +518,15 @@ function HeritageLanding() {
           className="absolute inset-0 h-full w-full object-cover object-[62%_center]"
         />
 
-        {/* Subtle navy overlay for contrast without hiding the photograph */}
-        <div className="absolute inset-0 bg-heritage/45" />
+        {/* Subtle navy blue overlay for contrast while preserving photograph visibility */}
+        <div className="absolute inset-0 bg-[#0B1F3A]/70" />
 
-        {/* Gentle directional navy gradient for text readability */}
-        <div className="absolute inset-0 bg-gradient-to-r from-heritage-deep/80 via-heritage-deep/45 to-transparent" />
-
-        {/* Subtle bottom gradient for visual depth */}
-        <div className="absolute inset-0 bg-gradient-to-t from-heritage-deep/35 via-transparent to-heritage-deep/10" />
 
         {/* Hero content */}
         <div className="relative z-10 mx-auto flex min-h-[610px] max-w-7xl items-center px-4 pb-32 pt-16 sm:min-h-[650px] sm:px-6 sm:pb-36 lg:px-8">
           <div className="max-w-3xl">
             {/* Heritage label */}
-            <span className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-heritage/40 px-4 py-2 text-xs font-semibold text-white shadow-sm backdrop-blur-sm">
+            <span className="inline-flex items-center gap-2 rounded-xl border border-white/25  px-3 py-2 text-xs font-semibold text-white shadow-sm backdrop-blur-sm">
               <MapPin className="h-3.5 w-3.5 text-white" />
               {t("heritage.title")}
             </span>
