@@ -8,6 +8,13 @@
       "when": 1791362483239,
       "tag": "0000_replies_and_reposts",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1795553936071,
+      "tag": "0001_tighten_open_read_policies",
+      "breakpoints": true
     }
   ]
 }
